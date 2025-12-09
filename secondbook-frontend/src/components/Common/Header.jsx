@@ -1,32 +1,36 @@
 // secondbook-frontend/src/components/Common/Header.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Search, User } from 'lucide-react'; // Using lucide-react for icons
+// NOTE: Importing ShoppingCart instead of Search
+import { BookOpen, ShoppingCart, User } from 'lucide-react';
 
 const Header = () => {
     return (
-        <header className="bg-white shadow-md sticky top-0 z-10">
+        <header className="bg-white shadow-lg sticky top-0 z-10 border-b-4 border-cyan-400">
             <div className="page-container flex items-center justify-between py-4">
                 {/* Logo/Brand */}
-                <Link to="/" className="flex items-center space-x-2 text-2xl font-bold text-gray-800">
-                    <BookOpen className="w-7 h-7 text-indigo-600" />
-                    <span>SecondBook</span>
+                <Link to="/" className="flex items-center space-x-2 text-3xl font-extrabold text-gray-800">
+                    <BookOpen className="w-8 h-8 text-cyan-500" />
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-teal-500">SecondBook</span>
                 </Link>
 
-                {/* Navigation */}
-                <nav className="hidden md:flex space-x-8 text-lg">
-                    <Link to="/" className="text-gray-600 hover:text-indigo-600 transition duration-150">Home</Link>
-                    <Link to="/books" className="text-gray-600 hover:text-indigo-600 transition duration-150">Browse Books</Link>
-                    <Link to="/donate" className="text-gray-600 hover:text-indigo-600 transition duration-150">Donate</Link>
+                {/* Navigation - INCREASED DISTANCE TO space-x-16 */}
+                <nav className="hidden md:flex space-x-16 text-lg font-medium">
+                    <Link to="/" className="text-gray-600 hover:text-cyan-500 transition duration-150">Home</Link>
+                    <Link to="/books" className="text-gray-600 hover:text-cyan-500 transition duration-150">Browse Books</Link>
+                    <Link to="/donate" className="text-gray-600 hover:text-cyan-500 transition duration-150">Donate</Link>
                 </nav>
 
                 {/* Icons/Actions */}
                 <div className="flex items-center space-x-4">
-                    <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition">
-                        <Search className="w-5 h-5" />
+                    {/* NEW: Shopping Cart (Trolley) Button */}
+                    <button className="p-2 rounded-full text-gray-600 hover:bg-cyan-50 transition">
+                        <ShoppingCart className="w-6 h-6" />
                     </button>
-                    <Link to="/dashboard" className="p-2 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">
-                        <User className="w-5 h-5" />
+
+                    {/* User/Profile Button (Retains pink accent) */}
+                    <Link to="/dashboard" className="p-2 rounded-full text-white bg-pink-500 hover:bg-pink-600 transition shadow-md">
+                        <User className="w-6 h-6" />
                     </Link>
                 </div>
             </div>
