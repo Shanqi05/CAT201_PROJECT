@@ -1,0 +1,52 @@
+[
+  {
+    "id": "101",
+    "title": "The Midnight Library",
+    "author": "Matt Haig",
+    "price": 14.50,
+    "category": "Fiction",
+    "condition": "Excellent",
+    "imageUrl": "https://via.placeholder.com/200x300?text=Midnight+Library",
+    "rating": 4.5
+  },
+  {
+    "id": "102",
+    "title": "Sapiens: A Brief History of Humankind",
+    "author": "Yuval Noah Harari",
+    "price": 18.99,
+    "category": "Non-Fiction",
+    "condition": "Good",
+    "imageUrl": "https://via.placeholder.com/200x300?text=Sapiens",
+    "rating": 4.7
+  },
+  {
+    "id": "103",
+    "title": "Where the Crawdads Sing",
+    "author": "Delia Owens",
+    "price": 12.99,
+    "category": "Mystery",
+    "condition": "Very Good",
+    "imageUrl": "https://via.placeholder.com/200x300?text=Crawdads",
+    "rating": 4.3
+  },
+  {
+    "id": "104",
+    "title": "Educated: A Memoir",
+    "author": "Tara Westover",
+    "price": 11.00,
+    "category": "Non-Fiction",
+    "condition": "Good",
+    "imageUrl": "https://via.placeholder.com/200x300?text=Educated",
+    "rating": 4.6
+  },
+  {
+    "id": "105",
+    "title": "The Secret Garden",
+    "author": "Frances Hodgson Burnett",
+    "price": 7.50,
+    "category": "Children",
+    "condition": "Excellent",
+    "imageUrl": "https://via.placeholder.com/200x300?text=Garden",
+    "rating": 4.2
+  }
+]
