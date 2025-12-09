@@ -1,0 +1,18 @@
+/* secondbook-frontend/src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global custom styles or font imports can go here */
+
+body {
+    font-family: 'Inter', sans-serif; /* Placeholder for a nice, modern font */
+    background-color: #f7f9fc; /* Light background for the bookstore */
+}
+
+/* Custom class for the main page container */
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
