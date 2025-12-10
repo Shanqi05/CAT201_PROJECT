@@ -4,22 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0519f6b5-f95e-47ec-9c9b-58205dfb2aec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/AddBookServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/LoginServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/LogoutServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/PurchaseServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/dao/BookDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/dao/OrderDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/dao/UserDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/model/Book.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/model/Order.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/model/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/util/DBConnection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/webapp/index.jsp" afterDir="false" />
+    <list default="true" id="0519f6b5-f95e-47ec-9c9b-58205dfb2aec" name="Changes" comment="backend: Data access object, models and DB connection">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/AddBookServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddBookServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/LoginServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/LoginServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/LogoutServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/LogoutServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/PurchaseServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/PurchaseServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/dao/BookDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/BookDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/dao/OrderDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/OrderDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/dao/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/model/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/model/Book.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/model/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/model/Order.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/model/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/util/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/util/DBConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main/webapp/index.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/index.jsp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +63,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.BookDAO.executor": "Run",
+    "Application.OrderDAO.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Node.js.Footer.jsx.executor": "Run",
     "Node.js.ProfilePage.jsx.executor": "Run",
@@ -130,9 +130,30 @@
       <workItem from="1765288725733" duration="3822000" />
       <workItem from="1765295307215" duration="630000" />
     </task>
+    <task id="LOCAL-00001" summary="backend: Data access object, models and DB connection">
+      <option name="closed" value="true" />
+      <created>1765385203836</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1765385203836</updated>
+    </task>
+    <task id="LOCAL-00002" summary="backend: Data access object, models and DB connection">
+      <option name="closed" value="true" />
+      <created>1765385295499</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1765385295499</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="backend: Data access object, models and DB connection" />
+    <option name="LAST_COMMIT_MESSAGE" value="backend: Data access object, models and DB connection" />
   </component>
 </project>
