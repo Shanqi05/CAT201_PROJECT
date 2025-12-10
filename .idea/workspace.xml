@@ -5,10 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0519f6b5-f95e-47ec-9c9b-58205dfb2aec" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/AddBookServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/LoginServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/LogoutServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/controller/PurchaseServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/dao/BookDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/dao/OrderDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/dao/UserDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/model/Book.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/model/Order.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/model/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/java/com/bookstore/util/DBConnection.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/main/webapp/index.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/BookCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/BookCard.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Header.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/HomePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/HomePage.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,12 +47,12 @@
     &quot;assignee&quot;: &quot;Shanqi05&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Shanqi05/CAT201_PROJECT.git&quot;,
-    &quot;accountId&quot;: &quot;3a94ad1a-b456-46d6-88ad-ea2cf1a41213&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Shanqi05/CAT201_PROJECT",
+    "accountId": "20c9cc52-4f58-494c-9e36-991954e26f7e"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
@@ -50,28 +61,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Node.js.Footer.jsx.executor&quot;: &quot;Run&quot;,
-    &quot;Node.js.ProfilePage.jsx.executor&quot;: &quot;Run&quot;,
-    &quot;Node.js.main.jsx.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/CAT201_PROJECT&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.BookDAO.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Node.js.Footer.jsx.executor": "Run",
+    "Node.js.ProfilePage.jsx.executor": "Run",
+    "Node.js.main.jsx.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/User/IdeaProjects/Clone_CAT201_project",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\User\IdeaProjects\Clone_CAT201_project" />
+      <recent name="C:\Users\User\IdeaProjects\Clone_CAT201_project\secondbook-frontend\src" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\User\CAT201_PROJECT\secondbook-frontend\node_modules" />
       <recent name="C:\Users\User\CAT201_PROJECT\secondbook-frontend\src\pages\Auth" />
@@ -96,8 +115,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.27397.103" />
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.27397.103" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
       </set>
     </attachedChunks>
   </component>
