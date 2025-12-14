@@ -4,6 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="0519f6b5-f95e-47ec-9c9b-58205dfb2aec" name="Changes" comment="">
       <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/api/accessories.json" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/assets/images/member.png" afterDir="false" />
@@ -18,6 +19,10 @@
       <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/main.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/DonationPage.jsx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/HomePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/HomePage.jsx" afterDir="false" />
+=======
+    <list default="true" id="0519f6b5-f95e-47ec-9c9b-58205dfb2aec" name="Changes" comment="Backend folder location changed">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+>>>>>>> e46c12991689e1ce6d925402174497c991da4a0e
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,12 +50,12 @@
     &quot;assignee&quot;: &quot;Shanqi05&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Shanqi05/CAT201_PROJECT.git&quot;,
-    &quot;accountId&quot;: &quot;3a94ad1a-b456-46d6-88ad-ea2cf1a41213&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Shanqi05/CAT201_PROJECT",
+    "accountId": "20c9cc52-4f58-494c-9e36-991954e26f7e"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
@@ -61,27 +66,52 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+<<<<<<< HEAD
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Node.js.Footer.jsx.executor": "Run",
     "Node.js.HomePage.jsx.executor": "Run",
+=======
+    "Application.BookDAO.executor": "Run",
+    "Application.OrderDAO.executor": "Run",
+    "Application.UserDAO.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Node.js.Footer.jsx.executor": "Run",
+>>>>>>> e46c12991689e1ce6d925402174497c991da4a0e
     "Node.js.ProfilePage.jsx.executor": "Run",
     "Node.js.main.jsx.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
+<<<<<<< HEAD
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/User/CAT201_PROJECT",
+=======
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/User/IdeaProjects/Clone_CAT201_project",
+>>>>>>> e46c12991689e1ce6d925402174497c991da4a0e
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+<<<<<<< HEAD
+=======
+    "to.speed.mode.migration.done": "true",
+>>>>>>> e46c12991689e1ce6d925402174497c991da4a0e
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\User\IdeaProjects\Clone_CAT201_project" />
+      <recent name="C:\Users\User\IdeaProjects\Clone_CAT201_project\secondbook-frontend\src" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\User\CAT201_PROJECT\secondbook-frontend\src\assets\images" />
       <recent name="C:\Users\User\CAT201_PROJECT\secondbook-frontend\node_modules" />
@@ -117,8 +147,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.27397.103" />
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.27397.103" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
       </set>
     </attachedChunks>
   </component>
@@ -136,9 +165,39 @@
       <workItem from="1765680751111" duration="2000" />
       <workItem from="1765688971911" duration="5162000" />
     </task>
+    <task id="LOCAL-00001" summary="backend: Data access object, models and DB connection">
+      <option name="closed" value="true" />
+      <created>1765385203836</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1765385203836</updated>
+    </task>
+    <task id="LOCAL-00002" summary="backend: Data access object, models and DB connection">
+      <option name="closed" value="true" />
+      <created>1765385295499</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1765385295499</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Backend folder location changed">
+      <option name="closed" value="true" />
+      <created>1765385799199</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1765385799199</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="backend: Data access object, models and DB connection" />
+    <MESSAGE value="Backend folder location changed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Backend folder location changed" />
   </component>
 </project>
