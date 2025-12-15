@@ -3,23 +3,21 @@ import { Routes, Route } from 'react-router-dom';
 import Header from './components/Common/Header';
 import Footer from './components/Common/Footer';
 
-// --- 1. YOUR FRIEND'S PAGES ---
+// --- 1. IMPORT ALL PAGES ---
 import HomePage from './pages/User/HomePage';
 import ProductListingPage from './pages/User/ProductListingPage';
 import ProductDetailPage from './pages/User/ProductDetailPage';
 import AccessoriesPage from './pages/User/AccessoriesPage';
 import AboutUsPage from './pages/User/AboutUsPage';
 import SearchResultsPage from './pages/User/SearchResultsPage';
-
-// --- 2. YOUR NEW PAGES (Login, Cart, Checkout) ---
 import LoginPage from './pages/User/LoginPage';
 import RegisterPage from './pages/User/RegisterPage';
-import UserDashboardPage from './pages/User/UserDashboardPage';
+import UserDashboardPage from './pages/User/UserDashboardPage'; // <--- CRITICAL
 import CartPage from './pages/User/CartPage';
 import CheckoutPage from './pages/User/CheckoutPage';
 import OrderSuccessPage from './pages/User/OrderSuccessPage';
 
-// --- 3. SECURITY WRAPPER ---
+// --- 2. IMPORT SECURITY ---
 import ProtectedRoute from './components/Common/ProtectedRoute';
 
 function App() {
@@ -29,23 +27,17 @@ function App() {
 
             <main className="flex-grow bg-gray-50 min-h-[80vh] py-8">
                 <Routes>
-                    {/* === PUBLIC ROUTES (Everyone can see) === */}
+                    {/* Public Routes */}
                     <Route path="/" element={<HomePage />} />
                     <Route path="/books" element={<ProductListingPage />} />
                     <Route path="/books/:id" element={<ProductDetailPage />} />
-
-                    {/* Friend's New Routes */}
-                    <Route path="/search" element={<SearchResultsPage />} />
                     <Route path="/accessories" element={<AccessoriesPage />} />
                     <Route path="/about" element={<AboutUsPage />} />
-
-                    {/* Authentication */}
+                    <Route path="/search" element={<SearchResultsPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
 
-                    {/* === PROTECTED ROUTES (Must be logged in) === */}
-
-                    {/* Dashboard */}
+                    {/* --- PROTECTED ROUTES (This is the missing road!) --- */}
                     <Route
                         path="/dashboard"
                         element={
@@ -54,8 +46,6 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-
-                    {/* Cart & Checkout Flow */}
                     <Route
                         path="/cart"
                         element={
