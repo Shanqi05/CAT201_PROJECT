@@ -5,7 +5,7 @@ import { User, BookOpen, Settings, LogOut, MapPin, Trash2, Camera, Plus, Lock, E
 
 const UserDashboardPage = () => {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('orders'); // Defaults to 'orders' so you can see the change immediately
+    const [activeTab, setActiveTab] = useState('profile'); // Defaults to 'orders' so you can see the change immediately
 
     // --- DATA STATES ---
     const [userData, setUserData] = useState(null);
@@ -205,103 +205,127 @@ const UserDashboardPage = () => {
             case 'orders':
                 return (
                     <div className="space-y-8 animate-fadeIn">
-                        <h2 className="text-3xl font-bold text-gray-900">Order History</h2>
+                        <div className="flex items-end gap-4">
+                            <h2 className="text-3xl font-bold text-gray-900">Order History</h2>
+                            <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-bold">
+                                {orders.length} orders
+                            </span>
+                        </div>
+
                         {orders.length === 0 ? (
-                            <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
-                                <Package className="mx-auto w-16 h-16 text-gray-300 mb-4" />
+                            // --- EMPTY STATE ---
+                            <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
+                                <Package className="mx-auto w-16 h-16 text-gray-200 mb-4" />
                                 <h3 className="text-xl font-bold text-gray-800">No Orders Yet</h3>
-                                <p className="text-gray-500">Looks like you haven't bought anything yet.</p>
-                                <button onClick={() => navigate('/books')} className="mt-6 px-6 py-2 bg-cyan-600 text-white rounded-lg font-bold hover:bg-cyan-700">Start Shopping</button>
+                                <p className="text-gray-400 mb-6">You haven't purchased anything yet.</p>
+                                <button onClick={() => navigate('/books')} className="px-8 py-3 bg-cyan-600 text-white rounded-xl font-bold hover:bg-cyan-700 shadow-md transition">
+                                    Start Shopping
+                                </button>
                             </div>
                         ) : (
+                            // --- ORDER LIST ---
                             orders.map((order) => {
-                                // --- CALCULATE SHIPPING ---
+                                // 1. Calculate Costs
                                 const subtotal = order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
                                 const shippingFee = order.total - subtotal;
 
+                                // 2. Determine Colors based on status
+                                const isDelivered = order.status === 'Delivered';
+                                const statusColor = isDelivered
+                                    ? "bg-green-100 text-green-700 border-green-200"
+                                    : "bg-blue-50 text-blue-600 border-blue-100";
+                                const headerGradient = isDelivered
+                                    ? "from-green-50 to-white"
+                                    : "from-blue-50 to-white";
+
                                 return (
-                                    <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300 mb-6">
-                                        {/* HEADER */}
-                                        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Order ID</span>
-                                                <span className="text-lg font-black text-gray-800">{order.id}</span>
+                                    <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 mb-8 transform hover:-translate-y-1">
+
+                                        {/* HEADER: Gradient Background */}
+                                        <div className={`bg-gradient-to-r ${headerGradient} px-6 py-4 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4`}>
+                                            <div className="flex flex-col">
+                                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Order ID</span>
+                                                <span className="text-lg font-black text-gray-800">#{order.id}</span>
                                             </div>
 
-                                            <div className="flex items-center gap-6">
-                                                <div className="flex items-center gap-2 text-sm text-gray-600 bg-white px-3 py-1 rounded-md border border-gray-200">
-                                                    <Calendar className="w-4 h-4 text-cyan-500"/>
-                                                    {order.date}
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-right hidden sm:block">
+                                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Date Placed</p>
+                                                    <div className="flex items-center justify-end gap-2 text-sm font-medium text-gray-600">
+                                                        <Calendar className="w-4 h-4 text-cyan-500"/> {order.date}
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-2 text-sm text-gray-600 bg-white px-3 py-1 rounded-md border border-gray-200">
-                                                    <Clock className="w-4 h-4 text-cyan-500"/>
-                                                    {order.time || "10:00 AM"}
-                                                </div>
-                                            </div>
 
-                                            <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2
-                                                ${order.status === 'Delivered' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-blue-100 text-blue-700 border border-blue-200'}`}>
-                                                {order.status === 'Delivered' ? <CheckCircle className="w-4 h-4"/> : <Truck className="w-4 h-4"/>}
-                                                {order.status}
+                                                <span className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border flex items-center gap-2 ${statusColor}`}>
+                                                    {isDelivered ? <CheckCircle size={16}/> : <Truck size={16}/>}
+                                                    {order.status}
+                                                </span>
                                             </div>
                                         </div>
 
                                         {/* BODY */}
                                         <div className="p-6">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-                                                <div>
-                                                    <p className="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center"><MapPin className="w-3 h-3 mr-1"/> Delivery To</p>
-                                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                                                        <p className="text-gray-800 text-sm font-medium leading-relaxed">
-                                                            {order.address || "123, Default Street, Penang"}
+                                            {/* Top Section: Address & Payment */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 pb-6 border-b border-gray-100">
+                                                <div className="flex items-start gap-3">
+                                                    <div className="bg-gray-100 p-2 rounded-full text-gray-500">
+                                                        <MapPin size={18} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-bold text-gray-900">Delivery Address</p>
+                                                        <p className="text-sm text-gray-500 leading-relaxed mt-1">
+                                                            {order.address || "No address provided"}
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div>
-                                                    <p className="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center"><CreditCard className="w-3 h-3 mr-1"/> Payment Info</p>
-                                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between">
-                                                        <span className="text-gray-700 text-sm">{order.paymentMethod || "Credit Card"}</span>
-                                                        <span className="font-bold text-gray-900">RM {order.total.toFixed(2)}</span>
+
+                                                <div className="flex items-start gap-3">
+                                                    <div className="bg-gray-100 p-2 rounded-full text-gray-500">
+                                                        <CreditCard size={18} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-bold text-gray-900">Payment Method</p>
+                                                        <p className="text-sm text-gray-500 mt-1">
+                                                            {order.paymentMethod || "Credit Card"}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="border-t border-gray-100 pt-4">
-                                                <p className="text-xs font-bold text-gray-400 uppercase mb-3">Items Purchased</p>
-                                                <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-                                                    {order.items && order.items.map((item, idx) => (
-                                                        <div key={idx} className="flex justify-between items-center text-sm group">
-                                                            <div className="flex items-center">
-                                                                <span className="bg-white border border-gray-200 w-8 h-8 flex items-center justify-center rounded-md text-xs font-bold text-gray-500 mr-3">
-                                                                    {item.quantity}x
-                                                                </span>
-                                                                <span className="text-gray-700 font-medium group-hover:text-cyan-600 transition">{item.title}</span>
-                                                            </div>
-                                                            <span className="text-gray-900 font-bold">
-                                                                RM {(item.price * item.quantity).toFixed(2)}
+                                            {/* Middle Section: Items */}
+                                            <div className="space-y-3 mb-6">
+                                                {order.items.map((item, idx) => (
+                                                    <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl hover:bg-cyan-50 transition-colors group">
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-xs font-bold text-gray-600 border border-gray-100">
+                                                                {item.quantity}x
                                                             </span>
+                                                            <div>
+                                                                <p className="text-sm font-bold text-gray-800 group-hover:text-cyan-700 transition-colors">{item.title}</p>
+                                                            </div>
                                                         </div>
-                                                    ))}
-
-                                                    {/* --- SUBTOTAL & SHIPPING --- */}
-                                                    <div className="border-t border-dashed border-gray-300 my-4"></div>
-
-                                                    <div className="flex justify-between items-center text-sm text-gray-500">
-                                                        <span>Subtotal</span>
-                                                        <span>RM {subtotal.toFixed(2)}</span>
+                                                        <span className="text-sm font-bold text-gray-900">
+                                                            RM {(item.price * item.quantity).toFixed(2)}
+                                                        </span>
                                                     </div>
+                                                ))}
+                                            </div>
 
-                                                    <div className="flex justify-between items-center text-sm text-gray-500">
-                                                        <span>Shipping Fee</span>
-                                                        <span>RM {shippingFee > 0 ? shippingFee.toFixed(2) : "0.00"}</span>
-                                                    </div>
-
-                                                    <div className="border-t border-gray-200 my-2"></div>
-
-                                                    <div className="flex justify-between items-center text-base pt-1">
-                                                        <span className="font-bold text-gray-800">Total Paid</span>
-                                                        <span className="font-black text-cyan-600 text-lg">RM {order.total.toFixed(2)}</span>
-                                                    </div>
+                                            {/* Bottom Section: Total */}
+                                            <div className="flex flex-col items-end gap-1 pt-2">
+                                                <div className="flex justify-between w-full md:w-1/3 text-sm text-gray-400">
+                                                    <span>Subtotal</span>
+                                                    <span>RM {subtotal.toFixed(2)}</span>
+                                                </div>
+                                                <div className="flex justify-between w-full md:w-1/3 text-sm text-gray-400">
+                                                    <span>Shipping</span>
+                                                    <span>{shippingFee === 0 ? "Free" : `RM ${shippingFee.toFixed(2)}`}</span>
+                                                </div>
+                                                <div className="flex justify-between w-full md:w-1/3 items-center mt-2 pt-3 border-t border-gray-100">
+                                                    <span className="font-bold text-gray-800">Total Paid</span>
+                                                    <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-blue-600">
+                                                        RM {order.total.toFixed(2)}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>

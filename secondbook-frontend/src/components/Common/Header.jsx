@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, ShoppingCart, ChevronDown, LogOut, LogIn } from 'lucide-react';
+// Removed ChevronDown from the imports below
+import { BookOpen, ShoppingCart, LogOut, LogIn } from 'lucide-react';
 import { getCartCount } from '../../utils/cartUtils';
 
 const Header = () => {
@@ -62,13 +63,12 @@ const Header = () => {
                                 onMouseEnter={() => setIsDropdownOpen(true)}
                                 onMouseLeave={() => setIsDropdownOpen(false)}
                             >
-                                {/* MAIN BUTTON - NOW CLICKABLE */}
+                                {/* MAIN BUTTON - Arrow Removed */}
                                 <Link
                                     to="/dashboard"
                                     className="flex items-center py-3 px-5 text-gray-800 hover:bg-pink-100 hover:text-pink-600 cursor-pointer"
                                 >
                                     My Account
-                                    <ChevronDown className="w-4 h-4 ml-1" />
                                 </Link>
 
                                 {/* DROPDOWN MENU */}

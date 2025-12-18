@@ -1,20 +1,36 @@
-// secondbook-frontend/src/pages/User/ProductDetailPage.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ProductImageGallery from '../../components/Products/ProductImageGallery';
-import { Heart, Star, ShoppingCart } from 'lucide-react';
+import { Heart, Star, ShoppingCart, Check } from 'lucide-react';
+
+// 1. IMPORT YOUR UTILS
+import { addToCart } from '../../utils/cartUtils';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
+    const [isAdded, setIsAdded] = useState(false); // For button animation
 
-    // Placeholder Data
+    // 2. YOUR PLACEHOLDER DATA
     const book = {
+        id: id || "1",
         title: "Where the Crawdads Sing (Preloved Edition)",
         author: "Delia Owens",
-        price: 15.50,
+        price: 15.50, // Ensure this is a number, not a string
         condition: "Good - Minor cover wear",
-        description: "A beautiful coming-of-age story and a mystery, exploring the life of an abandoned girl who raises herself in the marshlands of North Carolina. This preloved copy is ready for a new reader.",
-        id: id,
+        description: "A beautiful coming-of-age story and a mystery...",
+        imageUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800",
+        // Added stock just in case your utils check for it (optional)
+        stock: 5
+    };
+
+    // 3. HANDLE ADD TO CART
+    const handleAddToCart = () => {
+        // Use the function from your utils file
+        addToCart(book, 1);
+
+        // Visual feedback (Button turns green)
+        setIsAdded(true);
+        setTimeout(() => setIsAdded(false), 2000);
     };
 
     return (
@@ -35,16 +51,29 @@ const ProductDetailPage = () => {
                         {/* Price & Actions */}
                         <div className="flex items-center space-x-8 border-t pt-4">
                             <span className="text-5xl font-bold text-indigo-600">${book.price.toFixed(2)}</span>
-                            <button className="flex items-center bg-green-500 text-white font-bold py-3 px-8 rounded-full text-xl hover:bg-green-600 transition shadow-lg">
-                                <ShoppingCart className="w-5 h-5 mr-2" />
-                                Add to Cart
+
+                            {/* --- THE CONNECTED BUTTON --- */}
+                            <button
+                                onClick={handleAddToCart}
+                                disabled={isAdded}
+                                className={`flex items-center font-bold py-3 px-8 rounded-full text-xl transition shadow-lg transform active:scale-95
+                                    ${isAdded ? 'bg-green-600 text-white' : 'bg-green-500 text-white hover:bg-green-600'}
+                                `}
+                            >
+                                {isAdded ? (
+                                    <><Check className="w-6 h-6 mr-2" /> Added!</>
+                                ) : (
+                                    <><ShoppingCart className="w-5 h-5 mr-2" /> Add to Cart</>
+                                )}
                             </button>
+                            {/* --------------------------- */}
+
                             <button className="p-3 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
                                 <Heart className="w-6 h-6" />
                             </button>
                         </div>
 
-                        {/* Condition and Rating */}
+                        {/* Details... */}
                         <div className="text-lg space-y-1">
                             <p className="text-gray-800">Condition: <span className="font-semibold text-green-700">{book.condition}</span></p>
                             <div className="flex items-center text-yellow-500">
@@ -57,7 +86,6 @@ const ProductDetailPage = () => {
                             </div>
                         </div>
 
-                        {/* Description */}
                         <div className="pt-4 border-t">
                             <h2 className="text-2xl font-bold mb-3 text-gray-800">Overview</h2>
                             <p className="text-gray-700 leading-relaxed">{book.description}</p>
