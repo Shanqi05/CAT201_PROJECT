@@ -24,13 +24,6 @@ const DashboardSidebar = ({ items, active, setActive }) => {
                     </button>
                 );
             })}
-
-            <div className="pt-4 border-t border-gray-100">
-                <button className="w-full flex items-center p-3 rounded-lg text-left text-red-500 hover:bg-red-50 transition">
-                    <LogOut className="w-5 h-5 mr-3" />
-                    Logout (Placeholder)
-                </button>
-            </div>
         </div>
     );
 };

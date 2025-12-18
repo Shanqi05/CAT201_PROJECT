@@ -16,7 +16,6 @@ const Footer = () => {
                         <h4 className="font-bold text-lg mb-4">Explore</h4>
                         <ul className="space-y-2 text-gray-400 text-sm">
                             <li><a href="/books" className="hover:text-indigo-400">All Books</a></li>
-                            <li><a href="/donate" className="hover:text-indigo-400">How to Donate</a></li>
                             <li><a href="/dashboard" className="hover:text-indigo-400">My Dashboard</a></li>
                         </ul>
                     </div>
