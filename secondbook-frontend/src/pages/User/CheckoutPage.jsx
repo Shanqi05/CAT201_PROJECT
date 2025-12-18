@@ -303,7 +303,7 @@ const CheckoutPage = () => {
                 <div className="md:col-span-1">
                     <div className="bg-white p-6 rounded-lg shadow-md sticky top-24 border border-gray-100">
                         <h2 className="text-xl font-bold mb-4 text-gray-800">Order Summary</h2>
-                        
+
                         {/* Items List */}
                         <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                             {cartItems.map((item, index) => (
