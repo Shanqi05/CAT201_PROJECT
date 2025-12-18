@@ -1,7 +1,12 @@
 // secondbook-frontend/src/components/Common/Footer.jsx
-import React from 'react';
+import React, { useState } from 'react';
+import TermsModal from './TermsModal';
+import PrivacyModal from './PrivacyModal';
 
 const Footer = () => {
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+    
     return (
         <footer className="bg-gray-800 text-white mt-auto">
             <div className="page-container py-10">
@@ -31,8 +36,22 @@ const Footer = () => {
                     <div>
                         <h4 className="font-bold text-lg mb-4">Legal</h4>
                         <ul className="space-y-2 text-gray-400 text-sm">
-                            <li>Privacy Policy</li>
-                            <li>Terms of Service</li>
+                            <li>
+                                <button 
+                                    onClick={() => setShowPrivacyModal(true)}
+                                    className="hover:text-indigo-400 cursor-pointer"
+                                >
+                                    Privacy Policy
+                                </button>
+                            </li>
+                            <li>
+                                <button 
+                                    onClick={() => setShowTermsModal(true)}
+                                    className="hover:text-indigo-400 cursor-pointer"
+                                >
+                                    Terms and Conditions
+                                </button>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -40,6 +59,10 @@ const Footer = () => {
                     &copy; {new Date().getFullYear()} SecondBook. All rights reserved.
                 </div>
             </div>
+            
+            {/* Modals */}
+            {showTermsModal && <TermsModal onClose={() => setShowTermsModal(false)} />}
+            {showPrivacyModal && <PrivacyModal onClose={() => setShowPrivacyModal(false)} />}
         </footer>
     );
 };
