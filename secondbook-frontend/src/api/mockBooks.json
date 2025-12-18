@@ -7,7 +7,8 @@
     "category": "Fiction",
     "condition": "Excellent",
     "imageUrl": "https://via.placeholder.com/200x300?text=Midnight+Library",
-    "rating": 4.5
+    "rating": 4.5,
+    "stock": 15
   },
   {
     "id": "102",
@@ -17,7 +18,8 @@
     "category": "Non-Fiction",
     "condition": "Good",
     "imageUrl": "https://via.placeholder.com/200x300?text=Sapiens",
-    "rating": 4.7
+    "rating": 4.7,
+    "stock": 8
   },
   {
     "id": "103",
@@ -27,7 +29,8 @@
     "category": "Mystery",
     "condition": "Very Good",
     "imageUrl": "https://via.placeholder.com/200x300?text=Crawdads",
-    "rating": 4.3
+    "rating": 4.3,
+    "stock": 12
   },
   {
     "id": "104",
@@ -37,7 +40,8 @@
     "category": "Non-Fiction",
     "condition": "Good",
     "imageUrl": "https://via.placeholder.com/200x300?text=Educated",
-    "rating": 4.6
+    "rating": 4.6,
+    "stock": 20
   },
   {
     "id": "105",
@@ -47,6 +51,7 @@
     "category": "Children",
     "condition": "Excellent",
     "imageUrl": "https://via.placeholder.com/200x300?text=Garden",
-    "rating": 4.2
+    "rating": 4.2,
+    "stock": 5
   }
 ]
