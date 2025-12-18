@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCartTotal } from '../../utils/cartUtils';
-import { CreditCard, Truck, MapPin, Landmark, Banknote, Save } from 'lucide-react';
+import { CreditCard, Truck, MapPin, Banknote, Save } from 'lucide-react'; // Removed Landmark
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
@@ -20,11 +20,10 @@ const CheckoutPage = () => {
         city: '',
         zip: '',
         paymentMethod: 'card', // Default
-        // Payment Details
+        // Payment Details (Card Only)
         cardNumber: '',
         cardExpiry: '',
-        cardCvc: '',
-        selectedBank: ''
+        cardCvc: ''
     });
 
     // --- 1. LOAD DATA ON MOUNT ---
@@ -36,11 +35,11 @@ const CheckoutPage = () => {
         const items = JSON.parse(localStorage.getItem("shoppingCart") || "[]");
         setCartItems(items);
 
-        // C. Load Saved Addresses (for the Dropdown)
+        // C. Load Saved Addresses
         const storedAddresses = JSON.parse(localStorage.getItem("userAddresses") || "[]");
         setSavedAddresses(storedAddresses);
 
-        // D. AUTO-FILL: Get Name/Phone from Registration Data
+        // D. AUTO-FILL
         const registeredUser = JSON.parse(localStorage.getItem("registeredUser"));
         if (registeredUser) {
             setFormData(prev => ({
@@ -55,7 +54,7 @@ const CheckoutPage = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // --- 2. HANDLE ADDRESS SELECTION (Dropdown) ---
+    // --- 2. HANDLE ADDRESS SELECTION ---
     const handleAddressSelect = (e) => {
         const index = e.target.value;
         if (index !== "") {
@@ -69,7 +68,6 @@ const CheckoutPage = () => {
                 zip: selected.zip
             }));
         } else {
-            // If they select "Select...", revert to Registered User data if available
             const registeredUser = JSON.parse(localStorage.getItem("registeredUser"));
             setFormData(prev => ({
                 ...prev,
@@ -88,19 +86,19 @@ const CheckoutPage = () => {
             return false;
         }
 
-        // Zip Code (5 Digits)
+        // Zip Code
         if (!/^\d{5}$/.test(formData.zip)) {
             alert("Invalid Zip Code! It must be exactly 5 digits (e.g., 11900).");
             return false;
         }
 
-        // Phone (Simple length check)
+        // Phone
         if (formData.phone.length < 10) {
             alert("Invalid Phone Number!");
             return false;
         }
 
-        // Payment Validation
+        // Payment Validation (Card Only)
         if (formData.paymentMethod === 'card') {
             if (!/^\d{16}$/.test(formData.cardNumber.replace(/\s/g, ''))) {
                 alert("Invalid Card Number! Must be 16 digits.");
@@ -114,14 +112,9 @@ const CheckoutPage = () => {
                 alert("Invalid Expiry! Use MM/YY.");
                 return false;
             }
-        } else if (formData.paymentMethod === 'online') {
-            if (!formData.selectedBank) {
-                alert("Please select your bank.");
-                return false;
-            }
         }
 
-        return true; // Passed
+        return true;
     };
 
     // --- 4. PLACE ORDER ---
@@ -130,7 +123,7 @@ const CheckoutPage = () => {
 
         if (!validateForm()) return;
 
-        // A. Save Address Logic (If Checked)
+        // A. Save Address Logic
         if (saveAddressChecked) {
             const newAddress = {
                 fullName: formData.fullName,
@@ -139,7 +132,6 @@ const CheckoutPage = () => {
                 city: formData.city,
                 zip: formData.zip
             };
-            // Avoid saving exact duplicates (Optional check)
             const isDuplicate = savedAddresses.some(addr =>
                 addr.address === newAddress.address && addr.zip === newAddress.zip
             );
@@ -152,13 +144,13 @@ const CheckoutPage = () => {
 
         // B. Create Order Object
         const newOrder = {
-            id: "ORD-" + Math.floor(Math.random() * 100000), // Random 5-digit ID
+            id: "ORD-" + Math.floor(Math.random() * 100000),
             date: new Date().toLocaleDateString(),
             items: cartItems,
             total: total + 5,
             status: "Processing",
             address: `${formData.address}, ${formData.city} ${formData.zip}`,
-            paymentMethod: formData.paymentMethod === 'cod' ? 'Cash on Delivery' : formData.paymentMethod
+            paymentMethod: formData.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Credit/Debit Card'
         };
 
         // C. Save to History
@@ -238,7 +230,6 @@ const CheckoutPage = () => {
                                     <Save size={16} className="mr-1"/> Save this address for future purchases
                                 </label>
                             </div>
-
                         </div>
                     </div>
 
@@ -268,33 +259,14 @@ const CheckoutPage = () => {
                                 )}
                             </div>
 
-                            {/* Option 2: Online Banking */}
-                            <div className={`border rounded-lg p-4 cursor-pointer transition ${formData.paymentMethod === 'online' ? 'border-cyan-500 bg-cyan-50' : 'hover:bg-gray-50'}`}>
-                                <label className="flex items-center space-x-3 cursor-pointer">
-                                    <input type="radio" name="paymentMethod" value="online" checked={formData.paymentMethod === 'online'} onChange={handleChange} className="text-cyan-600 focus:ring-cyan-500"/>
-                                    <span className="font-bold text-gray-700 flex items-center"><Landmark size={18} className="mr-2"/> Online Banking (FPX)</span>
-                                </label>
-
-                                {formData.paymentMethod === 'online' && (
-                                    <div className="mt-4 pt-4 border-t border-cyan-200">
-                                        <select name="selectedBank" onChange={handleChange} className="w-full p-2 border rounded bg-white">
-                                            <option value="">-- Select Your Bank --</option>
-                                            <option value="maybank">Maybank2u</option>
-                                            <option value="cimb">CIMB Clicks</option>
-                                            <option value="public">Public Bank</option>
-                                            <option value="rhb">RHB Now</option>
-                                        </select>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Option 3: COD */}
+                            {/* Option 2: COD */}
                             <div className={`border rounded-lg p-4 cursor-pointer transition ${formData.paymentMethod === 'cod' ? 'border-cyan-500 bg-cyan-50' : 'hover:bg-gray-50'}`}>
                                 <label className="flex items-center space-x-3 cursor-pointer">
                                     <input type="radio" name="paymentMethod" value="cod" checked={formData.paymentMethod === 'cod'} onChange={handleChange} className="text-cyan-600 focus:ring-cyan-500"/>
                                     <span className="font-bold text-gray-700 flex items-center"><Banknote size={18} className="mr-2"/> Cash on Delivery (COD)</span>
                                 </label>
                             </div>
+
                         </div>
                     </div>
                 </div>
