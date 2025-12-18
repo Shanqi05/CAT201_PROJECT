@@ -37,7 +37,7 @@ const Header = () => {
 
                 {/* LOGO */}
                 <div className="flex flex-col items-start">
-                    <Link to="/" className="flex items-center space-x-2 text-3xl font-black text-gray-800">
+                    <Link to="/home" className="flex items-center space-x-2 text-3xl font-black text-gray-800">
                         <BookOpen className="w-8 h-8 text-cyan-500" />
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-teal-500">
                             SecondBook
