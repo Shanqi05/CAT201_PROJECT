@@ -11,7 +11,7 @@ export const addToCart = (product, quantity = 1) => {
     if (existingItemIndex > -1) {
         // If yes, increase the quantity by the specified amount
         cart[existingItemIndex].quantity += quantity;
-        
+
         // Make sure we don't exceed stock
         if (product.stock && cart[existingItemIndex].quantity > product.stock) {
             cart[existingItemIndex].quantity = product.stock;
