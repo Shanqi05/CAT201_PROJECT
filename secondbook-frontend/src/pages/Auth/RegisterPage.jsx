@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, Mail, ShieldCheck } from 'lucide-react';
+import { UserPlus, Mail, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import TermsModal from '../../components/Common/TermsModal';
+import PrivacyModal from '../../components/Common/PrivacyModal';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
@@ -9,17 +11,67 @@ const RegisterPage = () => {
         email: '',
         username: '',
         password: '',
-        role: 'customer' // Default role
+        role: 'customer' // Default role - always customer
     });
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+
+    const validatePassword = (password) => {
+        const minLength = 8;
+        const hasLower = /[a-z]/.test(password);
+        const hasUpper = /[A-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        if (password.length < minLength) {
+            return 'Password must be at least 8 characters long';
+        }
+        if (!hasLower) {
+            return 'Password must contain at least one lowercase letter';
+        }
+        if (!hasUpper) {
+            return 'Password must contain at least one uppercase letter';
+        }
+        if (!hasNumber) {
+            return 'Password must contain at least one number';
+        }
+        if (!hasSymbol) {
+            return 'Password must contain at least one symbol (!@#$%^&*...)';
+        }
+        return '';
+    };
+
+    const handlePasswordChange = (e) => {
+        const newPassword = e.target.value;
+        setFormData({...formData, password: newPassword});
+        setPasswordError(validatePassword(newPassword));
+    };
 
     const handleRegister = (e) => {
         e.preventDefault();
+
+        // Validate password
+        const passwordValidationError = validatePassword(formData.password);
+        if (passwordValidationError) {
+            setPasswordError(passwordValidationError);
+            alert(passwordValidationError);
+            return;
+        }
+
+        // Check terms acceptance
+        if (!acceptedTerms) {
+            alert('Please accept the Terms and Conditions and Privacy Policy');
+            return;
+        }
 
         // In a real app, you'd send this to an API.
         // Here we simulate saving the user to the "session"
         localStorage.setItem("registeredUser", JSON.stringify(formData));
 
-        alert(`Account created successfully as ${formData.role}! Please login.`);
+        alert('Account created successfully! Please login.');
         navigate('/login');
     };
 
@@ -54,28 +106,91 @@ const RegisterPage = () => {
                         onChange={(e) => setFormData({...formData, username: e.target.value})}
                         required
                     />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 outline-none"
-                        onChange={(e) => setFormData({...formData, password: e.target.value})}
-                        required
-                    />
-
-                    {/* Role Selection (For Testing Purposes) */}
-                    <div className="pt-2">
-                        <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Account Type</label>
-                        <select
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-600 outline-none"
-                            value={formData.role}
-                            onChange={(e) => setFormData({...formData, role: e.target.value})}
+                    {/* Password with visibility toggle */}
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Password"
+                            className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-pink-400 outline-none ${
+                                passwordError ? 'border-red-400' : 'border-gray-200'
+                            }`}
+                            value={formData.password}
+                            onChange={handlePasswordChange}
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
-                            <option value="customer">Customer (Buy Books)</option>
-                            <option value="admin">Admin (Manage Store)</option>
-                        </select>
+                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
                     </div>
 
-                    <button type="submit" className="w-full bg-pink-500 text-white font-bold py-3 rounded-xl hover:bg-pink-600 transition-all shadow-lg mt-4">
+                    {/* Password requirements */}
+                    <div className="text-xs space-y-1 px-1">
+                        <p className="text-gray-600 font-semibold">Password must contain:</p>
+                        <div className="grid grid-cols-2 gap-1">
+                            <p className={formData.password.length >= 8 ? 'text-green-600' : 'text-gray-400'}>
+                                ✓ At least 8 characters
+                            </p>
+                            <p className={/[a-z]/.test(formData.password) ? 'text-green-600' : 'text-gray-400'}>
+                                ✓ Lowercase letter
+                            </p>
+                            <p className={/[A-Z]/.test(formData.password) ? 'text-green-600' : 'text-gray-400'}>
+                                ✓ Uppercase letter
+                            </p>
+                            <p className={/[0-9]/.test(formData.password) ? 'text-green-600' : 'text-gray-400'}>
+                                ✓ Number
+                            </p>
+                            <p className={/[!@#$%^&*(),.?":{}|<>]/.test(formData.password) ? 'text-green-600' : 'text-gray-400'}>
+                                ✓ Symbol (!@#$%...)
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Terms and Conditions Checkbox */}
+                    <div className="pt-4 border-t border-gray-200">
+                        <label className="flex items-start space-x-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={acceptedTerms}
+                                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                                className="mt-1 w-5 h-5 text-pink-500 border-gray-300 rounded focus:ring-pink-400"
+                                required
+                            />
+                            <span className="text-sm text-gray-700">
+                                I agree to the{' '}
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setShowTermsModal(true);
+                                    }}
+                                    className="text-pink-500 font-semibold hover:underline"
+                                >
+                                    Terms and Conditions
+                                </button>{' '}
+                                and{' '}
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setShowPrivacyModal(true);
+                                    }}
+                                    className="text-pink-500 font-semibold hover:underline"
+                                >
+                                    Privacy Policy
+                                </button>
+                            </span>
+                        </label>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        className="w-full bg-pink-500 text-white font-bold py-3 rounded-xl hover:bg-pink-600 transition-all shadow-lg mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={!acceptedTerms || passwordError !== ''}
+                    >
                         Create Account
                     </button>
                 </form>
@@ -84,6 +199,10 @@ const RegisterPage = () => {
                     Already have an account? <Link to="/login" className="text-pink-500 font-bold hover:underline">Login</Link>
                 </p>
             </div>
+
+            {/* Modals */}
+            {showTermsModal && <TermsModal onClose={() => setShowTermsModal(false)} />}
+            {showPrivacyModal && <PrivacyModal onClose={() => setShowPrivacyModal(false)} />}
         </div>
     );
 };
