@@ -29,8 +29,8 @@ const BookCard = ({ book }) => {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-lg border-2 border-gray-100
-                    hover:shadow-2xl hover:scale-[1.03] transition-all duration-300 overflow-hidden group flex flex-col h-full">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200
+                    hover:shadow-2xl hover:scale-[1.05] hover:-rotate-1 transition-all duration-300 overflow-hidden group flex flex-col h-full transform">
 
             {/* WRAP ONLY IMAGE & TEXT IN LINK */}
             <Link to={`/books/${id}`} className="flex-grow">
@@ -41,6 +41,7 @@ const BookCard = ({ book }) => {
                         alt={title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
 
                 {/* Content */}
@@ -61,7 +62,7 @@ const BookCard = ({ book }) => {
                 {/* Add to Cart Button */}
                 <button
                     onClick={handleAddToCart}
-                    className="p-2 bg-gray-100 text-teal-600 rounded-lg hover:bg-teal-50 transition border border-gray-200"
+                    className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 text-purple-600 rounded-xl hover:from-purple-200 hover:to-pink-200 transition-all duration-300 border border-purple-200 shadow-md hover:shadow-lg transform hover:scale-110"
                     title="Add to Cart"
                 >
                     <ShoppingCart size={20} />
@@ -70,8 +71,8 @@ const BookCard = ({ book }) => {
                 {/* Buy Now Button */}
                 <button
                     onClick={handleBuyNow}
-                    className="flex-grow bg-teal-500 text-white text-sm font-bold py-2 px-4 rounded-lg
-                             hover:bg-teal-600 transition duration-150 shadow-md"
+                    className="flex-grow bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-bold py-2 px-4 rounded-xl
+                             hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                     Buy Now
                 </button>
