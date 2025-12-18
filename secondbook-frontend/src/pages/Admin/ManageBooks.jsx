@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, Edit, Trash2, Search, ArrowLeft } from 'lucide-react';
 import mockBooks from '../../api/mockBooks.json';
 
 const ManageBooks = () => {
     const [books, setBooks] = useState(mockBooks);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleDelete = (id) => {
         if(window.confirm("Are you sure you want to remove this book?")) {
@@ -11,13 +13,39 @@ const ManageBooks = () => {
         }
     };
 
+    const filteredBooks = books.filter(book => 
+        book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        book.category.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="page-container">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-black text-gray-900">Manage Inventory</h1>
+                <div className="flex items-center gap-4">
+                    <Link 
+                        to="/admin-dashboard"
+                        className="flex items-center text-gray-600 hover:text-cyan-600 transition"
+                    >
+                        <ArrowLeft size={20} className="mr-2" /> Back to Dashboard
+                    </Link>
+                    <h1 className="text-3xl font-black text-gray-900">Manage Inventory</h1>
+                </div>
                 <button className="bg-cyan-600 text-white px-4 py-2 rounded-lg flex items-center hover:bg-cyan-700 transition">
                     <Plus size={20} className="mr-2" /> Add New Book
                 </button>
+            </div>
+
+            {/* Search Bar */}
+            <div className="mb-6 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                    type="text"
+                    placeholder="Search books by title, author, or category..."
+                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
 
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
@@ -32,7 +60,14 @@ const ManageBooks = () => {
                     </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                    {books.map((book) => (
+                    {filteredBooks.length === 0 ? (
+                        <tr>
+                            <td colSpan="5" className="p-8 text-center text-gray-500">
+                                No books found matching "{searchTerm}"
+                            </td>
+                        </tr>
+                    ) : (
+                        filteredBooks.map((book) => (
                         <tr key={book.id} className="hover:bg-gray-50 transition">
                             <td className="p-4">
                                 <div className="flex items-center">
@@ -60,9 +95,13 @@ const ManageBooks = () => {
                                 </div>
                             </td>
                         </tr>
-                    ))}
+                    )))}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="mt-6 text-sm text-gray-500">
+                Showing {filteredBooks.length} of {books.length} books
             </div>
         </div>
     );
