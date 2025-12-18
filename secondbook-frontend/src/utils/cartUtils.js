@@ -1,7 +1,7 @@
 // src/utils/cartUtils.js
 
 // 1. ADD TO CART LOGIC
-export const addToCart = (product) => {
+export const addToCart = (product, quantity = 1) => {
     const existingCartString = localStorage.getItem("shoppingCart");
     const cart = existingCartString ? JSON.parse(existingCartString) : [];
 
@@ -9,11 +9,16 @@ export const addToCart = (product) => {
     const existingItemIndex = cart.findIndex(item => item.id === product.id);
 
     if (existingItemIndex > -1) {
-        // If yes, just increase the quantity
-        cart[existingItemIndex].quantity += 1;
+        // If yes, increase the quantity by the specified amount
+        cart[existingItemIndex].quantity += quantity;
+        
+        // Make sure we don't exceed stock
+        if (product.stock && cart[existingItemIndex].quantity > product.stock) {
+            cart[existingItemIndex].quantity = product.stock;
+        }
     } else {
-        // If no, add new item with quantity 1
-        cart.push({ ...product, quantity: 1 });
+        // If no, add new item with specified quantity
+        cart.push({ ...product, quantity: quantity });
     }
 
     // Save back to Local Storage

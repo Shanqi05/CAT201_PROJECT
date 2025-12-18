@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // <--- IMPORTED NAVIGATE
-import { Trash2 } from 'lucide-react';
+import { Trash2, Plus, Minus } from 'lucide-react';
 
 const CartPage = () => {
     const navigate = useNavigate(); // <--- ENABLE NAVIGATION
@@ -13,6 +13,20 @@ const CartPage = () => {
             setCartItems(JSON.parse(storedCart));
         }
     }, []);
+
+    const updateQuantity = (index, change) => {
+        const newCart = [...cartItems];
+        const newQuantity = newCart[index].quantity + change;
+        
+        // Check if quantity is valid
+        if (newQuantity < 1) return;
+        if (newCart[index].stock && newQuantity > newCart[index].stock) return;
+        
+        newCart[index].quantity = newQuantity;
+        setCartItems(newCart);
+        localStorage.setItem("shoppingCart", JSON.stringify(newCart));
+        window.dispatchEvent(new Event("cartUpdated"));
+    };
 
     const removeFromCart = (indexToRemove) => {
         const newCart = cartItems.filter((_, index) => index !== indexToRemove);
@@ -51,12 +65,34 @@ const CartPage = () => {
 
                                     <div>
                                         <h3 className="font-bold text-gray-800">{item.title}</h3>
-                                        <p className="text-gray-500 text-sm">Qty: {item.quantity}</p>
+                                        <p className="text-gray-500 text-sm">${item.price.toFixed(2)} each</p>
+                                        {item.stock && (
+                                            <p className="text-xs text-green-600">{item.stock} available</p>
+                                        )}
                                     </div>
                                 </div>
 
                                 <div className="flex items-center space-x-4">
-                                    <span className="font-bold text-cyan-600 text-lg">${(item.price * item.quantity).toFixed(2)}</span>
+                                    {/* Quantity Controls */}
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => updateQuantity(index, -1)}
+                                            disabled={item.quantity <= 1}
+                                            className="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition"
+                                        >
+                                            <Minus size={16} />
+                                        </button>
+                                        <span className="w-12 text-center font-bold text-gray-800">{item.quantity}</span>
+                                        <button
+                                            onClick={() => updateQuantity(index, 1)}
+                                            disabled={item.stock && item.quantity >= item.stock}
+                                            className="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition"
+                                        >
+                                            <Plus size={16} />
+                                        </button>
+                                    </div>
+
+                                    <span className="font-bold text-cyan-600 text-lg w-20 text-right">${(item.price * item.quantity).toFixed(2)}</span>
                                     <button
                                         onClick={() => removeFromCart(index)}
                                         className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition"
