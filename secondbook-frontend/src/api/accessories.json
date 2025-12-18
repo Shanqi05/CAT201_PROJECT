@@ -5,7 +5,8 @@
     "author": "The perfect bedtime companion",
     "price": 9.99,
     "imageUrl": "https://via.placeholder.com/200x300/f59e0b/ffffff?text=Book+Light",
-    "category": "Lighting"
+    "category": "Lighting",
+    "quantity": 10
   },
   {
     "id": "A002",
@@ -13,7 +14,8 @@
     "author": "Handcrafted and durable",
     "price": 5.50,
     "imageUrl": "https://via.placeholder.com/200x300/a855f7/ffffff?text=Bookmark",
-    "category": "Keepsakes"
+    "category": "Keepsakes",
+    "quantity": 10
   },
   {
     "id": "A003",
@@ -21,7 +23,8 @@
     "author": "For notes and spontaneous thoughts",
     "price": 14.99,
     "imageUrl": "https://via.placeholder.com/200x300/ef4444/ffffff?text=Journal",
-    "category": "Writing"
+    "category": "Writing",
+    "quantity": 10
   },
   {
     "id": "A004",
@@ -29,7 +32,8 @@
     "author": "A great gift for book lovers",
     "price": 11.50,
     "imageUrl": "https://via.placeholder.com/200x300/22c55e/ffffff?text=Mug",
-    "category": "Gifts"
+    "category": "Gifts",
+    "quantity": 10
   },
   {
     "id": "A005",
@@ -37,6 +41,7 @@
     "author": "Hands-free reading for cookbooks or textbooks",
     "price": 18.99,
     "imageUrl": "https://via.placeholder.com/200x300/60a5fa/ffffff?text=Book+Stand",
-    "category": "Keepsakes"
+    "category": "Keepsakes",
+    "quantity": 10
   }
 ]
