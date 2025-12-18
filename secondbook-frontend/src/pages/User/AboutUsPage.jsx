@@ -1,8 +1,6 @@
 // secondbook-frontend/src/pages/User/AboutUsPage.jsx
 import React from 'react';
 import { BookOpen, Target, Users, Leaf, Lightbulb } from 'lucide-react';
-
-// Assuming the image import path is confirmed to be working:
 import MemberPhoto from '../../assets/images/member.png';
 
 const AboutUsPage = () => {

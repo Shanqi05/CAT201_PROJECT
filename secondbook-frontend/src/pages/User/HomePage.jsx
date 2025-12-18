@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 import BookCard from '../../components/Common/BookCard';
 import { Star } from 'lucide-react';
 import mockBooks from '../../api/mockBooks.json';
-
-// Import the image correctly
 import PROMO_BANNER_PATH from '../../assets/images/promo_banner.png';
 
 // Placeholder data for Customer Reviews

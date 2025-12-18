@@ -1,78 +1,84 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+// 1. CRITICAL: Import these from react-router-dom
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+// 2. LAYOUT COMPONENTS
 import Header from './components/Common/Header';
 import Footer from './components/Common/Footer';
 
-// --- 1. IMPORT ALL PAGES ---
+// 3. AUTH PAGES
+import LoginPage from './pages/Auth/LoginPage';
+import RegisterPage from './pages/Auth/RegisterPage';
+
+// 4. USER PAGES
 import HomePage from './pages/User/HomePage';
 import ProductListingPage from './pages/User/ProductListingPage';
 import ProductDetailPage from './pages/User/ProductDetailPage';
 import AccessoriesPage from './pages/User/AccessoriesPage';
 import AboutUsPage from './pages/User/AboutUsPage';
-import SearchResultsPage from './pages/User/SearchResultsPage';
-import LoginPage from './pages/User/LoginPage';
-import RegisterPage from './pages/User/RegisterPage';
-import UserDashboardPage from './pages/User/UserDashboardPage'; // <--- CRITICAL
 import CartPage from './pages/User/CartPage';
 import CheckoutPage from './pages/User/CheckoutPage';
 import OrderSuccessPage from './pages/User/OrderSuccessPage';
+import UserDashboardPage from './pages/User/UserDashboardPage';
 
-// --- 2. IMPORT SECURITY ---
+// 5. ADMIN PAGES
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import ManageBooks from './pages/Admin/ManageBooks';
+
+// 6. SECURITY GUARDS
 import ProtectedRoute from './components/Common/ProtectedRoute';
+import AdminProtectedRoute from './components/Common/AdminProtectedRoute';
 
 function App() {
     return (
         <div className="flex flex-col min-h-screen">
+            {/* Header stays at the top of every page */}
             <Header />
 
-            <main className="flex-grow bg-gray-50 min-h-[80vh] py-8">
+            <main className="flex-grow bg-gray-50 py-8">
                 <Routes>
-                    {/* Public Routes */}
-                    <Route path="/" element={<HomePage />} />
+                    {/* ROOT REDIRECT */}
+                    <Route path="/" element={<Navigate to="/login" replace />} />
+
+                    {/* PUBLIC ROUTES */}
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/home" element={<HomePage />} />
                     <Route path="/books" element={<ProductListingPage />} />
                     <Route path="/books/:id" element={<ProductDetailPage />} />
                     <Route path="/accessories" element={<AccessoriesPage />} />
                     <Route path="/about" element={<AboutUsPage />} />
-                    <Route path="/search" element={<SearchResultsPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
 
-                    {/* --- PROTECTED ROUTES (This is the missing road!) --- */}
+                    {/* PROTECTED USER ROUTES */}
+                    <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+                    <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+                    <Route path="/dashboard" element={<ProtectedRoute><UserDashboardPage /></ProtectedRoute>} />
+                    <Route path="/order-success" element={<ProtectedRoute><OrderSuccessPage /></ProtectedRoute>} />
+
+                    {/* ADMIN ONLY ROUTES */}
                     <Route
-                        path="/dashboard"
+                        path="/admin-dashboard"
                         element={
-                            <ProtectedRoute>
-                                <UserDashboardPage />
-                            </ProtectedRoute>
+                            <AdminProtectedRoute>
+                                <AdminDashboard />
+                            </AdminProtectedRoute>
                         }
                     />
                     <Route
-                        path="/cart"
+                        path="/admin/manage-books"
                         element={
-                            <ProtectedRoute>
-                                <CartPage />
-                            </ProtectedRoute>
+                            <AdminProtectedRoute>
+                                <ManageBooks />
+                            </AdminProtectedRoute>
                         }
                     />
-                    <Route
-                        path="/checkout"
-                        element={
-                            <ProtectedRoute>
-                                <CheckoutPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/order-success"
-                        element={
-                            <ProtectedRoute>
-                                <OrderSuccessPage />
-                            </ProtectedRoute>
-                        }
-                    />
+
+                    {/* 404 FALLBACK */}
+                    <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
             </main>
 
+            {/* Footer stays at the bottom of every page */}
             <Footer />
         </div>
     );
