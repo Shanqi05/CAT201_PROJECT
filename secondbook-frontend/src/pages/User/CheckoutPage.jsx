@@ -303,6 +303,20 @@ const CheckoutPage = () => {
                 <div className="md:col-span-1">
                     <div className="bg-white p-6 rounded-lg shadow-md sticky top-24 border border-gray-100">
                         <h2 className="text-xl font-bold mb-4 text-gray-800">Order Summary</h2>
+                        
+                        {/* Items List */}
+                        <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                            {cartItems.map((item, index) => (
+                                <div key={index} className="flex justify-between items-start text-sm pb-2 border-b border-gray-100">
+                                    <div className="flex-1">
+                                        <p className="font-medium text-gray-800">{item.title}</p>
+                                        <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                                    </div>
+                                    <span className="text-gray-700 font-semibold ml-2">${(item.price * item.quantity).toFixed(2)}</span>
+                                </div>
+                            ))}
+                        </div>
+
                         <div className="space-y-2 border-b pb-4 mb-4">
                             <div className="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
