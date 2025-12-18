@@ -66,8 +66,8 @@ const CartPage = () => {
                                     <div>
                                         <h3 className="font-bold text-gray-800">{item.title}</h3>
                                         <p className="text-gray-500 text-sm">${item.price.toFixed(2)} each</p>
-                                        {item.stock && (
-                                            <p className="text-xs text-green-600">{item.stock} available</p>
+                                        {(item.stock || item.quantity) && (
+                                            <p className="text-xs text-green-600">{item.stock || item.quantity} available</p>
                                         )}
                                     </div>
                                 </div>
