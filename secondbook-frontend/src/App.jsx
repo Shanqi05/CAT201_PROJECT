@@ -24,6 +24,9 @@ import UserDashboardPage from './pages/User/UserDashboardPage';
 // 5. ADMIN PAGES
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import ManageBooks from './pages/Admin/ManageBooks';
+import ManageUsers from './pages/Admin/ManageUsers';
+import ViewOrders from './pages/Admin/ViewOrders';
+import Analytics from './pages/Admin/Analytics';
 
 // 6. SECURITY GUARDS
 import ProtectedRoute from './components/Common/ProtectedRoute';
@@ -69,6 +72,30 @@ function App() {
                         element={
                             <AdminProtectedRoute>
                                 <ManageBooks />
+                            </AdminProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/manage-users"
+                        element={
+                            <AdminProtectedRoute>
+                                <ManageUsers />
+                            </AdminProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/view-orders"
+                        element={
+                            <AdminProtectedRoute>
+                                <ViewOrders />
+                            </AdminProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/analytics"
+                        element={
+                            <AdminProtectedRoute>
+                                <Analytics />
                             </AdminProtectedRoute>
                         }
                     />
