@@ -1,12 +1,11 @@
 // secondbook-frontend/src/pages/User/HomePage.jsx
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import BookCard from '../../components/Common/BookCard';
-import { Star } from 'lucide-react';
+import { Star, BookOpen, ShoppingBag, Info, ChevronDown } from 'lucide-react';
 import mockBooks from '../../api/mockBooks.json';
 import PROMO_BANNER_PATH from '../../assets/images/promo_banner.png';
 
-// Placeholder data for Customer Reviews
 const mockReviews = [
     {
         name: 'Seaw Kim Tan',
@@ -31,106 +30,195 @@ const mockReviews = [
     },
 ];
 
-
 const HomePage = () => {
-    const newArrivals = mockBooks.slice(0, 5);
+    const [scrollIndex, setScrollIndex] = useState(0);
+    const heroRef = useRef(null);
 
+    useEffect(() => {
+        const handleScroll = () => {
+            if (!heroRef.current) return;
+            const { top, height } = heroRef.current.getBoundingClientRect();
+            const sectionHeight = height / 3;
+            const index = Math.min(2, Math.max(0, Math.floor(-top / sectionHeight)));
+            setScrollIndex(index);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const heroContent = [
+        {
+            title: "SecondBook",
+            subtitle: "PRELOVED BOOKS",
+            desc: "Discover 40,000+ preloved treasures.",
+            link: "/books",
+            label: "BOOKS",
+            icon: <BookOpen className="w-10 h-10" />,
+            img: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=2000"
+        },
+        {
+            title: "Essentials",
+            subtitle: "ACCESSORIES",
+            desc: "The perfect companions for your reading journey.",
+            link: "/accessories",
+            label: "ACCESSORIES",
+            icon: <ShoppingBag className="w-10 h-10" />,
+            img: "https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?auto=format&fit=crop&q=80&w=2000"
+        },
+        {
+            title: "Our Story",
+            subtitle: "ABOUT US",
+            desc: "Promoting literacy and sustainability since 2025.",
+            link: "/about",
+            label: "ABOUT US",
+            icon: <Info className="w-10 h-10" />,
+            img: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&q=80&w=2000"
+        }
+    ];
+
+    const newArrivals = mockBooks.slice(0, 5);
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating);
-        const stars = [];
-        for (let i = 0; i < 5; i++) {
-            stars.push(
-                <Star
-                    key={i}
-                    className={`w-4 h-4 ${i < fullStars ? 'fill-green-500 text-green-500' : 'text-gray-300'}`}
-                />
-            );
-        }
-        return <div className="flex space-x-0.5">{stars}</div>;
+        return (
+            <div className="flex space-x-0.5">
+                {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={`w-4 h-4 ${i < fullStars ? 'fill-green-500 text-green-500' : 'text-gray-300'}`} />
+                ))}
+            </div>
+        );
     };
 
     return (
-        <div className="page-container space-y-16">
-
-            {/* 1. Welcome Message (Enhanced with gradient and animation) */}
-            <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 p-12 md:p-20 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
-                {/* Decorative circles */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse-slow"></div>
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse-slow" style={{animationDelay: '1.5s'}}></div>
-                
-                <div className="relative z-10">
-                    <h1 className="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-lg" style={{fontFamily: 'Playfair Display, serif'}}>
-                        Welcome to <span className="text-yellow-300">SecondBook</span>
-                    </h1>
-                    <h2 className="text-2xl md:text-3xl font-bold text-white/90 mb-6">Your Preloved Bookstore</h2>
-                    <p className="text-lg md:text-xl text-white/95 leading-relaxed mb-8 max-w-3xl">
-                        🌟 Discover the magic of preloved books! Explore our curated collection of almost
-                        <span className="font-extrabold text-yellow-300"> 40,000 used books</span>, from timeless classics to modern bestsellers.
-                        Join us in promoting literacy and sustainability, one book at a time. ✨
-                    </p>
-                    <Link
-                        to="/books"
-                        className="inline-flex items-center bg-white text-purple-700 font-bold py-4 px-10 rounded-full text-lg hover:bg-yellow-300 hover:text-purple-900 transition-all duration-300 shadow-2xl transform hover:scale-105 hover:-translate-y-1"
-                    >
-                        🚀 Start Browsing Now
-                    </Link>
-                </div>
-            </section>
-
-            {/* 2. Top Banner/Promo Section (PNG Image) */}
-            <section className="shadow-2xl rounded-3xl overflow-hidden border-4 border-white hover-glow transform transition-all duration-300 hover:scale-[1.02]">
-                <Link to="/books">
-                    <img
-                        src={PROMO_BANNER_PATH}
-                        alt="Promotional Banner"
-                        className="w-full h-auto object-cover"
-                    />
-                </Link>
-            </section>
-
-            {/* 3. NEW ARRIVALS Section (Using mockBooks) */}
-            <section className="bg-white/50 backdrop-blur-sm p-8 rounded-3xl shadow-xl">
-                <div className="flex justify-between items-end mb-8">
-                    <div>
-                        <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600" style={{fontFamily: 'Playfair Display, serif'}}>NEW ARRIVALS</h2>
-                        <div className="h-1 w-32 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full mt-2"></div>
-                    </div>
-                    <Link to="/books" className="text-sm font-bold text-purple-600 hover:text-pink-600 transition-colors flex items-center gap-2 group">
-                        SHOW ALL <span className="transform group-hover:translate-x-1 transition-transform">→</span>
-                    </Link>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    {newArrivals.map((book) => (
-                        <BookCard key={book.id} book={book} />
+        <div className="w-full bg-white">
+            {/* 1. STICKY HERO SECTION (3张全屏图切换) */}
+            <section ref={heroRef} className="relative h-[300vh] bg-black">
+                <div className="sticky top-0 h-screen w-full overflow-hidden">
+                    {heroContent.map((item, index) => (
+                        <div
+                            key={index}
+                            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${scrollIndex === index ? 'opacity-100' : 'opacity-0'}`}
+                        >
+                            <img src={item.img} alt={item.title} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40" />
+                        </div>
                     ))}
+
+                    <div className="relative z-10 h-full flex flex-col items-center justify-center text-white px-6">
+                        <div className="text-center space-y-6 max-w-4xl transform transition-all duration-700">
+                            <p className="uppercase tracking-[0.4em] text-yellow-400 text-sm font-bold animate-pulse">
+                                {heroContent[scrollIndex].subtitle}
+                            </p>
+                            <h1 className="text-6xl md:text-9xl font-black tracking-tighter italic drop-shadow-2xl" style={{ fontFamily: 'Playfair Display, serif' }}>
+                                {heroContent[scrollIndex].title}
+                            </h1>
+                            <p className="text-lg md:text-2xl text-gray-100 font-light max-w-xl mx-auto drop-shadow-lg">
+                                {heroContent[scrollIndex].desc}
+                            </p>
+                            
+                            <div className="pt-8">
+                                <Link to={heroContent[scrollIndex].link} className="inline-flex flex-col items-center group">
+                                    <div className="bg-white/20 backdrop-blur-xl border border-white/40 p-6 rounded-2xl group-hover:bg-white group-hover:text-black transition-all duration-500 shadow-2xl">
+                                        {heroContent[scrollIndex].icon}
+                                    </div>
+                                    <span className="mt-4 font-black tracking-widest text-xs uppercase group-hover:text-yellow-400 transition-colors">
+                                        Enter {heroContent[scrollIndex].label}
+                                    </span>
+                                </Link>
+                            </div>
+                        </div>
+
+                        <div className="absolute bottom-10 animate-bounce flex flex-col items-center opacity-70">
+                            <span className="text-[10px] tracking-[0.4em] mb-2 uppercase">Scroll Down</span>
+                            <ChevronDown size={20} />
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            {/* 4. CUSTOMER REVIEWS Section */}
-            <section className="relative bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 p-12 rounded-3xl shadow-2xl overflow-hidden">
-                <div className="absolute top-0 left-1/2 w-96 h-96 bg-gradient-to-br from-yellow-200/30 to-pink-200/30 rounded-full blur-3xl transform -translate-x-1/2"></div>
-                <div className="relative z-10">
-                    <h2 className="text-4xl font-black text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-pink-600" style={{fontFamily: 'Playfair Display, serif'}}>✨ CUSTOMER REVIEWS ✨</h2>
-                    <p className="text-center text-gray-600 mb-10 text-lg">See what our happy readers are saying!</p>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {mockReviews.map((review, index) => (
-                            <div key={index} className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-l-4 border-gradient-to-b from-yellow-400 to-pink-500">
-                                <div className="flex items-center mb-4">
-                                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-bold mr-3 shadow-lg">
-                                        {review.initials}
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-gray-900">{review.name}</p>
-                                        {renderStars(review.rating)}
+            {/* 内容区域 - 紧贴下方 */}
+            <div className="relative z-20 bg-white space-y-24">
+                <div className="max-w-7xl mx-auto px-6 pt-20 pb-20 space-y-24">
+                    
+                    {/* 2. PROMO BANNER (升级版图文排版) */}
+                    <section className="relative h-[450px] md:h-[550px] rounded-[3rem] overflow-hidden shadow-2xl group transition-all duration-500">
+                        <Link to="/books">
+                            {/* 背景与遮罩 */}
+                            <div className="absolute inset-0">
+                                <img 
+                                    src={PROMO_BANNER_PATH} 
+                                    alt="Promo" 
+                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                                />
+                                {/* 渐变层，从左边深色到右边透明，方便放文字 */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent" />
+                            </div>
+
+                            {/* 内容 */}
+                            <div className="relative z-10 h-full flex flex-col justify-center px-10 md:px-20 text-white max-w-3xl space-y-6">
+                                <span className="inline-block bg-yellow-400 text-black px-4 py-1 rounded-full text-xs font-black tracking-widest w-fit transform -translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-700">
+                                    NEW YEAR SPECIAL
+                                </span>
+                                <h2 className="text-4xl md:text-7xl font-black leading-tight drop-shadow-lg" style={{ fontFamily: 'Playfair Display, serif' }}>
+                                    Your Next <br />
+                                    <span className="text-yellow-300 italic">Favorite Book</span> <br />
+                                    Is Waiting.
+                                </h2>
+                                <p className="text-lg md:text-xl text-gray-200 font-light max-w-md">
+                                    Unlock exclusive deals on preloved classics. Join 10,000+ readers who choose sustainability.
+                                </p>
+                                <div className="flex items-center gap-4 text-sm font-bold tracking-widest pt-4 group">
+                                    <span className="border-b-2 border-yellow-300 pb-1 group-hover:pr-4 transition-all duration-300">
+                                        BROWSE THE SALE
+                                    </span>
+                                    <div className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
+                                        →
                                     </div>
                                 </div>
-                                <p className="text-gray-700 italic mb-4 line-clamp-4 leading-relaxed">"{review.review}"</p>
-                                <p className="text-xs text-gray-500 font-semibold">{review.date}</p>
                             </div>
-                        ))}
-                    </div>
+                        </Link>
+                    </section>
+
+                    {/* 3. New Arrivals */}
+                    <section className="bg-gray-50 p-10 rounded-[3rem] shadow-sm border border-gray-100">
+                        <div className="flex justify-between items-end mb-10">
+                            <div>
+                                <h2 className="text-4xl font-black text-gray-900" style={{fontFamily: 'Playfair Display, serif'}}>NEW ARRIVALS</h2>
+                                <div className="h-1.5 w-24 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full mt-2"></div>
+                            </div>
+                            <Link to="/books" className="text-sm font-bold text-purple-600 hover:text-pink-600 flex items-center gap-1 transition-colors">
+                                EXPLORE ALL <ChevronDown className="-rotate-90" size={16}/>
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+                            {newArrivals.map((book) => (
+                                <BookCard key={book.id} book={book} />
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* 4. Customer Reviews */}
+                    <section className="bg-gradient-to-br from-amber-50 via-orange-50 to-pink-50 p-12 rounded-[3rem] shadow-xl">
+                        <h2 className="text-4xl font-black text-center mb-12 text-gray-900" style={{fontFamily: 'Playfair Display, serif'}}>✨ HAPPY READERS ✨</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {mockReviews.map((review, index) => (
+                                <div key={index} className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
+                                    <div className="flex items-center mb-6">
+                                        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-bold mr-4 shadow-md">
+                                            {review.initials}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-900 leading-none mb-1">{review.name}</p>
+                                            {renderStars(review.rating)}
+                                        </div>
+                                    </div>
+                                    <p className="text-gray-600 italic mb-6 line-clamp-4 leading-relaxed">"{review.review}"</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{review.date}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
                 </div>
-            </section>
+            </div>
         </div>
     );
 };

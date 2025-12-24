@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// Removed ChevronDown from the imports below
-import { BookOpen, ShoppingCart, LogOut, LogIn } from 'lucide-react';
+import { BookOpen, ShoppingCart, LogOut, LogIn, User } from 'lucide-react';
 import { getCartCount } from '../../utils/cartUtils';
 
 const Header = () => {
@@ -11,15 +10,11 @@ const Header = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        // Update Cart Badge
         const updateCart = () => setCartCount(getCartCount());
         updateCart();
         window.addEventListener('cartUpdated', updateCart);
-
-        // Check Login Status
         const token = localStorage.getItem("userToken");
         setIsLoggedIn(!!token);
-
         return () => window.removeEventListener('cartUpdated', updateCart);
     }, []);
 
@@ -33,74 +28,76 @@ const Header = () => {
     };
 
     return (
-        <header className="bg-white shadow-lg sticky top-0 z-20 border-b-4 border-pink-400">
-            <div className="page-container flex items-center justify-between py-3">
+        <header className="bg-black shadow-2xl sticky top-0 z-50 border-b border-white/10 backdrop-blur-md bg-opacity-95">
+            <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
 
-                {/* LOGO */}
-                <div className="flex flex-col items-start">
-                    <Link to="/home" className="flex items-center space-x-2 text-3xl font-black text-gray-800">
-                        <BookOpen className="w-8 h-8 text-cyan-500" />
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-teal-500">
+                {/* LOGO - 这里的颜色改成了炫酷的渐变彩色 */}
+                <div className="flex flex-col items-start group">
+                    <Link to="/home" className="flex items-center space-x-2 text-2xl font-black tracking-tighter">
+                        {/* 图标改用青色到蓝色的渐变感 */}
+                        <BookOpen className="w-8 h-8 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
+                        
+                        {/* 文字改用青色到紫色的鲜艳渐变 */}
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]">
                             SecondBook
                         </span>
                     </Link>
-                    <p className="text-xs font-semibold text-pink-600 tracking-wider ml-10 -mt-1 uppercase">
+                    {/* Slogan 也给一点淡紫色，呼应 Logo */}
+                    <p className="text-[10px] font-bold text-purple-400/80 tracking-[0.2em] ml-10 -mt-1 uppercase">
                         Your Preloved Bookstore
                     </p>
                 </div>
 
                 {/* NAVIGATION */}
-                <div className="flex items-center space-x-6">
-                    <nav className="hidden md:flex items-center text-md font-semibold bg-pink-50 rounded-lg overflow-hidden border border-pink-100">
-                        <Link to="/books" className="py-3 px-5 text-gray-800 hover:bg-pink-100 hover:text-pink-600 border-r border-pink-100">Books</Link>
-                        <Link to="/accessories" className="py-3 px-5 text-gray-800 hover:bg-pink-100 hover:text-pink-600 border-r border-pink-100">Accessories</Link>
-                        <Link to="/about" className="py-3 px-5 text-gray-800 hover:bg-pink-100 hover:text-pink-600 border-r border-pink-100">About Us</Link>
+                <div className="flex items-center space-x-8">
+                    <nav className="hidden md:flex items-center text-sm font-black bg-white/5 rounded-xl overflow-hidden border border-white/10">
+                        <Link to="/books" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Books</Link>
+                        <Link to="/accessories" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Accessories</Link>
+                        <Link to="/about" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">About Us</Link>
 
-                        {/* === ACCOUNT SECTION === */}
+                        {/* ACCOUNT SECTION */}
                         {isLoggedIn ? (
                             <div
                                 className="relative group"
                                 onMouseEnter={() => setIsDropdownOpen(true)}
                                 onMouseLeave={() => setIsDropdownOpen(false)}
                             >
-                                {/* MAIN BUTTON - Arrow Removed */}
                                 <Link
                                     to="/dashboard"
-                                    className="flex items-center py-3 px-5 text-gray-800 hover:bg-pink-100 hover:text-pink-600 cursor-pointer"
+                                    className="flex items-center py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all cursor-pointer uppercase tracking-widest"
                                 >
-                                    My Account
+                                    <User className="w-4 h-4 mr-2" /> Account
                                 </Link>
 
-                                {/* DROPDOWN MENU */}
                                 {isDropdownOpen && (
-                                    <div className="absolute top-full right-0 w-48 bg-white border border-gray-200 rounded-b-lg shadow-2xl z-50">
+                                    <div className="absolute top-full right-0 w-48 bg-[#0a0a0a] border border-white/10 rounded-b-xl shadow-2xl z-50 overflow-hidden">
                                         <Link
                                             to="/dashboard"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-cyan-50 hover:text-cyan-600"
+                                            className="block px-6 py-4 text-xs font-bold text-gray-400 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5"
                                         >
-                                            My Dashboard
+                                            DASHBOARD
                                         </Link>
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 border-t flex items-center"
+                                            className="w-full text-left px-6 py-4 text-xs font-bold text-red-500 hover:bg-red-500/10 flex items-center transition-colors"
                                         >
-                                            <LogOut className="w-4 h-4 mr-2" /> Logout
+                                            <LogOut className="w-4 h-4 mr-2" /> LOGOUT
                                         </button>
                                     </div>
                                 )}
                             </div>
                         ) : (
-                            <Link to="/login" className="flex items-center py-3 px-5 text-gray-800 hover:bg-pink-100 hover:text-pink-600">
+                            <Link to="/login" className="flex items-center py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all uppercase tracking-widest">
                                 <LogIn className="w-4 h-4 mr-2" /> Login
                             </Link>
                         )}
                     </nav>
 
-                    {/* CART ICON */}
-                    <Link to="/cart" className="relative p-3 rounded-full text-white bg-pink-500 hover:bg-pink-600 shadow-md">
-                        <ShoppingCart className="w-6 h-6" />
+                    {/* CART ICON - 保持白底黑字，但在黑色背景下非常跳跃 */}
+                    <Link to="/cart" className="relative p-3 rounded-full text-black bg-white hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] transform hover:scale-110 active:scale-90">
+                        <ShoppingCart className="w-5 h-5" />
                         {cartCount > 0 && (
-                            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full border-2 border-white transform translate-x-1/4 -translate-y-1/4">
+                            <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-black leading-none text-white bg-red-600 rounded-full border-2 border-black">
                                 {cartCount}
                             </span>
                         )}
