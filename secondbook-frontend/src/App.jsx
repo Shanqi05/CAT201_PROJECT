@@ -22,21 +22,22 @@ import OrderSuccessPage from './pages/User/OrderSuccessPage';
 import UserDashboardPage from './pages/User/UserDashboardPage';
 
 // 5. ADMIN PAGES
-import AdminDashboard from './pages/Admin/AdminDashboard';
+import AdminDashboard from './pages/Admin/AdminDashboard'; // Legacy dashboard
 import AdminHomePage from './pages/Admin/AdminHomePage';
 import ManageBooks from './pages/Admin/ManageBooks';
 import ManageUsers from './pages/Admin/ManageUsers';
+import ManageAccessories from './pages/Admin/ManageAccessories';
 import ViewOrders from './pages/Admin/ViewOrders';
 import Analytics from './pages/Admin/Analytics';
-import AdminLayout from './pages/Admin/AdminLayout';
-import AdminLayout from './pages/Admin/AdminLayout';
+import AdminLayout from './pages/Admin/AdminLayout'; // 确保这里只 import 一次
+
 // 6. SECURITY GUARDS
 import ProtectedRoute from './components/Common/ProtectedRoute';
 import AdminProtectedRoute from './components/Common/AdminProtectedRoute';
 
 function App() {
     const location = useLocation();
-    
+
     // Hide Header and Footer on login and register pages
     const hideHeaderFooter = ['/login', '/register'].includes(location.pathname) || location.pathname.startsWith('/admin');
 
@@ -67,52 +68,30 @@ function App() {
                     <Route path="/dashboard" element={<ProtectedRoute><UserDashboardPage /></ProtectedRoute>} />
                     <Route path="/order-success" element={<ProtectedRoute><OrderSuccessPage /></ProtectedRoute>} />
 
-                    {/* ADMIN ONLY ROUTES */}
-                    <Route
-                        path="/admin/home"
-                        element={
-                            <AdminProtectedRoute>
-                                <AdminHomePage />
-                            </AdminProtectedRoute>
-                        }
-                    />
+                    {/* ADMIN ONLY ROUTES (Updated Structure) */}
+                    <Route element={
+                        <AdminProtectedRoute>
+                            <AdminLayout />
+                        </AdminProtectedRoute>
+                    }>
+                        <Route path="/admin/home" element={<AdminHomePage />} />
+                        <Route path="/admin/manage-books" element={<ManageBooks />} />
+                        <Route path="/admin/manage-users" element={<ManageUsers />} />
+                        <Route path="/admin/view-orders" element={<ViewOrders />} />
+                        <Route path="/admin/analytics" element={<Analytics />} />
+
+                        <Route path="/admin/accessories" element={<ManageAccessories />} />
+
+
+                        <Route path="/admin" element={<Navigate to="/admin/home" replace />} />
+                    </Route>
+
+                    {/* Legacy Route (Optional, kept for compatibility) */}
                     <Route
                         path="/admin-dashboard"
                         element={
                             <AdminProtectedRoute>
                                 <AdminDashboard />
-                            </AdminProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/admin/manage-books"
-                        element={
-                            <AdminProtectedRoute>
-                                <ManageBooks />
-                            </AdminProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/admin/manage-users"
-                        element={
-                            <AdminProtectedRoute>
-                                <ManageUsers />
-                            </AdminProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/admin/view-orders"
-                        element={
-                            <AdminProtectedRoute>
-                                <ViewOrders />
-                            </AdminProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/admin/analytics"
-                        element={
-                            <AdminProtectedRoute>
-                                <Analytics />
                             </AdminProtectedRoute>
                         }
                     />

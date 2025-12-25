@@ -84,12 +84,6 @@ const ViewOrders = () => {
         <div className="page-container">
             <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center gap-4">
-                    <Link 
-                        to="/admin-dashboard"
-                        className="flex items-center text-gray-600 hover:text-cyan-600 transition"
-                    >
-                        <ArrowLeft size={20} className="mr-2" /> Back to Dashboard
-                    </Link>
                     <h1 className="text-3xl font-black text-gray-900">View Orders</h1>
                 </div>
             </div>

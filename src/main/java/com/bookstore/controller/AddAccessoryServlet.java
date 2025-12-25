@@ -1,7 +1,7 @@
 package com.bookstore.controller;
 
-import com.bookstore.dao.BookDAO;
-import com.bookstore.model.Book;
+import com.bookstore.dao.AccessoryDAO; // 假设你有这个DAO
+import com.bookstore.model.Accessory; // 假设你有这个Model
 import com.bookstore.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -10,65 +10,54 @@ import jakarta.servlet.http.*;
 import java.io.File;
 import java.io.IOException;
 
-@WebServlet("/addBook")
-@MultipartConfig( // for upload document
-        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-        maxFileSize = 1024 * 1024 * 10,      // 10MB
-        maxRequestSize = 1024 * 1024 * 50    // 50MB
-)
-public class AddBookServlet extends HttpServlet {
+// 1. URL 映射要和 React fetch 的地址对应
+@WebServlet("/addAccessory")
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 10, maxRequestSize = 1024 * 1024 * 50)
+public class AddAccessoryServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. 允许前端域
+        // 2. 必备的 CORS 设置
         response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-
-        // 2. >>> 补上这一行：允许携带 Cookie/Session <<<
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-
-        // 3. 允许的方法和头
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
 
-        // 处理 Pre-flight 请求
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
-        // 1. check whether login
+        // 3. 登录检查
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null) {
-            response.sendRedirect("login.jsp");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not logged in");
             return;
         }
 
-        // 2. Get text data
+        // 4. 获取参数 (根据前端 FormData)
         String title = request.getParameter("title");
-        String author = request.getParameter("author");
-        String type = request.getParameter("type"); // "SELL" or "DONATE"
+        String category = request.getParameter("category"); // 前端传的是 category
         double price = 0.0;
         try {
             price = Double.parseDouble(request.getParameter("price"));
         } catch (NumberFormatException e) { price = 0.0; }
 
-        // 3. Process image upload
-        Part part = request.getPart("image"); // 前端 <input type="file" name="image">
+        // 5. 图片处理 (逻辑同 Book)
+        Part part = request.getPart("image");
         String fileName = extractFileName(part);
-
-        // Image save path (Stored in the Tomcat deployment directory or the project runtime directory)
         String savePath = getServletContext().getRealPath("") + File.separator + "images";
         File fileSaveDir = new File(savePath);
         if (!fileSaveDir.exists()) fileSaveDir.mkdir();
-
         part.write(savePath + File.separator + fileName);
 
-        // 4. Save into database
-        Book book = new Book(title, author, price, type, currentUser.getId());
-        book.setImagePath("images/" + fileName); // 存相对路径
+        // 6. 保存到数据库 (需要你自己创建 Accessory 模型和 DAO)
+        // Accessory accessory = new Accessory(title, category, price, "images/" + fileName);
+        // AccessoryDAO dao = new AccessoryDAO();
+        // boolean success = dao.addAccessory(accessory);
 
-        BookDAO dao = new BookDAO();
-        boolean success = dao.addBook(book);
+        // 模拟成功 (等你建好 DAO 后替换这里)
+        boolean success = true;
 
         if (success) {
             response.setStatus(HttpServletResponse.SC_OK);
@@ -77,7 +66,6 @@ public class AddBookServlet extends HttpServlet {
         }
     }
 
-    // Helper method: Extract file name from HTTP header
     private String extractFileName(Part part) {
         String contentDisp = part.getHeader("content-disposition");
         String[] items = contentDisp.split(";");
