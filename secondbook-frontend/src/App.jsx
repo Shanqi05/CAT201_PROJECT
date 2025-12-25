@@ -1,6 +1,6 @@
 import React from 'react';
 // 1. CRITICAL: Import these from react-router-dom
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // 2. LAYOUT COMPONENTS
 import Header from './components/Common/Header';
@@ -33,10 +33,15 @@ import ProtectedRoute from './components/Common/ProtectedRoute';
 import AdminProtectedRoute from './components/Common/AdminProtectedRoute';
 
 function App() {
+    const location = useLocation();
+    
+    // Hide Header and Footer on login and register pages
+    const hideHeaderFooter = ['/login', '/register'].includes(location.pathname);
+
     return (
         <div className="flex flex-col min-h-screen">
-            {/* Header stays at the top of every page */}
-            <Header />
+            {/* Header only shows after login */}
+            {!hideHeaderFooter && <Header />}
 
             <main className="flex-grow bg-gray-50 py-8">
                 <Routes>
@@ -105,8 +110,8 @@ function App() {
                 </Routes>
             </main>
 
-            {/* Footer stays at the bottom of every page */}
-            <Footer />
+            {/* Footer only shows after login */}
+            {!hideHeaderFooter && <Footer />}
         </div>
     );
 }

@@ -8,23 +8,50 @@ const Header = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userRole, setUserRole] = useState('');
 
     useEffect(() => {
         const updateCart = () => setCartCount(getCartCount());
         updateCart();
         window.addEventListener('cartUpdated', updateCart);
         const token = localStorage.getItem("userToken");
+        const role = localStorage.getItem("userRole");
         setIsLoggedIn(!!token);
-        return () => window.removeEventListener('cartUpdated', updateCart);
+        setUserRole(role || '');
+        
+        // Listen for storage changes (e.g., after login)
+        const handleStorageChange = () => {
+            const newToken = localStorage.getItem("userToken");
+            const newRole = localStorage.getItem("userRole");
+            setIsLoggedIn(!!newToken);
+            setUserRole(newRole || '');
+        };
+        
+        window.addEventListener('storage', handleStorageChange);
+        return () => {
+            window.removeEventListener('cartUpdated', updateCart);
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, []);
 
     const handleLogout = () => {
         if (window.confirm("Are you sure you want to logout?")) {
             localStorage.removeItem("userToken");
+            localStorage.removeItem("userRole");
+            localStorage.removeItem("registeredUser");
             setIsLoggedIn(false);
+            setUserRole('');
             setIsDropdownOpen(false);
             navigate('/login');
         }
+    };
+
+    // Determine the home link based on user role
+    const getHomeLink = () => {
+        if (userRole === 'admin') {
+            return '/admin-dashboard';
+        }
+        return '/home';
     };
 
     return (
@@ -33,7 +60,7 @@ const Header = () => {
 
                 {/* LOGO - 这里的颜色改成了炫酷的渐变彩色 */}
                 <div className="flex flex-col items-start group">
-                    <Link to="/home" className="flex items-center space-x-2 text-2xl font-black tracking-tighter">
+                    <Link to={getHomeLink()} className="flex items-center space-x-2 text-2xl font-black tracking-tighter">
                         {/* 图标改用青色到蓝色的渐变感 */}
                         <BookOpen className="w-8 h-8 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
                         
@@ -63,7 +90,7 @@ const Header = () => {
                                 onMouseLeave={() => setIsDropdownOpen(false)}
                             >
                                 <Link
-                                    to="/dashboard"
+                                    to={userRole === 'admin' ? '/admin-dashboard' : '/dashboard'}
                                     className="flex items-center py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all cursor-pointer uppercase tracking-widest"
                                 >
                                     <User className="w-4 h-4 mr-2" /> Account
@@ -72,7 +99,7 @@ const Header = () => {
                                 {isDropdownOpen && (
                                     <div className="absolute top-full right-0 w-48 bg-[#0a0a0a] border border-white/10 rounded-b-xl shadow-2xl z-50 overflow-hidden">
                                         <Link
-                                            to="/dashboard"
+                                            to={userRole === 'admin' ? '/admin-dashboard' : '/dashboard'}
                                             className="block px-6 py-4 text-xs font-bold text-gray-400 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5"
                                         >
                                             DASHBOARD
