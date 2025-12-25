@@ -33,7 +33,7 @@ const LoginPage = () => {
             // 4. Role-based Navigation
             if (user.role === 'admin') {
                 console.log("Navigating to Admin Dashboard...");
-                navigate('/admin-dashboard');
+                navigate('/admin/home');
             } else {
                 console.log("Navigating to Customer Home...");
                 navigate('/home');

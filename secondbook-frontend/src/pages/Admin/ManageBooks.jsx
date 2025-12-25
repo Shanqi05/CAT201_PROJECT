@@ -13,7 +13,7 @@ const ManageBooks = () => {
         }
     };
 
-    const filteredBooks = books.filter(book => 
+    const filteredBooks = books.filter(book =>
         book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
         book.category.toLowerCase().includes(searchTerm.toLowerCase())
@@ -23,7 +23,7 @@ const ManageBooks = () => {
         <div className="page-container">
             <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center gap-4">
-                    <Link 
+                    <Link
                         to="/admin-dashboard"
                         className="flex items-center text-gray-600 hover:text-cyan-600 transition"
                     >
