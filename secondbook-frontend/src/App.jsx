@@ -23,11 +23,13 @@ import UserDashboardPage from './pages/User/UserDashboardPage';
 
 // 5. ADMIN PAGES
 import AdminDashboard from './pages/Admin/AdminDashboard';
+import AdminHomePage from './pages/Admin/AdminHomePage';
 import ManageBooks from './pages/Admin/ManageBooks';
 import ManageUsers from './pages/Admin/ManageUsers';
 import ViewOrders from './pages/Admin/ViewOrders';
 import Analytics from './pages/Admin/Analytics';
-
+import AdminLayout from './pages/Admin/AdminLayout';
+import AdminLayout from './pages/Admin/AdminLayout';
 // 6. SECURITY GUARDS
 import ProtectedRoute from './components/Common/ProtectedRoute';
 import AdminProtectedRoute from './components/Common/AdminProtectedRoute';
@@ -36,14 +38,16 @@ function App() {
     const location = useLocation();
     
     // Hide Header and Footer on login and register pages
-    const hideHeaderFooter = ['/login', '/register'].includes(location.pathname);
+    const hideHeaderFooter = ['/login', '/register'].includes(location.pathname) || location.pathname.startsWith('/admin');
+
+    const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname === '/admin-dashboard';
 
     return (
         <div className="flex flex-col min-h-screen">
             {/* Header only shows after login */}
             {!hideHeaderFooter && <Header />}
 
-            <main className="flex-grow bg-gray-50 py-8">
+            <main className={`flex-grow ${isAdminRoute ? '' : 'bg-gray-50 py-8'}`}>
                 <Routes>
                     {/* ROOT REDIRECT */}
                     <Route path="/" element={<Navigate to="/login" replace />} />
@@ -64,6 +68,14 @@ function App() {
                     <Route path="/order-success" element={<ProtectedRoute><OrderSuccessPage /></ProtectedRoute>} />
 
                     {/* ADMIN ONLY ROUTES */}
+                    <Route
+                        path="/admin/home"
+                        element={
+                            <AdminProtectedRoute>
+                                <AdminHomePage />
+                            </AdminProtectedRoute>
+                        }
+                    />
                     <Route
                         path="/admin-dashboard"
                         element={
