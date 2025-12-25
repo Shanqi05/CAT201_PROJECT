@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, BookOpen, Users, Settings, Search,
-    Bell, Mail, LogOut, ShoppingBag, Menu, Info, User, ChevronDown, BarChart2
+    Bell, Mail, LogOut, ShoppingBag, Menu, Info, User,
+    ChevronDown, BarChart2, ClipboardList // <--- 1. 新增 ClipboardList 图标
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -11,7 +12,7 @@ const AdminLayout = () => {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [currentUser, setCurrentUser] = useState({ name: '', id: null, role: '' });
     const navigate = useNavigate();
-    const location = useLocation(); // 用于判断当前 active 菜单
+    const location = useLocation();
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
@@ -34,10 +35,15 @@ const AdminLayout = () => {
         navigate('/login');
     };
 
+    // 2. 修改菜单数组，在 Users 上面添加 Orders
     const menuItems = [
         { name: 'Dashboard', icon: <LayoutDashboard size={20} />, link: '/admin/home' },
         { name: 'Book', icon: <BookOpen size={20} />, link: '/admin/manage-books' },
         { name: 'Accessories', icon: <ShoppingBag size={20} />, link: '/admin/accessories' },
+
+        // >>>>> 新增 Orders 入口 <<<<<
+        { name: 'Orders', icon: <ClipboardList size={20} />, link: '/admin/view-orders' },
+
         { name: 'Users', icon: <Users size={20} />, link: '/admin/manage-users' },
         { name: 'Analytics', icon: <BarChart2 size={20} />, link: '/admin/analytics' },
         { name: 'Settings', icon: <Settings size={20} />, link: '/admin/settings' },
@@ -79,7 +85,6 @@ const AdminLayout = () => {
                 <nav className="flex-1 overflow-y-auto py-4">
                     <ul className="space-y-1">
                         {menuItems.map((item, index) => {
-                            // 判断当前链接是否激活
                             const isActive = location.pathname === item.link;
                             return (
                                 <li key={index}>
@@ -117,8 +122,7 @@ const AdminLayout = () => {
                         </div>
                     </div>
                     <div className="flex items-center gap-6">
-                         {/* ... Header Right Side (Icons & User Menu) - 代码同之前 ... */}
-                         <div className="flex items-center gap-4 border-r border-gray-700 pr-6">
+                        <div className="flex items-center gap-4 border-r border-gray-700 pr-6">
                             <div className="relative cursor-pointer group">
                                 <Mail className="text-gray-400 w-5 h-5 group-hover:text-white transition-colors" />
                                 <span className="absolute -top-1.5 -right-1.5 bg-cyan-500 text-white text-[10px] font-bold px-1 rounded-full">5</span>
@@ -139,7 +143,7 @@ const AdminLayout = () => {
                                 </div>
                                 <ChevronDown size={14} className={`text-gray-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
                             </button>
-                             {userMenuOpen && (
+                            {userMenuOpen && (
                                 <div className="absolute right-0 mt-2 w-48 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2">
                                     <div className="px-4 py-2 border-b border-gray-800 mb-2">
                                         <p className="text-xs text-gray-500">Signed in as</p>
@@ -156,7 +160,6 @@ const AdminLayout = () => {
 
                 {/* MAIN CONTENT WRAPPER */}
                 <main className="flex-1 overflow-y-auto bg-gray-100 p-8">
-                     {/* 关键：Outlet 会在这里渲染子路由（AdminHomePage 或 ManageBooks） */}
                     <Outlet />
                 </main>
             </div>

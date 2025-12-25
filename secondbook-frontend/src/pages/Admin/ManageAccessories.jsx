@@ -1,120 +1,115 @@
 import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Search, Filter, X, Upload, Image as ImageIcon } from 'lucide-react';
-import mockBooks from '../../api/mockBooks.json'; // 假设这是你的初始数据，实际应该从后端 fetch
+import { Plus, Edit, Trash2, Search, Filter, X, Upload, ShoppingBag } from 'lucide-react';
 
-const ManageBooks = () => {
+// 模拟数据 (你可以稍后替换为从后端 fetch)
+const mockAccessories = [
+    { id: 1, title: "Vintage Metal Bookmark", category: "Bookmark", price: 5.90, imagePath: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=200", status: "Active" },
+    { id: 2, title: "LED Reading Light", category: "Electronics", price: 12.50, imagePath: "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=200", status: "Active" },
+    { id: 3, title: "Canvas Tote Bag", category: "Merchandise", price: 8.00, imagePath: "https://images.unsplash.com/photo-1597484662317-c9253e602531?auto=format&fit=crop&q=80&w=200", status: "Out of Stock" },
+];
+
+const ManageAccessories = () => {
     // 1. 状态管理
-    const [books, setBooks] = useState(mockBooks);
+    const [accessories, setAccessories] = useState(mockAccessories);
     const [searchTerm, setSearchTerm] = useState('');
-
-    // 控制 Modal 显示/隐藏
     const [showModal, setShowModal] = useState(false);
 
-    // 新书表单数据
+    // 表单数据 (去掉了 Author，保留了必要的字段)
     const [formData, setFormData] = useState({
         title: '',
-        author: '',
-        type: 'SELL', // 对应 Servlet 的 "SELL" 或 "DONATE"
+        category: 'Bookmark', // 默认为书签
         price: '',
-        image: null // 存储文件对象
+        image: null
     });
 
-    // 图片预览 URL
     const [previewUrl, setPreviewUrl] = useState(null);
 
     // --- Handlers ---
-
-    // 处理普通文本输入
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // 处理文件选择
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setFormData(prev => ({ ...prev, image: file }));
-            setPreviewUrl(URL.createObjectURL(file)); // 生成预览链接
+            setPreviewUrl(URL.createObjectURL(file));
         }
     };
 
-    // 提交表单给 Servlet
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 1. 构建 FormData 对象 (用于上传文件)
         const data = new FormData();
         data.append('title', formData.title);
-        data.append('author', formData.author);
-        data.append('type', formData.type);
+        data.append('category', formData.category); // 注意：这里传给后端的是 category
         data.append('price', formData.price);
         if (formData.image) {
-            data.append('image', formData.image); // 对应 Servlet part = request.getPart("image")
+            data.append('image', formData.image);
         }
 
         try {
-            // 2. 发送 POST 请求到你的 Servlet
-            const response = await fetch('http://localhost:8080/SecondBookProject/addBook', {
+            // 指向 AddAccessoryServlet
+            const response = await fetch('http://localhost:8080/SecondBookProject/addAccessory', {
                 method: 'POST',
                 credentials: 'include',
                 body: data,
             });
 
             if (response.ok) {
-                alert("Book added successfully!");
+                alert("Accessory added successfully!");
                 setShowModal(false);
-                setBooks([...books, {
+                // 更新列表 (模拟)
+                setAccessories([...accessories, {
                     id: Date.now(),
                     ...formData,
-                    imageUrl: previewUrl || "https://via.placeholder.com/150",
-                    price: parseFloat(formData.price)
+                    imagePath: previewUrl || "https://via.placeholder.com/150",
+                    price: parseFloat(formData.price),
+                    status: "Active"
                 }]);
-                // 重置表单
-                setFormData({ title: '', author: '', type: 'SELL', price: '', image: null });
+                setFormData({ title: '', category: 'Bookmark', price: '', image: null });
                 setPreviewUrl(null);
             } else {
-                alert("Failed to upload book. Server error.");
+                alert("Failed to upload accessory. Server error.");
             }
         } catch (error) {
-            console.error("Error uploading book:", error);
+            console.error("Error uploading accessory:", error);
             alert("Error connecting to server.");
         }
     };
 
     const handleDelete = (id) => {
-        if(window.confirm("Are you sure you want to remove this book?")) {
-            setBooks(books.filter(book => book.id !== id));
+        if(window.confirm("Are you sure you want to remove this item?")) {
+            setAccessories(accessories.filter(item => item.id !== id));
         }
     };
 
-    const filteredBooks = books.filter(book =>
-        book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredItems = accessories.filter(item =>
+        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.category.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
         <div className="p-8 max-w-7xl mx-auto w-full relative">
 
-            {/* Header Area */}
+            {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
-                        Manage Inventory
+                        Manage Accessories
                     </h1>
                     <p className="text-gray-500 text-sm mt-1">
-                        View, update, and organize your bookstore collection.
+                        Curate your collection of bookmarks, lights, and merchandise.
                     </p>
                 </div>
 
-                {/* Add New Book Button - Triggers Modal */}
                 <button
                     onClick={() => setShowModal(true)}
                     className="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-lg flex items-center transition-all shadow-lg hover:shadow-xl group"
                 >
                     <Plus size={18} className="mr-2 group-hover:scale-110 transition-transform" />
-                    <span className="font-bold text-sm">Add New Book</span>
+                    <span className="font-bold text-sm">Add Accessory</span>
                 </button>
             </div>
 
@@ -124,7 +119,7 @@ const ManageBooks = () => {
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                     <input
                         type="text"
-                        placeholder="Search title, author, category..."
+                        placeholder="Search accessories..."
                         className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent outline-none text-sm transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -135,60 +130,66 @@ const ManageBooks = () => {
                 </button>
             </div>
 
-            {/* Table Section */}
+            {/* Table */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500 font-bold">
-                                <th className="p-5">Book Details</th>
-                                <th className="p-5">Type</th>
+                                <th className="p-5">Product Details</th>
+                                <th className="p-5">Category</th>
                                 <th className="p-5">Price</th>
                                 <th className="p-5">Status</th>
                                 <th className="p-5 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {filteredBooks.length === 0 ? (
+                            {filteredItems.length === 0 ? (
                                 <tr>
                                     <td colSpan="5" className="p-12 text-center text-gray-500">
-                                        No books found matching "{searchTerm}"
+                                        No accessories found.
                                     </td>
                                 </tr>
                             ) : (
-                                filteredBooks.map((book) => (
-                                    <tr key={book.id} className="hover:bg-gray-50/80 transition-colors group">
+                                filteredItems.map((item) => (
+                                    <tr key={item.id} className="hover:bg-gray-50/80 transition-colors group">
                                         <td className="p-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200">
-                                                    <img src={book.imageUrl || book.imagePath} alt={book.title} className="w-full h-full object-cover" />
+                                                <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200 bg-gray-100 flex items-center justify-center">
+                                                    {item.imagePath ? (
+                                                        <img src={item.imagePath} alt={item.title} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <ShoppingBag className="text-gray-300" size={24} />
+                                                    )}
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-gray-900 leading-tight">{book.title}</p>
-                                                    <p className="text-xs text-gray-500 mt-1 font-medium">{book.author}</p>
+                                                    <p className="font-bold text-gray-900 leading-tight">{item.title}</p>
+                                                    <p className="text-xs text-gray-500 mt-1 font-medium">ID: #{item.id}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="p-5">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                                                {book.type || book.category}
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
+                                                {item.category}
                                             </span>
                                         </td>
-                                        <td className="p-5">
-                                            <span className="font-mono font-bold text-gray-900 text-sm">
-                                                ${parseFloat(book.price).toFixed(2)}
-                                            </span>
+                                        <td className="p-5 font-mono font-bold text-gray-900 text-sm">
+                                            ${parseFloat(item.price).toFixed(2)}
                                         </td>
                                         <td className="p-5">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-100">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                                                Active
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
+                                                item.status === 'Active'
+                                                ? 'bg-green-50 text-green-700 border-green-100'
+                                                : 'bg-gray-100 text-gray-500 border-gray-200'
+                                            }`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'Active' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+                                                {item.status || 'Active'}
                                             </span>
                                         </td>
                                         <td className="p-5 text-right">
                                             <div className="flex justify-end gap-2">
                                                 <button className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"><Edit size={18}/></button>
-                                                <button onClick={() => handleDelete(book.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
+                                                <button onClick={() => handleDelete(item.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -199,56 +200,46 @@ const ManageBooks = () => {
                 </div>
             </div>
 
-            {/* --- ADD BOOK MODAL --- */}
+            {/* --- ADD MODAL --- */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100">
-                        {/* Modal Header */}
+                        {/* Header */}
                         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                             <h2 className="text-xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
-                                Add New Book
+                                Add Accessory
                             </h2>
-                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-red-500 transition-colors">
-                                <X size={24} />
-                            </button>
+                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={24} /></button>
                         </div>
 
-                        {/* Modal Form */}
+                        {/* Form */}
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
 
-                            {/* Title & Author */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Book Title</label>
-                                    <input
-                                        type="text" name="title" required
-                                        value={formData.title} onChange={handleInputChange}
-                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all"
-                                        placeholder="Enter title"
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Author</label>
-                                    <input
-                                        type="text" name="author" required
-                                        value={formData.author} onChange={handleInputChange}
-                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all"
-                                        placeholder="Author name"
-                                    />
-                                </div>
+                            {/* Name */}
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Name</label>
+                                <input
+                                    type="text" name="title" required
+                                    value={formData.title} onChange={handleInputChange}
+                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all"
+                                    placeholder="e.g., Metal Bookmark"
+                                />
                             </div>
 
-                            {/* Type & Price */}
+                            {/* Category & Price */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Type</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
                                     <select
-                                        name="type"
-                                        value={formData.type} onChange={handleInputChange}
+                                        name="category"
+                                        value={formData.category} onChange={handleInputChange}
                                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all appearance-none"
                                     >
-                                        <option value="SELL">Sell</option>
-                                        <option value="DONATE">Donate</option>
+                                        <option value="Bookmark">Bookmark</option>
+                                        <option value="Stationery">Stationery</option>
+                                        <option value="Tote Bag">Tote Bag</option>
+                                        <option value="Light">Reading Light</option>
+                                        <option value="Other">Other</option>
                                     </select>
                                 </div>
                                 <div className="space-y-1">
@@ -262,19 +253,17 @@ const ManageBooks = () => {
                                 </div>
                             </div>
 
-                            {/* Image Upload Area */}
+                            {/* Image Upload */}
                             <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Book Cover</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Image</label>
                                 <div className="flex items-center justify-center w-full">
                                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all hover:border-cyan-400 relative overflow-hidden group">
-
                                         {previewUrl ? (
                                             <img src={previewUrl} alt="Preview" className="w-full h-full object-cover absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity" />
                                         ) : (
                                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                                 <Upload className="w-8 h-8 mb-3 text-gray-400 group-hover:text-cyan-500 transition-colors" />
-                                                <p className="text-sm text-gray-500"><span className="font-bold">Click to upload</span> or drag and drop</p>
-                                                <p className="text-xs text-gray-400">PNG, JPG (MAX. 2MB)</p>
+                                                <p className="text-sm text-gray-500">Upload Image</p>
                                             </div>
                                         )}
                                         <input type="file" name="image" className="hidden" accept="image/*" onChange={handleFileChange} required />
@@ -282,23 +271,11 @@ const ManageBooks = () => {
                                 </div>
                             </div>
 
-                            {/* Modal Footer Actions */}
+                            {/* Actions */}
                             <div className="pt-4 flex gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowModal(false)}
-                                    className="flex-1 py-3 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 py-3 bg-black text-cyan-400 rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-cyan-500/20"
-                                >
-                                    Upload Book
-                                </button>
+                                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors">Cancel</button>
+                                <button type="submit" className="flex-1 py-3 bg-black text-cyan-400 rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-cyan-500/20">Add Item</button>
                             </div>
-
                         </form>
                     </div>
                 </div>
@@ -307,4 +284,4 @@ const ManageBooks = () => {
     );
 };
 
-export default ManageBooks;
+export default ManageAccessories;
