@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogIn, Lock, User } from 'lucide-react';
 
-// [REMOVE]: We don't need the JSON file anymore
-// import usersData from '../../api/users.json';
-
 const LoginPage = () => {
     const navigate = useNavigate();
     const [loginInput, setLoginInput] = useState('');
@@ -13,7 +10,7 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        // 1. Prepare data for the backend (FormData matches Servlet expectation)
+        // 1. Prepare data
         const formData = new URLSearchParams();
         formData.append('username', loginInput);
         formData.append('password', password);
@@ -29,28 +26,28 @@ const LoginPage = () => {
             });
 
             if (response.ok) {
-                // 3. Get the User Object from Backend (includes id, username, role, etc.)
+                // 3. Get User Data
                 const user = await response.json();
                 console.log("Login Successful:", user);
 
-                // 4. Save User Data to Local Storage
-                // We use the key 'user' so AdminLayout can find it easily
+                // 4. Save User Data
                 localStorage.setItem("user", JSON.stringify(user));
 
-                // Optional: Save specific items if needed elsewhere
+                // 【FIXED HERE】: Must save userRole explicitly for ProtectedRoute to work
                 localStorage.setItem("userRole", user.role);
 
-                // 5. Trigger storage event to update other components immediately
+                // 5. Trigger storage event
                 window.dispatchEvent(new Event("storage"));
 
-                // 6. Redirect based on Role (Check lowercase to match DB)
+                // 6. Redirect based on Role
                 if (user.role && user.role.toLowerCase() === 'admin') {
+                    console.log("Navigating to Admin...");
                     navigate('/admin/home');
                 } else {
+                    console.log("Navigating to Home...");
                     navigate('/home');
                 }
             } else {
-                // Handle Login Failed
                 alert("Invalid username or password.");
             }
         } catch (error) {
