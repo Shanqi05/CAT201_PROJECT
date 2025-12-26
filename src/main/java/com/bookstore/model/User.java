@@ -6,7 +6,6 @@ public class User {
     private String password;
     private String email;
     private String role;     // "USER" or "ADMIN"
-    private double balance;  // e.g. 100.00
     private String address;
 
     // 1. Default Constructor
@@ -18,7 +17,6 @@ public class User {
         this.password = password;
         this.email = email;
         this.role = "USER";   // Default role
-        this.balance = 0.0;   // Default balance
         this.address = address;
     }
 
@@ -38,10 +36,6 @@ public class User {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    public double getBalance() { return balance; }
-    public void setBalance(double balance) { this.balance = balance; }
-
     public String getAddress() {return address;}
-
     public void setAddress(String address) {this.address = address;}
 }

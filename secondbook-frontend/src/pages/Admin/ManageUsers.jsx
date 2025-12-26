@@ -1,38 +1,80 @@
 // src/pages/Admin/ManageUsers.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, UserX, Shield, User, Mail, Users, Filter } from 'lucide-react';
-import usersData from '../../api/users.json';
 
 const ManageUsers = () => {
-    // 1. State Management
-    const [users, setUsers] = useState(usersData);
+    // State Management
+    const [users, setUsers] = useState([]); // Initialize with empty array
     const [searchTerm, setSearchTerm] = useState('');
-    // New: Currently active Tab ('all' | 'customer' | 'admin')
     const [activeTab, setActiveTab] = useState('all');
 
-    const handleDeleteUser = (id) => {
-        if(window.confirm("Are you sure you want to delete this user?")) {
-            setUsers(users.filter(user => user.id !== id));
+    // 2. Fetch users on component mount
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/CAT201_project/getUsers', {
+                method: 'GET',
+            });
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Users fetched:", data);
+                setUsers(data);
+            }
+        } catch (error) {
+            console.error("Error fetching users:", error);
         }
     };
+    const handleDeleteUser = async (id) => {
+            if(window.confirm("Are you sure you want to delete this user?")) {
+                try {
+                    // 3. Call Delete API
+                    const response = await fetch(`http://localhost:8080/CAT201_project/deleteUser?id=${id}`, {
+                        method: 'DELETE',
+                        credentials: 'include',
+                    });
 
-    // 2. Modified Filter Logic: Matches both Search Term AND Current Tab
+                    if (response.ok) {
+                        setUsers(users.filter(user => user.id !== id));
+                        alert("User deleted successfully.");
+                    } else {
+                        alert("Failed to delete user.");
+                    }
+                } catch (error) {
+                    console.error("Error deleting user:", error);
+                }
+            }
+        };
+
+    // Filter Logic
     const filteredUsers = users.filter(user => {
-        // Search match
-        const matchesSearch = 
-            user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.username.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        // Tab match
-        const matchesTab = activeTab === 'all' || user.role === activeTab;
+        // 4. Update filtering logic to use 'username' instead of 'name' if DB doesn't have name
+        const matchesSearch =
+            (user.username || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+        // 5. Handle Role matching (DB might store "USER" uppercase, frontend uses 'customer' lowercase)
+        // We normalize both to lowercase to compare safely
+        const userRole = (user.role || '').toLowerCase();
+        // Map 'USER' from DB to 'customer' for tab logic if needed, or just compare loosely
+        // If DB has "USER", activeTab "customer" needs to match
+        const matchesTab = activeTab === 'all' ||
+                           (activeTab === 'customer' && userRole === 'user') ||
+                           (activeTab === 'admin' && userRole === 'admin');
 
         return matchesSearch && matchesTab;
     });
 
+    // Helper to count roles safely
+    const countRoles = (targetRole) => {
+        return users.filter(u => (u.role || '').toLowerCase() === targetRole).length;
+    };
+
     return (
         <div className="p-8 max-w-7xl mx-auto w-full">
-            
+
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
@@ -55,57 +97,35 @@ const ManageUsers = () => {
                 <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
                     <div>
                         <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Customers</p>
-                        <h3 className="text-3xl font-black text-cyan-600 mt-1">{users.filter(u => u.role === 'customer').length}</h3>
+                        {/* Use helper function to count 'user' role */}
+                        <h3 className="text-3xl font-black text-cyan-600 mt-1">{countRoles('user')}</h3>
                     </div>
                     <div className="bg-cyan-50 p-3 rounded-xl text-cyan-600"><User size={24} /></div>
                 </div>
                 <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
                     <div>
                         <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Admins</p>
-                        <h3 className="text-3xl font-black text-purple-600 mt-1">{users.filter(u => u.role === 'admin').length}</h3>
+                        {/* Use helper function to count 'admin' role */}
+                        <h3 className="text-3xl font-black text-purple-600 mt-1">{countRoles('admin')}</h3>
                     </div>
                     <div className="bg-purple-50 p-3 rounded-xl text-purple-600"><Shield size={24} /></div>
                 </div>
             </div>
 
-            {/* Controls Section: Tabs & Search */}
+            {/* Controls Section */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-                
-                {/* 3. New: Tab Switcher */}
                 <div className="flex bg-gray-100 p-1 rounded-xl">
-                    <button 
-                        onClick={() => setActiveTab('all')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all ${
-                            activeTab === 'all' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'
-                        }`}
-                    >
-                        All Users
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('customer')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all ${
-                            activeTab === 'customer' ? 'bg-white text-cyan-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-                        }`}
-                    >
-                        Customers
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('admin')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all ${
-                            activeTab === 'admin' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'
-                        }`}
-                    >
-                        Admins
-                    </button>
+                    <button onClick={() => setActiveTab('all')} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all ${activeTab === 'all' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>All Users</button>
+                    <button onClick={() => setActiveTab('customer')} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all ${activeTab === 'customer' ? 'bg-white text-cyan-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Customers</button>
+                    <button onClick={() => setActiveTab('admin')} className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center transition-all ${activeTab === 'admin' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Admins</button>
                 </div>
 
-                {/* Search Bar */}
                 <div className="relative w-full md:w-96">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                     <input
                         type="text"
                         placeholder="Search users..."
-                        className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent outline-none text-sm transition-all"
+                        className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 outline-none text-sm"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -129,7 +149,7 @@ const ManageUsers = () => {
                             {filteredUsers.length === 0 ? (
                                 <tr>
                                     <td colSpan="5" className="p-12 text-center text-gray-500">
-                                        No {activeTab !== 'all' ? activeTab : ''} users found matching "{searchTerm}"
+                                        No users found.
                                     </td>
                                 </tr>
                             ) : (
@@ -138,12 +158,14 @@ const ManageUsers = () => {
                                         <td className="p-5">
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm ${
-                                                    user.role === 'admin' ? 'bg-gradient-to-br from-purple-500 to-indigo-600' : 'bg-gradient-to-br from-cyan-400 to-blue-500'
+                                                    (user.role || '').toUpperCase() === 'ADMIN' ? 'bg-gradient-to-br from-purple-500 to-indigo-600' : 'bg-gradient-to-br from-cyan-400 to-blue-500'
                                                 }`}>
-                                                    {user.name.charAt(0)}
+                                                    {/* Display first char of username since we don't have 'name' */}
+                                                    {user.username ? user.username.charAt(0).toUpperCase() : '?'}
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-gray-900 leading-tight">{user.name}</p>
+                                                    {/* Changed user.name to user.username */}
+                                                    <p className="font-bold text-gray-900 leading-tight">{user.username}</p>
                                                     <p className="text-[10px] text-gray-400 font-mono mt-0.5">ID: {user.id}</p>
                                                 </div>
                                             </div>
@@ -158,7 +180,7 @@ const ManageUsers = () => {
                                             @{user.username}
                                         </td>
                                         <td className="p-5">
-                                            {user.role === 'admin' ? (
+                                            {(user.role || '').toUpperCase() === 'ADMIN' ? (
                                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-100">
                                                     <Shield size={12} fill="currentColor" className="opacity-50" />
                                                     Admin
@@ -174,12 +196,11 @@ const ManageUsers = () => {
                                             <button
                                                 onClick={() => handleDeleteUser(user.id)}
                                                 className={`p-2 rounded-lg transition-colors ${
-                                                    user.role === 'admin' 
-                                                    ? 'text-gray-300 cursor-not-allowed' 
+                                                    (user.role || '').toUpperCase() === 'ADMIN'
+                                                    ? 'text-gray-300 cursor-not-allowed'
                                                     : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
                                                 }`}
-                                                disabled={user.role === 'admin'}
-                                                title={user.role === 'admin' ? "Cannot delete admin" : "Delete User"}
+                                                disabled={(user.role || '').toUpperCase() === 'ADMIN'}
                                             >
                                                 <UserX size={18}/>
                                             </button>
@@ -189,12 +210,6 @@ const ManageUsers = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-                
-                {/* Footer */}
-                <div className="p-4 border-t border-gray-100 bg-gray-50/50 text-xs text-gray-500 flex justify-between items-center font-medium">
-                    <span>Showing {filteredUsers.length} results</span>
-                    <span>Filter: {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</span>
                 </div>
             </div>
         </div>
