@@ -1,28 +1,31 @@
-// src/pages/Admin/AdminLayout.jsx
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, BookOpen, Users, Settings, Search,
     Bell, Mail, LogOut, ShoppingBag, Menu, Info, User,
-    ChevronDown, BarChart2, ClipboardList // <--- 1. 新增 ClipboardList 图标
+    ChevronDown, BarChart2, ClipboardList
 } from 'lucide-react';
 
 const AdminLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
-    const [currentUser, setCurrentUser] = useState({ name: '', id: null, role: '' });
+
+    // 状态：保存当前登录的用户信息
+    const [currentUser, setCurrentUser] = useState({ name: 'Admin', id: 'N/A', role: '' });
+
     const navigate = useNavigate();
     const location = useLocation();
 
+    // 1. 读取 LocalStorage
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             try {
                 const parsed = JSON.parse(storedUser);
                 setCurrentUser({
-                    name: parsed.username || parsed.name || 'Admin',
-                    id: parsed.id,
-                    role: parsed.role
+                    name: parsed.username || 'Administrator',
+                    id: parsed.id || 'N/A',
+                    role: parsed.role || 'Admin'
                 });
             } catch (error) {
                 console.error("Failed to parse user data", error);
@@ -32,18 +35,15 @@ const AdminLayout = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('user');
+        localStorage.removeItem('userRole');
         navigate('/login');
     };
 
-    // 2. 修改菜单数组，在 Users 上面添加 Orders
     const menuItems = [
         { name: 'Dashboard', icon: <LayoutDashboard size={20} />, link: '/admin/home' },
         { name: 'Book', icon: <BookOpen size={20} />, link: '/admin/manage-books' },
         { name: 'Accessories', icon: <ShoppingBag size={20} />, link: '/admin/accessories' },
-
-        // >>>>> 新增 Orders 入口 <<<<<
         { name: 'Orders', icon: <ClipboardList size={20} />, link: '/admin/view-orders' },
-
         { name: 'Users', icon: <Users size={20} />, link: '/admin/manage-users' },
         { name: 'Analytics', icon: <BarChart2 size={20} />, link: '/admin/analytics' },
         { name: 'Settings', icon: <Settings size={20} />, link: '/admin/settings' },
@@ -68,17 +68,19 @@ const AdminLayout = () => {
                     </Link>
                 </div>
 
+                {/* [UPDATE 1]: Sidebar User Info (显示 ID) */}
                 <div className={`text-center border-b border-gray-800 transition-all duration-300 ${sidebarOpen ? 'p-6' : 'p-4'}`}>
                     <div className={`mx-auto rounded-full mb-3 overflow-hidden border-[3px] border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300 ${sidebarOpen ? 'w-16 h-16' : 'w-10 h-10'}`}>
-                        <div className="w-full h-full bg-gray-800 text-white flex items-center justify-center">
-                            <User size={sidebarOpen ? 30 : 20} />
+                        <div className="w-full h-full bg-gray-800 text-white flex items-center justify-center font-bold text-xl">
+                            {currentUser.name.charAt(0).toUpperCase()}
                         </div>
                     </div>
                     <div className={`transition-opacity duration-200 ${sidebarOpen ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}>
-                        <h3 className="font-bold text-gray-100 truncate px-2">{currentUser.name || 'Loading...'}</h3>
-                        {currentUser.id && (
-                            <p className="text-[10px] text-gray-400 font-mono mt-1 bg-gray-900 inline-block px-2 py-0.5 rounded border border-gray-700">ID: {currentUser.id}</p>
-                        )}
+                        <h3 className="font-bold text-gray-100 truncate px-2">{currentUser.name}</h3>
+                        {/* 这里显示 ID */}
+                        <p className="text-[10px] text-gray-400 font-mono mt-1 bg-gray-900 inline-block px-2 py-0.5 rounded border border-gray-700">
+                            ID: {currentUser.id}
+                        </p>
                     </div>
                 </div>
 
@@ -117,7 +119,7 @@ const AdminLayout = () => {
                             <Menu size={24} />
                         </button>
                         <div className="relative hidden md:block w-96">
-                            <input type="text" placeholder="Search inventory, orders, users..." className="w-full bg-gray-900 border border-gray-700 text-gray-200 rounded-full py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder-gray-500" />
+                            <input type="text" placeholder="Search..." className="w-full bg-gray-900 border border-gray-700 text-gray-200 rounded-full py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder-gray-500" />
                             <Search className="absolute left-3 top-3 text-gray-500 w-4 h-4" />
                         </div>
                     </div>
@@ -132,14 +134,22 @@ const AdminLayout = () => {
                                 <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
                             </div>
                         </div>
+
+                        {/* [UPDATE 2]: Header User Info (显示 ID) */}
                         <div className="relative">
                             <button onClick={() => setUserMenuOpen(!userMenuOpen)} className="flex items-center gap-3 hover:bg-gray-900 p-2 rounded-lg transition-colors focus:outline-none">
                                 <div className="w-9 h-9 bg-gray-800 text-cyan-400 rounded-full flex items-center justify-center shadow-md border border-gray-700">
-                                    <span className="font-bold text-sm">{currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'A'}</span>
+                                    <span className="font-bold text-sm">
+                                        {currentUser.name.charAt(0).toUpperCase()}
+                                    </span>
                                 </div>
                                 <div className="hidden md:block text-left">
                                     <p className="text-xs font-bold text-gray-200 leading-none">{currentUser.name}</p>
-                                    <p className="text-[10px] text-gray-500">Administrator</p>
+
+                                    {/* 这里改成了显示 ID */}
+                                    <p className="text-[10px] text-gray-500 font-mono">
+                                        ID: {currentUser.id}
+                                    </p>
                                 </div>
                                 <ChevronDown size={14} className={`text-gray-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
                             </button>
@@ -158,7 +168,6 @@ const AdminLayout = () => {
                     </div>
                 </header>
 
-                {/* MAIN CONTENT WRAPPER */}
                 <main className="flex-1 overflow-y-auto bg-gray-100 p-8">
                     <Outlet />
                 </main>

@@ -5,24 +5,18 @@ public class Book {
     private String title;
     private String author;
     private double price;
-    private String status;
-    private String listingType;
-    private String imagePath;
-    private int sellerId;
+    private String imagePath;  // Maps to database 'image_path'
+    private String status;     // 'Active' or 'Sold'
+
+    // [NEW FIELDS] Added to match updated Database
+    private String category;
+    private String condition;  // Maps to database 'book_condition'
+    private double rating;
+    private int stock;
 
     public Book() {}
 
-    // 构造函数也更新一下
-    public Book(String title, String author, double price, String listingType, int sellerId) {
-        this.title = title;
-        this.author = author;
-        this.price = price;
-        this.listingType = listingType;
-        this.sellerId = sellerId;
-        this.status = "Active"; // default
-    }
-
-    // Getters and Setters
+    // Getters and Setters for ALL fields
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -35,15 +29,22 @@ public class Book {
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public String getListingType() { return listingType; }
-    public void setListingType(String listingType) { this.listingType = listingType; }
-
     public String getImagePath() { return imagePath; }
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 
-    public int getSellerId() { return sellerId; }
-    public void setSellerId(int sellerId) { this.sellerId = sellerId; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    // [New Getters/Setters]
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getCondition() { return condition; }
+    public void setCondition(String condition) { this.condition = condition; }
+
+    public double getRating() { return rating; }
+    public void setRating(double rating) { this.rating = rating; }
+
+    public int getStock() { return stock; }
+    public void setStock(int stock) { this.stock = stock; }
 }
