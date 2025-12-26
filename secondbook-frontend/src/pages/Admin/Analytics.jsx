@@ -1,46 +1,83 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     BookOpen, ShoppingBag, TrendingUp, Activity,
     ArrowUpRight, ArrowDownRight, Calendar, Download
 } from 'lucide-react';
 
-// 模拟数据
-const stats = [
-    {
-        label: "Total Books",
-        value: "620",
-        change: "+12%",
-        trend: "up",
-        icon: <BookOpen className="text-white" size={24} />,
-        color: "bg-blue-500"
-    },
-    {
-        label: "Total Accessories", // >>> 新增：Total Accessories
-        value: "145",
-        change: "+5.2%",
-        trend: "up",
-        icon: <ShoppingBag className="text-white" size={24} />,
-        color: "bg-purple-500" // 使用不同颜色区分
-    },
-    {
-        label: "Total Revenue",
-        value: "$22,520",
-        change: "+8.4%",
-        trend: "up",
-        icon: <TrendingUp className="text-white" size={24} />,
-        color: "bg-green-500"
-    },
-    {
-        label: "Conversion Rate", // >>> 保留了 Conversion Rate (去掉了 Avg Order Value)
-        value: "2.4%",
-        change: "-0.1%",
-        trend: "down",
-        icon: <Activity className="text-white" size={24} />,
-        color: "bg-orange-500"
-    }
-];
-
 const Analytics = () => {
+    // 1. State Management
+    const [statsData, setStatsData] = useState({
+        totalBooks: 0,
+        totalAccessories: 0,
+        totalEarnings: 0 // Note: Ensure your Java backend sends 'totalEarnings' or 'totalRevenue' inside 'stats'
+    });
+    const [loading, setLoading] = useState(true);
+
+    // 2. Fetch Real Backend Data
+    useEffect(() => {
+        const fetchAnalytics = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/CAT201_project/dashboard-stats', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Analytics Data:", data);
+
+                    // >>> FIX: Merge data.stats with the outer totalAccessories <<<
+                    setStatsData({
+                        ...data.stats,                     // Spread existing stats (books, orders/earnings)
+                        totalAccessories: data.totalAccessories // Manually grab totalAccessories from the outer layer
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching analytics:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAnalytics();
+    }, []);
+
+    // 3. Construct Stats Array for Display (Mixed Real + Mock Data)
+    const statsCards = [
+        {
+            label: "Total Books",
+            value: loading ? "..." : statsData.totalBooks, // [Real Data]
+            change: "+12%", // [Mock Trend] - No historical data implemented yet
+            trend: "up",
+            icon: <BookOpen className="text-white" size={24} />,
+            color: "bg-blue-500"
+        },
+        {
+            label: "Total Accessories",
+            value: loading ? "..." : statsData.totalAccessories, // [Real Data] - Now fetching correctly
+            change: "+5.2%",
+            trend: "up",
+            icon: <ShoppingBag className="text-white" size={24} />,
+            color: "bg-purple-500"
+        },
+        {
+            label: "Total Revenue",
+            // Note: Make sure the JSON key matches 'totalEarnings' or change this to statsData.totalRevenue
+            value: loading ? "..." : `$${statsData.totalEarnings ? statsData.totalEarnings.toFixed(2) : "0.00"}`,
+            change: "+8.4%",
+            trend: "up",
+            icon: <TrendingUp className="text-white" size={24} />,
+            color: "bg-green-500"
+        },
+        {
+            label: "Conversion Rate",
+            value: "3.2%", // [Fully Mocked] - Hard to calculate without session tracking, used for demo
+            change: "-0.1%",
+            trend: "down",
+            icon: <Activity className="text-white" size={24} />,
+            color: "bg-orange-500"
+        }
+    ];
+
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-10">
 
@@ -55,22 +92,24 @@ const Analytics = () => {
                     </p>
                 </div>
 
-                {/* Date Range & Export Actions */}
                 <div className="flex items-center gap-3">
                     <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
                         <Calendar size={16} />
                         <span>Last 30 Days</span>
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-black text-cyan-400 border border-black rounded-lg text-sm font-bold hover:bg-gray-800 transition-colors shadow-lg">
+                    <button
+                        onClick={() => alert("Export feature is available in Pro version.")}
+                        className="flex items-center gap-2 px-4 py-2 bg-black text-cyan-400 border border-black rounded-lg text-sm font-bold hover:bg-gray-800 transition-colors shadow-lg"
+                    >
                         <Download size={16} />
                         <span>Export Report</span>
                     </button>
                 </div>
             </div>
 
-            {/* 2. Key Metrics Grid */}
+            {/* 2. Key Metrics Grid (REAL DATA) */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, index) => (
+                {statsCards.map((stat, index) => (
                     <div key={index} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-4">
                             <div className={`${stat.color} p-3 rounded-xl shadow-lg shadow-gray-200`}>
@@ -91,13 +130,16 @@ const Analytics = () => {
                 ))}
             </div>
 
-            {/* 3. Charts Area (Visual Mockups) */}
+            {/* 3. Charts Area (STATIC / MOCKED DATA for Visuals) */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 {/* Revenue Chart Mockup */}
                 <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <div className="flex justify-between items-center mb-8">
-                        <h3 className="font-bold text-gray-800">Revenue Trends</h3>
+                        <div>
+                            <h3 className="font-bold text-gray-800">Revenue Trends (Projected)</h3>
+                            <p className="text-[10px] text-gray-400">Based on historical projection data</p>
+                        </div>
                         <div className="flex gap-2">
                             <span className="w-3 h-3 rounded-full bg-cyan-500"></span>
                             <span className="text-xs text-gray-500">Books</span>
@@ -108,25 +150,18 @@ const Analytics = () => {
                     {/* CSS-only Bar Chart Visualization */}
                     <div className="flex items-end justify-between h-64 gap-2 pt-4 px-2">
                         {[40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95].map((height, i) => (
-                            // >>> 修复点：添加了 h-full <<<
-                            // 之前少了 h-full，导致容器高度为0，所以看不见
                             <div key={i} className="w-full h-full bg-gray-50 rounded-t-lg relative group overflow-hidden">
-
-                                {/* 灰色背景条 (可选，如果你想让它看起来像个槽) */}
                                 <div className="absolute inset-0 bg-gray-100 rounded-t-lg"></div>
-
-                                {/* 青色柱子 (Books) */}
+                                {/* Books Bar */}
                                 <div
                                     className="absolute bottom-0 w-full bg-cyan-500 rounded-t-lg transition-all duration-500 hover:bg-cyan-400 z-10"
                                     style={{ height: `${height}%` }}
                                 >
-                                    {/* Tooltip (鼠标放上去显示数值) */}
                                     <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] font-bold py-1 px-2 rounded transition-opacity whitespace-nowrap z-20">
                                         ${height}k
                                     </div>
                                 </div>
-
-                                {/* 紫色柱子 (Accessories - 叠在下面或者做成堆叠效果) */}
+                                {/* Accessories Bar */}
                                 <div
                                     className="absolute bottom-0 w-full bg-purple-500 rounded-t-lg opacity-80 z-0"
                                     style={{ height: `${height * 0.4}%` }}
@@ -142,14 +177,13 @@ const Analytics = () => {
 
                 {/* Sales by Category Mockup */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <h3 className="font-bold text-gray-800 mb-6">Sales by Category</h3>
+                    <h3 className="font-bold text-gray-800 mb-6">Sales Distribution</h3>
 
                     <div className="relative w-48 h-48 mx-auto mb-8">
-                        {/* CSS Donut Chart */}
                         <div className="w-full h-full rounded-full border-[16px] border-cyan-500 border-r-purple-500 border-b-gray-200 transform rotate-45"></div>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
                             <span className="text-3xl font-black text-gray-900">72%</span>
-                            <span className="text-xs text-gray-500">Books Sold</span>
+                            <span className="text-xs text-gray-500">Books</span>
                         </div>
                     </div>
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class AccessoryDAO {
 
-    // 1. 添加 (你原本写的)
+    // 1. Add a new accessory
     public boolean addAccessory(Accessory accessory) {
         boolean isSuccess = false;
         String sql = "INSERT INTO accessories (title, category, price, image_path, status) VALUES (?, ?, ?, ?, ?)";
@@ -20,7 +20,7 @@ public class AccessoryDAO {
             ps.setString(2, accessory.getCategory());
             ps.setDouble(3, accessory.getPrice());
             ps.setString(4, accessory.getImagePath());
-            ps.setString(5, "Active");
+            ps.setString(5, "Active"); // Default status
 
             int row = ps.executeUpdate();
             if (row > 0) isSuccess = true;
@@ -31,10 +31,11 @@ public class AccessoryDAO {
         return isSuccess;
     }
 
-    // 2. >>> 新增: 获取所有配件列表 <<<
+    // 2. Retrieve all accessories list
     public List<Accessory> getAllAccessories() {
         List<Accessory> list = new ArrayList<>();
-        String sql = "SELECT * FROM accessories ORDER BY id DESC"; // 倒序排列，新的在前面
+        // Sort by ID descending, so the newest items appear first
+        String sql = "SELECT * FROM accessories ORDER BY id DESC";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -46,6 +47,7 @@ public class AccessoryDAO {
                 acc.setTitle(rs.getString("title"));
                 acc.setCategory(rs.getString("category"));
                 acc.setPrice(rs.getDouble("price"));
+                // Important: Maps database 'image_path' to Java 'imagePath'
                 acc.setImagePath(rs.getString("image_path"));
                 acc.setStatus(rs.getString("status"));
                 list.add(acc);
@@ -56,7 +58,7 @@ public class AccessoryDAO {
         return list;
     }
 
-    // 3. >>> 新增: 根据ID删除 <<<
+    // 3. Delete accessory by ID
     public boolean deleteAccessory(int id) {
         boolean isSuccess = false;
         String sql = "DELETE FROM accessories WHERE id = ?";
@@ -72,5 +74,24 @@ public class AccessoryDAO {
             e.printStackTrace();
         }
         return isSuccess;
+    }
+
+    // 4. Get total count of accessories (Required for Dashboard display)
+    public int getTotalAccessoriesCount() {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM accessories";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                count = rs.getInt(1); // Get the result from the first column
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 }

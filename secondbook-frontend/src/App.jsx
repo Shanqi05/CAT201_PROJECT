@@ -1,5 +1,4 @@
 import React from 'react';
-// 1. CRITICAL: Import these from react-router-dom
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // 2. LAYOUT COMPONENTS
@@ -22,14 +21,13 @@ import OrderSuccessPage from './pages/User/OrderSuccessPage';
 import UserDashboardPage from './pages/User/UserDashboardPage';
 
 // 5. ADMIN PAGES
-import AdminDashboard from './pages/Admin/AdminDashboard'; // Legacy dashboard
-import AdminHomePage from './pages/Admin/AdminHomePage';
+import AdminLayout from './pages/Admin/AdminLayout';
+import AdminHomePage from './pages/Admin/AdminHomePage'; // Main Admin Dashboard
 import ManageBooks from './pages/Admin/ManageBooks';
 import ManageUsers from './pages/Admin/ManageUsers';
 import ManageAccessories from './pages/Admin/ManageAccessories';
 import ViewOrders from './pages/Admin/ViewOrders';
 import Analytics from './pages/Admin/Analytics';
-import AdminLayout from './pages/Admin/AdminLayout'; // 确保这里只 import 一次
 
 // 6. SECURITY GUARDS
 import ProtectedRoute from './components/Common/ProtectedRoute';
@@ -38,19 +36,19 @@ import AdminProtectedRoute from './components/Common/AdminProtectedRoute';
 function App() {
     const location = useLocation();
 
-    // Hide Header and Footer on login and register pages
+    // Hide Header/Footer on Login, Register, and all Admin pages
     const hideHeaderFooter = ['/login', '/register'].includes(location.pathname) || location.pathname.startsWith('/admin');
 
-    const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname === '/admin-dashboard';
+    const isAdminRoute = location.pathname.startsWith('/admin');
 
     return (
         <div className="flex flex-col min-h-screen">
-            {/* Header only shows after login */}
+            {/* Header (Visible only on User pages) */}
             {!hideHeaderFooter && <Header />}
 
             <main className={`flex-grow ${isAdminRoute ? '' : 'bg-gray-50 py-8'}`}>
                 <Routes>
-                    {/* ROOT REDIRECT */}
+                    {/* ROOT REDIRECT -> Go to Login */}
                     <Route path="/" element={<Navigate to="/login" replace />} />
 
                     {/* PUBLIC ROUTES */}
@@ -62,46 +60,36 @@ function App() {
                     <Route path="/accessories" element={<AccessoriesPage />} />
                     <Route path="/about" element={<AboutUsPage />} />
 
-                    {/* PROTECTED USER ROUTES */}
+                    {/* PROTECTED USER ROUTES (Login Required) */}
                     <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
                     <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
                     <Route path="/dashboard" element={<ProtectedRoute><UserDashboardPage /></ProtectedRoute>} />
                     <Route path="/order-success" element={<ProtectedRoute><OrderSuccessPage /></ProtectedRoute>} />
 
-                    {/* ADMIN ONLY ROUTES (Updated Structure) */}
-                    <Route element={
+                    {/* --- ADMIN ROUTES SECTION --- */}
+                    <Route path="/admin" element={
                         <AdminProtectedRoute>
                             <AdminLayout />
                         </AdminProtectedRoute>
                     }>
-                        <Route path="/admin/home" element={<AdminHomePage />} />
-                        <Route path="/admin/manage-books" element={<ManageBooks />} />
-                        <Route path="/admin/manage-users" element={<ManageUsers />} />
-                        <Route path="/admin/view-orders" element={<ViewOrders />} />
-                        <Route path="/admin/analytics" element={<Analytics />} />
+                        {/* 1. Default Redirect */}
+                        <Route index element={<Navigate to="home" replace />} />
 
-                        <Route path="/admin/accessories" element={<ManageAccessories />} />
-
-
-                        <Route path="/admin" element={<Navigate to="/admin/home" replace />} />
+                        {/* 2. Admin Children Routes (【FIX】: Removed /admin prefix) */}
+                        <Route path="home" element={<AdminHomePage />} />
+                        <Route path="manage-books" element={<ManageBooks />} />
+                        <Route path="manage-users" element={<ManageUsers />} />
+                        <Route path="view-orders" element={<ViewOrders />} />
+                        <Route path="analytics" element={<Analytics />} />
+                        <Route path="accessories" element={<ManageAccessories />} />
                     </Route>
 
-                    {/* Legacy Route (Optional, kept for compatibility) */}
-                    <Route
-                        path="/admin-dashboard"
-                        element={
-                            <AdminProtectedRoute>
-                                <AdminDashboard />
-                            </AdminProtectedRoute>
-                        }
-                    />
-
-                    {/* 404 FALLBACK */}
+                    {/* 404 FALLBACK -> Redirect to Login */}
                     <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
             </main>
 
-            {/* Footer only shows after login */}
+            {/* Footer (Visible only on User pages) */}
             {!hideHeaderFooter && <Footer />}
         </div>
     );
