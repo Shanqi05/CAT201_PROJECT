@@ -4,40 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-<<<<<<< HEAD
-    <list default="true" id="0519f6b5-f95e-47ec-9c9b-58205dfb2aec" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/api/accessories.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/assets/images/member.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/assets/images/promo_banner.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/AboutUsPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/AccessoriesPage.jsx" afterDir="false" />
+    <list default="true" id="9a6d909e-50cb-4c05-83ba-2911f53bac52" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/AccessoryDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/model/Accessory.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Header.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/main.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/main.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/DonationPage.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/HomePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/HomePage.jsx" afterDir="false" />
-=======
-    <list default="true" id="0519f6b5-f95e-47ec-9c9b-58205dfb2aec" name="Changes" comment="Backend folder location changed">
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/ProtectedRoute.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/CartPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/CheckoutPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/LoginPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/OrderSuccessPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/Profile.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/RegisterPage.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondbook-frontend/src/utils/cartUtils.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-<<<<<<< HEAD
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/BookCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/BookCard.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Header.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/UserDashboardPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/UserDashboardPage.jsx" afterDir="false" />
-=======
->>>>>>> e46c12991689e1ce6d925402174497c991da4a0e
->>>>>>> 1c8e1c7b1152939aad808a961cc38012a04e3b61
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/ManageAccessories.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/ManageAccessories.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/ManageBooks.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/ManageBooks.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddAccessoryServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddAccessoryServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddBookServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddBookServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/BookDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/BookDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/AddBookServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/AddBookServlet.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,224 +23,94 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="package.json" />
-        <option value="JavaScript File" />
-        <option value="JSX File" />
+        <option value="Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="sq1" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "history": [
-    {
-      "state": "OPEN"
-    },
-    {
-      "state": "OPEN",
-      "author": "Shanqi05"
-    }
-  ],
   "lastFilter": {
     "state": "OPEN",
-    "author": "Shanqi05"
+    "assignee": "SelinaTan05"
   }
 }]]></component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
-    "url": "https://github.com/Shanqi05/CAT201_PROJECT.git",
-    "accountId": "c6895309-38f3-43d4-a614-a223ea0e9474"
+    "url": "https://github.com/Shanqi05/CAT201_PROJECT",
+    "accountId": "20c9cc52-4f58-494c-9e36-991954e26f7e"
   }
 }]]></component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 5
-}</component>
-  <component name="ProjectId" id="36blqLL0aTSB74wafzmuOU4Nnje" />
-  <component name="ProjectLevelVcsManager">
-    <ConfirmationsSetting value="1" id="Add" />
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="37NALaO4xUNa4rjjusatq6BwJRy" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-<<<<<<< HEAD
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
-    &quot;Application.BookDAO.executor&quot;: &quot;Run&quot;,
-    &quot;Application.OrderDAO.executor&quot;: &quot;Run&quot;,
-    &quot;Application.UserDAO.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Node.js.Footer.jsx.executor&quot;: &quot;Run&quot;,
-    &quot;Node.js.ProfilePage.jsx.executor&quot;: &quot;Run&quot;,
-    &quot;Node.js.main.jsx.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Smart Tomcat.Tomcat.executor&quot;: &quot;Run&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/IdeaProjects/Clone_CAT201_project&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
-=======
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-<<<<<<< HEAD
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Node.js.Footer.jsx.executor": "Run",
-    "Node.js.HomePage.jsx.executor": "Run",
-=======
-    "Application.BookDAO.executor": "Run",
-    "Application.OrderDAO.executor": "Run",
-    "Application.UserDAO.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Node.js.Footer.jsx.executor": "Run",
->>>>>>> e46c12991689e1ce6d925402174497c991da4a0e
-    "Node.js.ProfilePage.jsx.executor": "Run",
-    "Node.js.main.jsx.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-<<<<<<< HEAD
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/User/CAT201_PROJECT",
-=======
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/User/IdeaProjects/Clone_CAT201_project",
->>>>>>> e46c12991689e1ce6d925402174497c991da4a0e
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-<<<<<<< HEAD
-=======
-    "to.speed.mode.migration.done": "true",
->>>>>>> e46c12991689e1ce6d925402174497c991da4a0e
-    "vue.rearranger.settings.migration": "true"
->>>>>>> 1c8e1c7b1152939aad808a961cc38012a04e3b61
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\User\IdeaProjects\Clone_CAT201_project" />
-      <recent name="C:\Users\User\IdeaProjects\Clone_CAT201_project\secondbook-frontend\src" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-<<<<<<< HEAD
-      <recent name="C:\Users\Ng Xin Yuan\IdeaProjects\CAT201_PROJECT\secondbook-frontend\src\pages\User" />
-=======
-      <recent name="C:\Users\User\CAT201_PROJECT\secondbook-frontend\src\assets\images" />
->>>>>>> 1c8e1c7b1152939aad808a961cc38012a04e3b61
-      <recent name="C:\Users\User\CAT201_PROJECT\secondbook-frontend\node_modules" />
-      <recent name="C:\Users\User\CAT201_PROJECT\secondbook-frontend\src\pages\Auth" />
-      <recent name="C:\Users\User\CAT201_PROJECT\secondbook-frontend\src\context" />
-      <recent name="C:\Users\User\CAT201_PROJECT\secondbook-frontend\src\pages\Customer" />
-    </key>
-  </component>
   <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="CAT201_PROJECT" />
+    <configuration name="Tomcat" type="com.poratu.idea.plugins.tomcat">
+      <predefined_log_file enabled="true" id="Tomcat Localhost Log" />
+      <predefined_log_file enabled="true" id="Tomcat Access Log" />
+      <predefined_log_file id="Tomcat Catalina Log" />
+      <predefined_log_file id="Tomcat Manager Log" />
+      <predefined_log_file id="Tomcat Host Manager Log" />
+      <option name="catalinaBase" value="C:\Users\User\.SmartTomcat\Clone_CAT201_project\CAT201_project" />
+      <option name="contextPath" value="/CAT201_project" />
+      <option name="docBase" value="$PROJECT_DIR$/src/main/webapp" />
+      <option name="extraClassPath" value="" />
+      <option name="tomcatInfo">
+        <TomcatInfo>
+          <option name="name" value="Apache Tomcat/10.1.50" />
+          <option name="path" value="$USER_HOME$/Desktop/Tools/apache-tomcat-10.1.50" />
+          <option name="version" value="10.1.50.0" />
+        </TomcatInfo>
+      </option>
+      <option name="vmOptions" value="" />
+      <module name="CAT201_project" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="CAT201_PROJECT" />
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="CAT201_PROJECT" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="CAT201_PROJECT" />
-      <option name="filePath" />
-      <method v="2" />
     </configuration>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28238.7" />
-        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-IU-252.28238.7" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
       </set>
     </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="0519f6b5-f95e-47ec-9c9b-58205dfb2aec" name="Changes" comment="" />
-      <created>1765283341442</created>
+      <changelist id="9a6d909e-50cb-4c05-83ba-2911f53bac52" name="Changes" comment="" />
+      <created>1766731914201</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1765283341442</updated>
-      <workItem from="1765283342942" duration="5133000" />
-      <workItem from="1765288725733" duration="3822000" />
-<<<<<<< HEAD
-      <workItem from="1765295307215" duration="630000" />
-      <workItem from="1765689830406" duration="14632000" />
-=======
-      <workItem from="1765295307215" duration="812000" />
-      <workItem from="1765329372718" duration="408000" />
-      <workItem from="1765680751111" duration="2000" />
-      <workItem from="1765688971911" duration="5162000" />
->>>>>>> 1c8e1c7b1152939aad808a961cc38012a04e3b61
+      <updated>1766731914201</updated>
     </task>
-    <task id="LOCAL-00001" summary="backend: Data access object, models and DB connection">
-      <option name="closed" value="true" />
-      <created>1765385203836</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1765385203836</updated>
-    </task>
-    <task id="LOCAL-00002" summary="backend: Data access object, models and DB connection">
-      <option name="closed" value="true" />
-      <created>1765385295499</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1765385295499</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Backend folder location changed">
-      <option name="closed" value="true" />
-      <created>1765385799199</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1765385799199</updated>
-    </task>
-    <option name="localTasksCounter" value="4" />
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="backend: Data access object, models and DB connection" />
-    <MESSAGE value="Backend folder location changed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Backend folder location changed" />
   </component>
 </project>

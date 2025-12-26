@@ -55,7 +55,7 @@ const ManageBooks = () => {
 
         try {
             // 2. 发送 POST 请求到你的 Servlet
-            const response = await fetch('http://localhost:8080/SecondBookProject/addBook', {
+            const response = await fetch('http://localhost:8080/CAT201_project/addBook', {
                 method: 'POST',
                 credentials: 'include',
                 body: data,

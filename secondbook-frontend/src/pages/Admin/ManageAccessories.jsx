@@ -51,7 +51,7 @@ const ManageAccessories = () => {
 
         try {
             // 指向 AddAccessoryServlet
-            const response = await fetch('http://localhost:8080/SecondBookProject/addAccessory', {
+            const response = await fetch('http://localhost:8080/CAT201_project/addAccessory', {
                 method: 'POST',
                 credentials: 'include',
                 body: data,
