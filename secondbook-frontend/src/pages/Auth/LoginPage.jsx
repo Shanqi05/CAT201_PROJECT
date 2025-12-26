@@ -10,41 +10,40 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        // 1. Prepare data
         const formData = new URLSearchParams();
         formData.append('username', loginInput);
         formData.append('password', password);
 
         try {
-            // 2. Send request to Java Servlet
+            // [FIX 1]: Add credentials: 'include' so the browser saves the JSESSIONID cookie
             const response = await fetch('http://localhost:8080/CAT201_project/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: formData
+                body: formData,
+                credentials: 'include' // <--- 必须加这行，否则后端 Session 无效
             });
 
             if (response.ok) {
-                // 3. Get User Data
                 const user = await response.json();
                 console.log("Login Successful:", user);
 
-                // 4. Save User Data
-                localStorage.setItem("user", JSON.stringify(user));
+                // [FIX 2]: Save "userToken" because Header.js checks for it!
+                // Since your backend uses Sessions (Cookies) and not JWT,
+                // we just save a dummy string or the user ID to satisfy the frontend check.
+                localStorage.setItem("userToken", "logged-in");
 
-                // 【FIXED HERE】: Must save userRole explicitly for ProtectedRoute to work
+                localStorage.setItem("user", JSON.stringify(user));
                 localStorage.setItem("userRole", user.role);
 
-                // 5. Trigger storage event
+                // Trigger storage event to update Header immediately
                 window.dispatchEvent(new Event("storage"));
 
-                // 6. Redirect based on Role
+                // Redirect based on Role
                 if (user.role && user.role.toLowerCase() === 'admin') {
-                    console.log("Navigating to Admin...");
                     navigate('/admin/home');
                 } else {
-                    console.log("Navigating to Home...");
                     navigate('/home');
                 }
             } else {
