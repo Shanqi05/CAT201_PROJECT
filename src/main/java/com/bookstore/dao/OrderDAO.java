@@ -1,125 +1,168 @@
 package com.bookstore.dao;
 
 import com.bookstore.model.Order;
+import com.bookstore.model.OrderItem;
 import com.bookstore.util.DBConnection;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class OrderDAO {
 
-    // 【Function: Process a Purchase】
-    // This method handles the Transaction.
-    // Returns: String message (e.g., "SUCCESS", "Insufficient Funds", "Book Sold")
-    public String placeOrder(int bookId, int buyerId) {
+    // ==========================================
+    //  方法 1: 创建订单 (用于购买 PurchaseServlet)
+    // ==========================================
+    public boolean createOrder(Order order) {
         Connection conn = null;
-        PreparedStatement psCheckBook = null;
-        PreparedStatement psCheckBuyer = null;
-        PreparedStatement psUpdateBuyer = null;
-        PreparedStatement psUpdateSeller = null;
-        PreparedStatement psUpdateBook = null;
-        PreparedStatement psInsertOrder = null;
-        ResultSet rsBook = null;
-        ResultSet rsBuyer = null;
+        PreparedStatement psOrder = null;
+        PreparedStatement psItem = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            // 1. 开启事务 (Transaction)
+            conn.setAutoCommit(false);
+
+            // 2. 插入主表 orders
+            String sqlOrder = "INSERT INTO orders (user_id, total_amount, status, shipping_address, payment_method) VALUES (?, ?, ?, ?, ?)";
+            psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
+            psOrder.setInt(1, order.getUserId());
+            psOrder.setDouble(2, order.getTotalAmount());
+            psOrder.setString(3, "PENDING");
+            psOrder.setString(4, order.getShippingAddress());
+            psOrder.setString(5, order.getPaymentMethod());
+
+            int rowAffected = psOrder.executeUpdate();
+            if (rowAffected == 0) throw new SQLException("Creating order failed, no rows affected.");
+
+            // 3. 获取生成的 Order ID
+            int newOrderId = 0;
+            rs = psOrder.getGeneratedKeys();
+            if (rs.next()) {
+                newOrderId = rs.getInt(1);
+            } else {
+                throw new SQLException("Creating order failed, no ID obtained.");
+            }
+
+            // 4. 插入子表 order_items
+            String sqlItem = "INSERT INTO order_items (order_id, book_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)";
+            psItem = conn.prepareStatement(sqlItem);
+
+            for (OrderItem item : order.getItems()) {
+                psItem.setInt(1, newOrderId);
+                psItem.setInt(2, item.getBookId());
+                psItem.setInt(3, item.getQuantity());
+                psItem.setDouble(4, item.getPriceAtPurchase());
+                psItem.addBatch();
+            }
+
+            psItem.executeBatch();
+
+            // 5. 提交事务
+            conn.commit();
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            return false;
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (psItem != null) psItem.close();
+                if (psOrder != null) psOrder.close();
+                if (conn != null) conn.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    // ==========================================
+    //  方法 2: 获取所有订单 (用于查看 GetOrdersServlet)
+    // ==========================================
+    // Inside OrderDAO.java
+
+    public List<Map<String, Object>> getAllOrders() {
+        // Use LinkedHashMap to preserve the SQL order (ORDER BY date DESC)
+        Map<Integer, Map<String, Object>> ordersMap = new java.util.LinkedHashMap<>();
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
         try {
             conn = DBConnection.getConnection();
 
-            // ⚠️ CRITICAL: Turn off auto-commit to start a Transaction
-            conn.setAutoCommit(false);
+            // SQL remains the same (LEFT JOINs)
+            String sql = "SELECT o.id, o.created_at, o.total_amount, o.status, " +
+                    "u.username AS customer_name, u.email, o.shipping_address, " +
+                    "b.title AS book_title, b.image_path, b.price " +
+                    "FROM orders o " +
+                    "LEFT JOIN users u ON o.user_id = u.id " +
+                    "LEFT JOIN order_items oi ON o.id = oi.order_id " +
+                    "LEFT JOIN books b ON oi.book_id = b.id " +
+                    "ORDER BY o.created_at DESC";
 
-            // 1. Get Book Details (Price & Seller ID)
-            String sqlBook = "SELECT price, seller_id, status FROM books WHERE id = ?";
-            psCheckBook = conn.prepareStatement(sqlBook);
-            psCheckBook.setInt(1, bookId);
-            rsBook = psCheckBook.executeQuery();
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
 
-            if (!rsBook.next()) return "Book Not Found";
-            double price = rsBook.getDouble("price");
-            int sellerId = rsBook.getInt("seller_id");
-            String status = rsBook.getString("status");
+            while (rs.next()) {
+                int orderId = rs.getInt("id");
 
-            if ("SOLD".equals(status)) return "Book Already Sold";
+                // 1. Check if this order already exists in our Map
+                Map<String, Object> order = ordersMap.get(orderId);
 
-            // 2. Get Buyer Details (Check Balance)
-            String sqlBuyer = "SELECT balance FROM users WHERE id = ?";
-            psCheckBuyer = conn.prepareStatement(sqlBuyer);
-            psCheckBuyer.setInt(1, buyerId);
-            rsBuyer = psCheckBuyer.executeQuery();
+                if (order == null) {
+                    // New Order found! Initialize the header info
+                    order = new HashMap<>();
+                    order.put("id", orderId);
+                    order.put("date", rs.getTimestamp("created_at").toString());
+                    order.put("total", rs.getDouble("total_amount"));
+                    order.put("status", rs.getString("status"));
+                    order.put("customerName", rs.getString("customer_name"));
+                    order.put("email", rs.getString("email"));
+                    order.put("phone", "N/A"); // Hardcoded as per previous fix
+                    order.put("address", rs.getString("shipping_address"));
 
-            if (!rsBuyer.next()) return "Buyer Not Found";
-            double buyerBalance = rsBuyer.getDouble("balance");
+                    // Critical: Initialize the products list
+                    order.put("products", new ArrayList<Map<String, Object>>());
 
-            if (buyerBalance < price) return "Insufficient Balance";
+                    // Add to Map
+                    ordersMap.put(orderId, order);
+                }
 
-            // --- IF WE REACH HERE, EVERYTHING IS OK. START UPDATING DATA ---
+                // 2. Extract Book Info (if exists)
+                String bookTitle = rs.getString("book_title");
+                if (bookTitle != null) {
+                    Map<String, Object> product = new HashMap<>();
+                    product.put("bookTitle", bookTitle);
+                    product.put("bookImage", rs.getString("image_path"));
+                    product.put("bookPrice", rs.getDouble("price"));
 
-            // 3. Deduct Money from Buyer
-            String sqlDeduct = "UPDATE users SET balance = balance - ? WHERE id = ?";
-            psUpdateBuyer = conn.prepareStatement(sqlDeduct);
-            psUpdateBuyer.setDouble(1, price);
-            psUpdateBuyer.setInt(2, buyerId);
-            psUpdateBuyer.executeUpdate();
-
-            // 4. Add Money to Seller
-            String sqlAdd = "UPDATE users SET balance = balance + ? WHERE id = ?";
-            psUpdateSeller = conn.prepareStatement(sqlAdd);
-            psUpdateSeller.setDouble(1, price);
-            psUpdateSeller.setInt(2, sellerId);
-            psUpdateSeller.executeUpdate();
-
-            // 5. Update Book Status to 'SOLD'
-            String sqlBookStatus = "UPDATE books SET status = 'SOLD' WHERE id = ?";
-            psUpdateBook = conn.prepareStatement(sqlBookStatus);
-            psUpdateBook.setInt(1, bookId);
-            psUpdateBook.executeUpdate();
-
-            // 6. Create Order Record
-            String sqlOrder = "INSERT INTO orders (book_id, buyer_id, total_amount) VALUES (?, ?, ?)";
-            psInsertOrder = conn.prepareStatement(sqlOrder);
-            psInsertOrder.setInt(1, bookId);
-            psInsertOrder.setInt(2, buyerId);
-            psInsertOrder.setDouble(3, price);
-            psInsertOrder.executeUpdate();
-
-            // COMMIT: Save all changes permanently
-            conn.commit();
-            return "SUCCESS";
+                    // 3. Add this book to the CURRENT order's product list
+                    List<Map<String, Object>> productList = (List<Map<String, Object>>) order.get("products");
+                    productList.add(product);
+                }
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            // ROLLBACK: If any error happens, undo everything!
-            if (conn != null) {
-                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            }
-            return "Database Error: " + e.getMessage();
         } finally {
-            // Close all resources (Standard boilerplate)
             try {
-                if (rsBook != null) rsBook.close();
-                if (rsBuyer != null) rsBuyer.close();
-                if (psCheckBook != null) psCheckBook.close();
-                if (psCheckBuyer != null) psCheckBuyer.close();
-                if (psUpdateBuyer != null) psUpdateBuyer.close();
-                if (psUpdateSeller != null) psUpdateSeller.close();
-                if (psUpdateBook != null) psUpdateBook.close();
-                if (psInsertOrder != null) psInsertOrder.close();
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
                 if (conn != null) conn.close();
-            } catch (SQLException e) { e.printStackTrace(); }
+            } catch (Exception e) {
+            }
         }
-    }
 
-    // 【Main Method for Testing】
-    public static void main(String[] args) {
-        OrderDAO orderDAO = new OrderDAO();
-
-        // Assume database:
-        // User ID 1 is a seller (testuser)，balance 100.0
-        // Create a User ID 2 as a buyer，load balance for him。
-        // or just let user ID 1 buy his own book
-
-
-        System.out.println("--- Processing Order ---");
-        // Seller ID 1 try to by a Book ID 1
-        String result = orderDAO.placeOrder(1, 1);
-        System.out.println("Result: " + result);
+        // Convert the Map values back to a List for the frontend
+        return new ArrayList<>(ordersMap.values());
     }
 }

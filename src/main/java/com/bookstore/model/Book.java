@@ -5,25 +5,24 @@ public class Book {
     private String title;
     private String author;
     private double price;
-    private String status;      // "AVAILABLE" or "SOLD"
+    private String status;
     private String listingType;
     private String imagePath;
     private int sellerId;
 
-
     public Book() {}
 
-
+    // 构造函数也更新一下
     public Book(String title, String author, double price, String listingType, int sellerId) {
         this.title = title;
         this.author = author;
         this.price = price;
         this.listingType = listingType;
         this.sellerId = sellerId;
-        this.status = "AVAILABLE"; // 默认就是可购买状态
+        this.status = "Active"; // default
     }
 
-    // 3. Getters and Setters (用来存取数据)
+    // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

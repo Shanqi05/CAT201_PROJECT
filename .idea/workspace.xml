@@ -4,16 +4,36 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a6d909e-50cb-4c05-83ba-2911f53bac52" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/AccessoryDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/model/Accessory.java" afterDir="false" />
+    <list default="true" id="9a6d909e-50cb-4c05-83ba-2911f53bac52" name="Changes" comment="Fix Tomcat and AddBook function">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DeleteAccessoryServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DeleteBookServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DeleteUserServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetAccessoriesServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetBooksServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetOrdersServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetUsersServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/model/OrderItem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/ManageAccessories.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/ManageAccessories.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/ManageBooks.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/ManageBooks.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/ViewOrders.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/ViewOrders.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddAccessoryServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddAccessoryServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddBookServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddBookServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/PurchaseServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/PurchaseServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/AccessoryDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/AccessoryDAO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/BookDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/BookDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/AddBookServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/AddBookServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/OrderDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/OrderDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/dao/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/model/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/model/Book.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/model/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/model/Order.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/model/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/PurchaseServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/PurchaseServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/dao/BookDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/dao/BookDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/dao/OrderDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/dao/OrderDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/dao/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/dao/UserDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/model/Book.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/model/Book.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/model/Order.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/model/Order.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/model/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/model/User.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,6 +131,19 @@
       <option name="presentableId" value="Default" />
       <updated>1766731914201</updated>
     </task>
+    <task id="LOCAL-00001" summary="Fix Tomcat and AddBook function">
+      <option name="closed" value="true" />
+      <created>1766735190273</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1766735190273</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fix Tomcat and AddBook function" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix Tomcat and AddBook function" />
   </component>
 </project>

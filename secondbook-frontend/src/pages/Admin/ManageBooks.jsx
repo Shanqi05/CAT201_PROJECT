@@ -1,26 +1,38 @@
-import React, { useState } from 'react';
-import { Plus, Edit, Trash2, Search, Filter, X, Upload, Image as ImageIcon } from 'lucide-react';
-import mockBooks from '../../api/mockBooks.json'; // 假设这是你的初始数据，实际应该从后端 fetch
-
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit, Trash2, Search, Filter, X, Upload } from 'lucide-react';
 const ManageBooks = () => {
-    // 1. 状态管理
-    const [books, setBooks] = useState(mockBooks);
+    // 状态管理
+    const [books, setBooks] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-
-    // 控制 Modal 显示/隐藏
     const [showModal, setShowModal] = useState(false);
-
-    // 新书表单数据
     const [formData, setFormData] = useState({
-        title: '',
-        author: '',
-        type: 'SELL', // 对应 Servlet 的 "SELL" 或 "DONATE"
-        price: '',
-        image: null // 存储文件对象
+        title: '', author: '', type: 'SELL', price: '', image: null
     });
-
-    // 图片预览 URL
     const [previewUrl, setPreviewUrl] = useState(null);
+
+    // 2. 把 fetchBooks 函数定义放在 useEffect 之前
+    const fetchBooks = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/CAT201_project/getBooks', {
+                method: 'GET',
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("从数据库拿到的数据:", data);
+                setBooks(data);
+            } else {
+                console.error("Failed to fetch books");
+            }
+        } catch (error) {
+            console.error("Error connecting to server:", error);
+        }
+    };
+
+    // 3. 然后再调用它
+    useEffect(() => {
+        fetchBooks();
+    }, []);
 
     // --- Handlers ---
 
@@ -82,16 +94,35 @@ const ManageBooks = () => {
         }
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         if(window.confirm("Are you sure you want to remove this book?")) {
-            setBooks(books.filter(book => book.id !== id));
+            try {
+                // 发送 DELETE 请求给后端
+                // 注意：这里要把 id 拼接到 URL 后面
+                const response = await fetch(`http://localhost:8080/CAT201_project/deleteBook?id=${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include', // 必须带上，防止 CORS 问题
+                });
+
+                if (response.ok) {
+                    // 后端删除成功后，再更新前端界面
+                    setBooks(books.filter(book => book.id !== id));
+                    alert("Book deleted successfully!");
+                } else {
+                    alert("Failed to delete book.");
+                }
+            } catch (error) {
+                console.error("Error deleting book:", error);
+                alert("Error connecting to server.");
+            }
         }
     };
 
     const filteredBooks = books.filter(book =>
-        book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.category?.toLowerCase().includes(searchTerm.toLowerCase())
+        book.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        book.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        // 注意：后端可能返回 'type' 也可能返回 'category'，这里要做个兼容
+        (book.type || book.category || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -161,7 +192,16 @@ const ManageBooks = () => {
                                         <td className="p-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200">
-                                                    <img src={book.imageUrl || book.imagePath} alt={book.title} className="w-full h-full object-cover" />
+                                                    <img
+                                                        src={
+                                                            book.imageUrl // 如果是刚上传的预览图 (Base64/Blob)
+                                                            ? book.imageUrl
+                                                            : `http://localhost:8080/CAT201_project/uploads/${book.image}` // 如果是数据库里的文件名
+                                                        }
+                                                        alt={book.title}
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) => {e.target.src = "https://via.placeholder.com/150"}} // 图片加载失败时的替补图
+                                                    />
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-gray-900 leading-tight">{book.title}</p>

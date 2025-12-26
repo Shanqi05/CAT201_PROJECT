@@ -1,28 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // 1. 引入 useEffect
 import { Plus, Edit, Trash2, Search, Filter, X, Upload, ShoppingBag } from 'lucide-react';
 
-// 模拟数据 (你可以稍后替换为从后端 fetch)
-const mockAccessories = [
-    { id: 1, title: "Vintage Metal Bookmark", category: "Bookmark", price: 5.90, imagePath: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=200", status: "Active" },
-    { id: 2, title: "LED Reading Light", category: "Electronics", price: 12.50, imagePath: "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&q=80&w=200", status: "Active" },
-    { id: 3, title: "Canvas Tote Bag", category: "Merchandise", price: 8.00, imagePath: "https://images.unsplash.com/photo-1597484662317-c9253e602531?auto=format&fit=crop&q=80&w=200", status: "Out of Stock" },
-];
-
 const ManageAccessories = () => {
-    // 1. 状态管理
-    const [accessories, setAccessories] = useState(mockAccessories);
+    // 1. 状态管理 - 初始为空数组
+    const [accessories, setAccessories] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
 
-    // 表单数据 (去掉了 Author，保留了必要的字段)
+    // 表单数据
     const [formData, setFormData] = useState({
         title: '',
-        category: 'Bookmark', // 默认为书签
+        category: 'Bookmark',
         price: '',
         image: null
     });
 
     const [previewUrl, setPreviewUrl] = useState(null);
+
+    // --- 2. 页面加载时获取数据 ---
+    useEffect(() => {
+        fetchAccessories();
+    }, []);
+
+    const fetchAccessories = async () => {
+        try {
+            // 确保你后端有 GetAccessoriesServlet 对应这个路径
+            const response = await fetch('http://localhost:8080/CAT201_project/getAccessories', {
+                method: 'GET',
+            });
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Accessories fetched:", data);
+                setAccessories(data);
+            }
+        } catch (error) {
+            console.error("Error fetching accessories:", error);
+        }
+    };
 
     // --- Handlers ---
     const handleInputChange = (e) => {
@@ -43,14 +57,13 @@ const ManageAccessories = () => {
 
         const data = new FormData();
         data.append('title', formData.title);
-        data.append('category', formData.category); // 注意：这里传给后端的是 category
+        data.append('category', formData.category);
         data.append('price', formData.price);
         if (formData.image) {
             data.append('image', formData.image);
         }
 
         try {
-            // 指向 AddAccessoryServlet
             const response = await fetch('http://localhost:8080/CAT201_project/addAccessory', {
                 method: 'POST',
                 credentials: 'include',
@@ -60,14 +73,7 @@ const ManageAccessories = () => {
             if (response.ok) {
                 alert("Accessory added successfully!");
                 setShowModal(false);
-                // 更新列表 (模拟)
-                setAccessories([...accessories, {
-                    id: Date.now(),
-                    ...formData,
-                    imagePath: previewUrl || "https://via.placeholder.com/150",
-                    price: parseFloat(formData.price),
-                    status: "Active"
-                }]);
+                fetchAccessories(); // 成功后直接重新拉取最新列表，比手动更新 state 更稳
                 setFormData({ title: '', category: 'Bookmark', price: '', image: null });
                 setPreviewUrl(null);
             } else {
@@ -79,55 +85,55 @@ const ManageAccessories = () => {
         }
     };
 
-    const handleDelete = (id) => {
+    // --- 3. 删除功能对接后端 ---
+    const handleDelete = async (id) => {
         if(window.confirm("Are you sure you want to remove this item?")) {
-            setAccessories(accessories.filter(item => item.id !== id));
+            try {
+                // 确保你后端有 DeleteAccessoryServlet
+                const response = await fetch(`http://localhost:8080/CAT201_project/deleteAccessory?id=${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    setAccessories(accessories.filter(item => item.id !== id));
+                    alert("Item deleted successfully!");
+                } else {
+                    alert("Failed to delete item.");
+                }
+            } catch (error) {
+                console.error("Error deleting item:", error);
+                alert("Error connecting to server.");
+            }
         }
     };
 
     const filteredItems = accessories.filter(item =>
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchTerm.toLowerCase())
+        item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.category?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
         <div className="p-8 max-w-7xl mx-auto w-full relative">
-
-            {/* Header */}
+            {/* Header & Search Bar (代码保持不变，省略以节省空间，直接复制你原来的即可) */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
                         Manage Accessories
                     </h1>
-                    <p className="text-gray-500 text-sm mt-1">
-                        Curate your collection of bookmarks, lights, and merchandise.
-                    </p>
+                    <p className="text-gray-500 text-sm mt-1">Curate your collection.</p>
                 </div>
-
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-lg flex items-center transition-all shadow-lg hover:shadow-xl group"
-                >
+                <button onClick={() => setShowModal(true)} className="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-lg flex items-center transition-all shadow-lg hover:shadow-xl group">
                     <Plus size={18} className="mr-2 group-hover:scale-110 transition-transform" />
                     <span className="font-bold text-sm">Add Accessory</span>
                 </button>
             </div>
 
-            {/* Search Bar */}
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="relative w-full md:w-96">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                    <input
-                        type="text"
-                        placeholder="Search accessories..."
-                        className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent outline-none text-sm transition-all"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                    <input type="text" placeholder="Search accessories..." className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 outline-none text-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
                 </div>
-                <button className="flex items-center px-4 py-2.5 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 border border-gray-200 transition text-sm font-bold">
-                    <Filter size={16} className="mr-2" /> Filters
-                </button>
             </div>
 
             {/* Table */}
@@ -146,9 +152,7 @@ const ManageAccessories = () => {
                         <tbody className="divide-y divide-gray-50">
                             {filteredItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="p-12 text-center text-gray-500">
-                                        No accessories found.
-                                    </td>
+                                    <td colSpan="5" className="p-12 text-center text-gray-500">No accessories found.</td>
                                 </tr>
                             ) : (
                                 filteredItems.map((item) => (
@@ -156,8 +160,14 @@ const ManageAccessories = () => {
                                         <td className="p-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200 bg-gray-100 flex items-center justify-center">
+                                                    {/* 4. 图片逻辑修改：兼容数据库路径和本地预览 */}
                                                     {item.imagePath ? (
-                                                        <img src={item.imagePath} alt={item.title} className="w-full h-full object-cover" />
+                                                        <img
+                                                            src={item.imagePath.startsWith('blob') ? item.imagePath : `http://localhost:8080/CAT201_project/${item.imagePath}`}
+                                                            alt={item.title}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => {e.target.src = "https://via.placeholder.com/150"}}
+                                                        />
                                                     ) : (
                                                         <ShoppingBag className="text-gray-300" size={24} />
                                                     )}
@@ -177,13 +187,9 @@ const ManageAccessories = () => {
                                             ${parseFloat(item.price).toFixed(2)}
                                         </td>
                                         <td className="p-5">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
-                                                item.status === 'Active'
-                                                ? 'bg-green-50 text-green-700 border-green-100'
-                                                : 'bg-gray-100 text-gray-500 border-gray-200'
-                                            }`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'Active' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                                                {item.status || 'Active'}
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-100">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                                Active
                                             </span>
                                         </td>
                                         <td className="p-5 text-right">
@@ -200,85 +206,64 @@ const ManageAccessories = () => {
                 </div>
             </div>
 
-            {/* --- ADD MODAL --- */}
+            {/* Modal 部分保持不变，直接用你原本的代码即可 */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100">
-                        {/* Header */}
-                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <h2 className="text-xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
-                                Add Accessory
-                            </h2>
-                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={24} /></button>
-                        </div>
+                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+                 <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100">
+                     <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                         <h2 className="text-xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
+                             Add Accessory
+                         </h2>
+                         <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={24} /></button>
+                     </div>
 
-                        {/* Form */}
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                     <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                         <div className="space-y-1">
+                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Name</label>
+                             <input type="text" name="title" required value={formData.title} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" placeholder="e.g., Metal Bookmark" />
+                         </div>
 
-                            {/* Name */}
-                            <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Name</label>
-                                <input
-                                    type="text" name="title" required
-                                    value={formData.title} onChange={handleInputChange}
-                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all"
-                                    placeholder="e.g., Metal Bookmark"
-                                />
-                            </div>
+                         <div className="grid grid-cols-2 gap-4">
+                             <div className="space-y-1">
+                                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
+                                 <select name="category" value={formData.category} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all appearance-none">
+                                     <option value="Bookmark">Bookmark</option>
+                                     <option value="Stationery">Stationery</option>
+                                     <option value="Tote Bag">Tote Bag</option>
+                                     <option value="Light">Reading Light</option>
+                                     <option value="Other">Other</option>
+                                 </select>
+                             </div>
+                             <div className="space-y-1">
+                                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price ($)</label>
+                                 <input type="number" name="price" step="0.01" required value={formData.price} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" placeholder="0.00" />
+                             </div>
+                         </div>
 
-                            {/* Category & Price */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
-                                    <select
-                                        name="category"
-                                        value={formData.category} onChange={handleInputChange}
-                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all appearance-none"
-                                    >
-                                        <option value="Bookmark">Bookmark</option>
-                                        <option value="Stationery">Stationery</option>
-                                        <option value="Tote Bag">Tote Bag</option>
-                                        <option value="Light">Reading Light</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price ($)</label>
-                                    <input
-                                        type="number" name="price" step="0.01" required
-                                        value={formData.price} onChange={handleInputChange}
-                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all"
-                                        placeholder="0.00"
-                                    />
-                                </div>
-                            </div>
+                         <div className="space-y-1">
+                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Image</label>
+                             <div className="flex items-center justify-center w-full">
+                                 <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all hover:border-cyan-400 relative overflow-hidden group">
+                                     {previewUrl ? (
+                                         <img src={previewUrl} alt="Preview" className="w-full h-full object-cover absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity" />
+                                     ) : (
+                                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                             <Upload className="w-8 h-8 mb-3 text-gray-400 group-hover:text-cyan-500 transition-colors" />
+                                             <p className="text-sm text-gray-500">Upload Image</p>
+                                         </div>
+                                     )}
+                                     <input type="file" name="image" className="hidden" accept="image/*" onChange={handleFileChange} required />
+                                 </label>
+                             </div>
+                         </div>
 
-                            {/* Image Upload */}
-                            <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Image</label>
-                                <div className="flex items-center justify-center w-full">
-                                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all hover:border-cyan-400 relative overflow-hidden group">
-                                        {previewUrl ? (
-                                            <img src={previewUrl} alt="Preview" className="w-full h-full object-cover absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity" />
-                                        ) : (
-                                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                                <Upload className="w-8 h-8 mb-3 text-gray-400 group-hover:text-cyan-500 transition-colors" />
-                                                <p className="text-sm text-gray-500">Upload Image</p>
-                                            </div>
-                                        )}
-                                        <input type="file" name="image" className="hidden" accept="image/*" onChange={handleFileChange} required />
-                                    </label>
-                                </div>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="pt-4 flex gap-3">
-                                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors">Cancel</button>
-                                <button type="submit" className="flex-1 py-3 bg-black text-cyan-400 rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-cyan-500/20">Add Item</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                         <div className="pt-4 flex gap-3">
+                             <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors">Cancel</button>
+                             <button type="submit" className="flex-1 py-3 bg-black text-cyan-400 rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-cyan-500/20">Add Item</button>
+                         </div>
+                     </form>
+                 </div>
+             </div>
             )}
         </div>
     );
