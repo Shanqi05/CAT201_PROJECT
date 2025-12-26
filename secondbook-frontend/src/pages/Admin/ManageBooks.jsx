@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Search, Filter, X, Upload } from 'lucide-react';
+
 const ManageBooks = () => {
     // 状态管理
     const [books, setBooks] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
+
+    // [UPDATE 1]: 在这里增加了 condition 默认值
     const [formData, setFormData] = useState({
-        title: '', author: '', type: 'SELL', price: '', image: null
+        title: '', author: '', type: 'SELL', price: '', condition: 'Good', image: null
     });
     const [previewUrl, setPreviewUrl] = useState(null);
 
-    // 2. 把 fetchBooks 函数定义放在 useEffect 之前
     const fetchBooks = async () => {
         try {
             const response = await fetch('http://localhost:8080/CAT201_project/getBooks', {
@@ -29,44 +31,42 @@ const ManageBooks = () => {
         }
     };
 
-    // 3. 然后再调用它
     useEffect(() => {
         fetchBooks();
     }, []);
 
     // --- Handlers ---
 
-    // 处理普通文本输入
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // 处理文件选择
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             setFormData(prev => ({ ...prev, image: file }));
-            setPreviewUrl(URL.createObjectURL(file)); // 生成预览链接
+            setPreviewUrl(URL.createObjectURL(file));
         }
     };
 
-    // 提交表单给 Servlet
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 1. 构建 FormData 对象 (用于上传文件)
         const data = new FormData();
         data.append('title', formData.title);
         data.append('author', formData.author);
-        data.append('type', formData.type);
+        data.append('type', formData.type); // 这是 Category
         data.append('price', formData.price);
+
+        // [UPDATE 2]: 把 condition 发送给后端
+        data.append('condition', formData.condition);
+
         if (formData.image) {
-            data.append('image', formData.image); // 对应 Servlet part = request.getPart("image")
+            data.append('image', formData.image);
         }
 
         try {
-            // 2. 发送 POST 请求到你的 Servlet
             const response = await fetch('http://localhost:8080/CAT201_project/addBook', {
                 method: 'POST',
                 credentials: 'include',
@@ -80,10 +80,12 @@ const ManageBooks = () => {
                     id: Date.now(),
                     ...formData,
                     imageUrl: previewUrl || "https://via.placeholder.com/150",
-                    price: parseFloat(formData.price)
+                    price: parseFloat(formData.price),
+                    // 临时显示在前端，直到刷新页面
+                    condition: formData.condition
                 }]);
-                // 重置表单
-                setFormData({ title: '', author: '', type: 'SELL', price: '', image: null });
+                // 重置表单 (包括 condition)
+                setFormData({ title: '', author: '', type: 'SELL', condition: 'Good', price: '', image: null });
                 setPreviewUrl(null);
             } else {
                 alert("Failed to upload book. Server error.");
@@ -97,15 +99,12 @@ const ManageBooks = () => {
     const handleDelete = async (id) => {
         if(window.confirm("Are you sure you want to remove this book?")) {
             try {
-                // 发送 DELETE 请求给后端
-                // 注意：这里要把 id 拼接到 URL 后面
                 const response = await fetch(`http://localhost:8080/CAT201_project/deleteBook?id=${id}`, {
                     method: 'DELETE',
-                    credentials: 'include', // 必须带上，防止 CORS 问题
+                    credentials: 'include',
                 });
 
                 if (response.ok) {
-                    // 后端删除成功后，再更新前端界面
                     setBooks(books.filter(book => book.id !== id));
                     alert("Book deleted successfully!");
                 } else {
@@ -121,7 +120,6 @@ const ManageBooks = () => {
     const filteredBooks = books.filter(book =>
         book.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         book.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // 注意：后端可能返回 'type' 也可能返回 'category'，这里要做个兼容
         (book.type || book.category || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -139,7 +137,6 @@ const ManageBooks = () => {
                     </p>
                 </div>
 
-                {/* Add New Book Button - Triggers Modal */}
                 <button
                     onClick={() => setShowModal(true)}
                     className="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-lg flex items-center transition-all shadow-lg hover:shadow-xl group"
@@ -174,6 +171,8 @@ const ManageBooks = () => {
                             <tr className="bg-gray-50 border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500 font-bold">
                                 <th className="p-5">Book Details</th>
                                 <th className="p-5">Type</th>
+                                {/* [UPDATE 3]: 新增 Condition 列头 */}
+                                <th className="p-5">Condition</th>
                                 <th className="p-5">Price</th>
                                 <th className="p-5">Status</th>
                                 <th className="p-5 text-right">Actions</th>
@@ -182,7 +181,7 @@ const ManageBooks = () => {
                         <tbody className="divide-y divide-gray-50">
                             {filteredBooks.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="p-12 text-center text-gray-500">
+                                    <td colSpan="6" className="p-12 text-center text-gray-500">
                                         No books found matching "{searchTerm}"
                                     </td>
                                 </tr>
@@ -194,13 +193,13 @@ const ManageBooks = () => {
                                                 <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200">
                                                     <img
                                                         src={
-                                                            book.imageUrl // 如果是刚上传的预览图 (Base64/Blob)
+                                                            book.imageUrl
                                                             ? book.imageUrl
-                                                            : `http://localhost:8080/CAT201_project/uploads/${book.image}` // 如果是数据库里的文件名
+                                                            : `http://localhost:8080/CAT201_project/uploads/${book.imagePath || book.image}`
                                                         }
                                                         alt={book.title}
                                                         className="w-full h-full object-cover"
-                                                        onError={(e) => {e.target.src = "https://via.placeholder.com/150"}} // 图片加载失败时的替补图
+                                                        onError={(e) => {e.target.src = "https://via.placeholder.com/150"}}
                                                     />
                                                 </div>
                                                 <div>
@@ -214,6 +213,16 @@ const ManageBooks = () => {
                                                 {book.type || book.category}
                                             </span>
                                         </td>
+                                        {/* [UPDATE 4]: 显示 Condition */}
+                                        <td className="p-5">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                                                (book.condition === 'New' || book.condition === 'Like New')
+                                                ? 'bg-purple-50 text-purple-700 border-purple-100'
+                                                : 'bg-orange-50 text-orange-700 border-orange-100'
+                                            }`}>
+                                                {book.condition || 'Good'}
+                                            </span>
+                                        </td>
                                         <td className="p-5">
                                             <span className="font-mono font-bold text-gray-900 text-sm">
                                                 ${parseFloat(book.price).toFixed(2)}
@@ -222,7 +231,7 @@ const ManageBooks = () => {
                                         <td className="p-5">
                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-100">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                                                Active
+                                                {book.status || 'Active'}
                                             </span>
                                         </td>
                                         <td className="p-5 text-right">
@@ -243,7 +252,6 @@ const ManageBooks = () => {
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100">
-                        {/* Modal Header */}
                         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                             <h2 className="text-xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
                                 Add New Book
@@ -253,7 +261,6 @@ const ManageBooks = () => {
                             </button>
                         </div>
 
-                        {/* Modal Form */}
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
 
                             {/* Title & Author */}
@@ -278,10 +285,10 @@ const ManageBooks = () => {
                                 </div>
                             </div>
 
-                            {/* Type & Price */}
+                            {/* [UPDATE 5]: Type 和 Condition 放一排 */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Type</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
                                     <select
                                         name="type"
                                         value={formData.type} onChange={handleInputChange}
@@ -289,17 +296,36 @@ const ManageBooks = () => {
                                     >
                                         <option value="SELL">Sell</option>
                                         <option value="DONATE">Donate</option>
+                                        <option value="Fiction">Fiction</option>
+                                        <option value="Non-Fiction">Non-Fiction</option>
+                                        <option value="Children">Children</option>
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price ($)</label>
-                                    <input
-                                        type="number" name="price" step="0.01" required
-                                        value={formData.price} onChange={handleInputChange}
-                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all"
-                                        placeholder="0.00"
-                                    />
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Condition</label>
+                                    <select
+                                        name="condition"
+                                        value={formData.condition} onChange={handleInputChange}
+                                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all appearance-none"
+                                    >
+                                        <option value="New">New</option>
+                                        <option value="Like New">Like New</option>
+                                        <option value="Very Good">Very Good</option>
+                                        <option value="Good">Good</option>
+                                        <option value="Fair">Fair</option>
+                                    </select>
                                 </div>
+                            </div>
+
+                            {/* Price */}
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price ($)</label>
+                                <input
+                                    type="number" name="price" step="0.01" required
+                                    value={formData.price} onChange={handleInputChange}
+                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all"
+                                    placeholder="0.00"
+                                />
                             </div>
 
                             {/* Image Upload Area */}
@@ -307,7 +333,6 @@ const ManageBooks = () => {
                                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Book Cover</label>
                                 <div className="flex items-center justify-center w-full">
                                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all hover:border-cyan-400 relative overflow-hidden group">
-
                                         {previewUrl ? (
                                             <img src={previewUrl} alt="Preview" className="w-full h-full object-cover absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity" />
                                         ) : (

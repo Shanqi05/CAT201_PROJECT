@@ -1,46 +1,61 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogIn, Lock, User } from 'lucide-react';
-import usersData from '../../api/users.json';
+
+// [REMOVE]: We don't need the JSON file anymore
+// import usersData from '../../api/users.json';
 
 const LoginPage = () => {
     const navigate = useNavigate();
     const [loginInput, setLoginInput] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
 
-        // Debug: See what you are typing
-        console.log("Attempting login for:", loginInput);
+        // 1. Prepare data for the backend (FormData matches Servlet expectation)
+        const formData = new URLSearchParams();
+        formData.append('username', loginInput);
+        formData.append('password', password);
 
-        // 1. Find user in the JSON list
-        const user = usersData.find(
-            (u) => (u.username === loginInput || u.email === loginInput) && u.password === password
-        );
+        try {
+            // 2. Send request to Java Servlet
+            const response = await fetch('http://localhost:8080/CAT201_project/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData
+            });
 
-        if (user) {
-            console.log("User found:", user.name, "Role:", user.role);
+            if (response.ok) {
+                // 3. Get the User Object from Backend (includes id, username, role, etc.)
+                const user = await response.json();
+                console.log("Login Successful:", user);
 
-            // 2. Save Session Data
-            localStorage.setItem("userToken", "fake-jwt-token-" + user.id);
-            localStorage.setItem("userRole", user.role); // Important for AdminProtectedRoute
-            localStorage.setItem("registeredUser", JSON.stringify(user));
+                // 4. Save User Data to Local Storage
+                // We use the key 'user' so AdminLayout can find it easily
+                localStorage.setItem("user", JSON.stringify(user));
 
-            // 3. Trigger a storage event (In case Header needs to update immediately)
-            window.dispatchEvent(new Event("storage"));
+                // Optional: Save specific items if needed elsewhere
+                localStorage.setItem("userRole", user.role);
 
-            // 4. Role-based Navigation
-            if (user.role === 'admin') {
-                console.log("Navigating to Admin Dashboard...");
-                navigate('/admin/home');
+                // 5. Trigger storage event to update other components immediately
+                window.dispatchEvent(new Event("storage"));
+
+                // 6. Redirect based on Role (Check lowercase to match DB)
+                if (user.role && user.role.toLowerCase() === 'admin') {
+                    navigate('/admin/home');
+                } else {
+                    navigate('/home');
+                }
             } else {
-                console.log("Navigating to Customer Home...");
-                navigate('/home');
+                // Handle Login Failed
+                alert("Invalid username or password.");
             }
-        } else {
-            console.error("Login failed: No matching user found.");
-            alert("Invalid credentials. Please check your username and password.");
+        } catch (error) {
+            console.error("Login Error:", error);
+            alert("Server error. Please try again later.");
         }
     };
 
@@ -60,7 +75,7 @@ const LoginPage = () => {
                         </div>
                         <input
                             type="text"
-                            placeholder="Username or Email"
+                            placeholder="Username"
                             className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all"
                             value={loginInput}
                             onChange={(e) => setLoginInput(e.target.value)}

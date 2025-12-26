@@ -2,31 +2,46 @@ package com.bookstore.dao;
 
 import com.bookstore.model.Book;
 import com.bookstore.util.DBConnection;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BookDAO {
 
-    // Function 1: Insert a book
+    // ==========================================
+    //  1. Add New Book (适配新的数据库列)
+    // ==========================================
     public boolean addBook(Book book) {
-        String sql = "INSERT INTO books (title, author, price, listing_type, status, seller_id, image_path) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        // [FIX]: SQL updated to match new table columns (category, book_condition, stock)
+        // Removed 'type', added 'category', 'book_condition', 'stock'
+        String sql = "INSERT INTO books (title, author, price, category, book_condition, image_path, stock, rating, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        // Connection closed
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, book.getTitle());
             ps.setString(2, book.getAuthor());
             ps.setDouble(3, book.getPrice());
-            ps.setString(4, book.getListingType());
-            ps.setString(5, "AVAILABLE");
-            ps.setInt(6, book.getSellerId());
-            ps.setString(7, book.getImagePath());
 
-            int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0; // if > 0, success
+            // [FIX]: Use getCategory() instead of getListingType()
+            ps.setString(4, book.getCategory() != null ? book.getCategory() : "General");
+
+            // [FIX]: Use getCondition()
+            ps.setString(5, book.getCondition() != null ? book.getCondition() : "Good");
+
+            ps.setString(6, book.getImagePath());
+
+            // [FIX]: Use getStock()
+            ps.setInt(7, book.getStock() > 0 ? book.getStock() : 1);
+
+            // Default rating to 0.0 if new
+            ps.setDouble(8, book.getRating());
+
+            // Default status
+            ps.setString(9, "Active");
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -34,14 +49,16 @@ public class BookDAO {
         }
     }
 
-    // Function 2 : Select all available book for display user
-    public java.util.List<Book> getAllBooks() {
-        java.util.List<Book> books = new java.util.ArrayList<>();
-        String sql = "SELECT * FROM books ORDER BY id DESC"; // 让新书排在前面
+    // ==========================================
+    //  2. Get All Books (查询所有书)
+    // ==========================================
+    public List<Book> getAllBooks() {
+        List<Book> books = new ArrayList<>();
+        String sql = "SELECT * FROM books ORDER BY id DESC";
 
-        try (java.sql.Connection conn = com.bookstore.util.DBConnection.getConnection();
-             java.sql.PreparedStatement ps = conn.prepareStatement(sql);
-             java.sql.ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Book book = new Book();
@@ -49,86 +66,46 @@ public class BookDAO {
                 book.setTitle(rs.getString("title"));
                 book.setAuthor(rs.getString("author"));
                 book.setPrice(rs.getDouble("price"));
+                book.setImagePath(rs.getString("image_path"));
+                book.setStatus(rs.getString("status"));
 
-                // >>> 这里的名字必须是你数据库里的真实列名 <<<
-                book.setListingType(rs.getString("listing_type")); // 数据库列名
-                book.setImagePath(rs.getString("image_path"));     // 数据库列名
-                // book.setSellerId(rs.getInt("seller_id"));       // 如果需要的话
+                // [FIX]: Map new columns
+                book.setCategory(rs.getString("category"));
+                book.setCondition(rs.getString("book_condition"));
+                book.setRating(rs.getDouble("rating"));
+                book.setStock(rs.getInt("stock"));
 
                 books.add(book);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return books;
     }
 
-    // 【Function 3: Search Books by Keyword】
-    // For the Search Bar (e.g., user types "Java")
-    public List<Book> searchBooks(String keyword) {
-        List<Book> bookList = new ArrayList<>();
-        String sql = "SELECT * FROM books WHERE status = 'AVAILABLE' AND (title LIKE ? OR author LIKE ?)";
-
+    // ==========================================
+    //  3. Delete Book
+    // ==========================================
+    public boolean deleteBook(int id) {
+        String sql = "DELETE FROM books WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            String searchPattern = "%" + keyword + "%"; // % is for wildcard search
-            ps.setString(1, searchPattern);
-            ps.setString(2, searchPattern);
+            ps.setInt(1, id);
+            int rows = ps.executeUpdate();
+            return rows > 0;
 
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Book b = new Book();
-                b.setId(rs.getInt("id"));
-                b.setTitle(rs.getString("title"));
-                b.setAuthor(rs.getString("author"));
-                b.setPrice(rs.getDouble("price"));
-                b.setListingType(rs.getString("listing_type"));
-                b.setImagePath(rs.getString("image_path"));
-                bookList.add(b);
-            }
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return bookList;
     }
 
-    // 【Function 4: Filter Books】
-    // allows users to filter by Type (SELL/DONATE) and Price Range.
-    public List<Book> filterBooks(String type, double minPrice, double maxPrice) {
-        List<Book> bookList = new ArrayList<>();
-
-        // SQL logic: Select books that match the type AND are within the price range
-        String sql = "SELECT * FROM books WHERE status = 'AVAILABLE' AND listing_type = ? AND price >= ? AND price <= ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, type);      // e.g., "SELL" or "DONATE"
-            ps.setDouble(2, minPrice);  // e.g., 5.00
-            ps.setDouble(3, maxPrice);  // e.g., 50.00
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Book b = new Book();
-                b.setId(rs.getInt("id"));
-                b.setTitle(rs.getString("title"));
-                b.setAuthor(rs.getString("author"));
-                b.setPrice(rs.getDouble("price"));
-                b.setListingType(rs.getString("listing_type"));
-                b.setImagePath(rs.getString("image_path"));
-                bookList.add(b);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return bookList;
-    }
-
-    // 【Function 5: Get Book by ID】
-    // for "Product Details Page" and "Checkout Process"
+    // ==========================================
+    //  4. Get Book By ID (用于详情页)
+    // ==========================================
     public Book getBookById(int id) {
-        Book b = null;
+        Book book = null;
         String sql = "SELECT * FROM books WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -138,60 +115,22 @@ public class BookDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                b = new Book();
-                b.setId(rs.getInt("id"));
-                b.setTitle(rs.getString("title"));
-                b.setAuthor(rs.getString("author"));
-                b.setPrice(rs.getDouble("price"));
-                b.setStatus(rs.getString("status"));
-                b.setListingType(rs.getString("listing_type"));
-                b.setSellerId(rs.getInt("seller_id"));
-                b.setImagePath(rs.getString("image_path"));
+                book = new Book();
+                book.setId(rs.getInt("id"));
+                book.setTitle(rs.getString("title"));
+                book.setAuthor(rs.getString("author"));
+                book.setPrice(rs.getDouble("price"));
+                book.setImagePath(rs.getString("image_path"));
+                book.setStatus(rs.getString("status"));
+                book.setCategory(rs.getString("category"));
+                book.setCondition(rs.getString("book_condition"));
+                book.setRating(rs.getDouble("rating"));
+                book.setStock(rs.getInt("stock"));
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return b;
-    }
-
-    public boolean deleteBook(int id) {
-        boolean isSuccess = false;
-        String sql = "DELETE FROM books WHERE id = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-
-            int row = ps.executeUpdate();
-            if (row > 0) {
-                isSuccess = true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return isSuccess;
-    }
-
-    // For testing use
-    public static void main(String[] args) {
-        BookDAO dao = new BookDAO();
-
-        // create a book
-        Book newBook = new Book("Java Programming", "John Doe", 25.50, "SELL", 1);
-
-        // add book
-        if(dao.addBook(newBook)) {
-            System.out.println("Book added successfully！");
-        } else {
-            System.out.println("Failed to add book");
-        }
-
-        // search book
-        System.out.println("--- Searching ---");
-        List<Book> books = dao.getAllBooks();
-        for (Book b : books) {
-            System.out.println("Book title: " + b.getTitle() + " | Price: " + b.getPrice());
-        }
+        return book;
     }
 }

@@ -2,85 +2,45 @@ package com.bookstore.controller;
 
 import com.bookstore.dao.BookDAO;
 import com.bookstore.model.Book;
+import com.google.gson.Gson; // 确保你引入了 Gson 库
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 
-// 1. 设置访问路径
 @WebServlet("/getBooks")
 public class GetBooksServlet extends HttpServlet {
 
-    // 2. 处理 CORS 预检 (和你的 AddBookServlet 一样，防止跨域报错)
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        setCorsHeaders(resp);
-        resp.setStatus(HttpServletResponse.SC_OK);
-    }
-
-    // 3. 处理 GET 请求 (获取数据)
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 设置响应头
-        setCorsHeaders(response);
+        // 1. 设置跨域 (CORS) - 允许前端 React 访问
         response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         response.setHeader("Access-Control-Allow-Credentials", "true");
+
+        // 2. 设置响应类型为 JSON
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        // 从数据库获取所有书
-        BookDAO dao = new BookDAO();
-        List<Book> books = dao.getAllBooks(); // 确保你的 BookDAO 里有这个方法！
+        try {
+            // 3. 从数据库获取所有书
+            BookDAO bookDAO = new BookDAO();
+            List<Book> books = bookDAO.getAllBooks();
 
-        // 4. 手动拼接 JSON 字符串
-        PrintWriter out = response.getWriter();
-        StringBuilder json = new StringBuilder("[");
+            // 4. 使用 Gson 自动转换成 JSON 字符串
+            // 这会自动调用 Book.java 里的所有 getXxx() 方法
+            Gson gson = new Gson();
+            String json = gson.toJson(books);
 
-        for (int i = 0; i < books.size(); i++) {
-            Book b = books.get(i);
+            // 5. 发送给前端
+            response.getWriter().write(json);
 
-            // 防止字符串里有引号导致 JSON 格式错误
-            String title = escape(b.getTitle());
-            String author = escape(b.getAuthor());
-            String category = escape(b.getListingType()); // >>> 重点：把 listingType 映射为 category
-            String image = (b.getImagePath() != null) ? b.getImagePath() : ""; // >>> 重点：把 imagePath 映射为 image
-
-            json.append("{")
-                    .append("\"id\":").append(b.getId()).append(",")
-                    .append("\"title\":\"").append(title).append("\",")
-                    .append("\"author\":\"").append(author).append("\",")
-                    .append("\"price\":").append(b.getPrice()).append(",")
-                    .append("\"category\":\"").append(category).append("\",") // 前端用 category
-                    .append("\"image\":\"").append(image).append("\"")       // 前端用 image
-                    .append("}");
-
-            // 如果不是最后一个，加逗号
-            if (i < books.size() - 1) {
-                json.append(",");
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching books");
         }
-        json.append("]");
-
-        // 发送给前端
-        out.print(json.toString());
-        out.flush();
-    }
-
-    // 简单的转义工具，防止书名里有双引号破坏 JSON
-    private String escape(String text) {
-        if (text == null) return "";
-        return text.replace("\"", "\\\"").replace("\n", " ");
-    }
-
-    // 统一的 CORS 设置
-    private void setCorsHeaders(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
     }
 }
