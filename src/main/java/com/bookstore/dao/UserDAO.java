@@ -3,14 +3,17 @@ package com.bookstore.dao;
 import com.bookstore.model.User;
 import com.bookstore.util.DBConnection;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
 
-    // 【Function 1: Register New User】
-    // Returns true if successful, false if failed (e.g., username exists)
+    // ==========================================
+    //  Feature 1: Register New User
+    // ==========================================
     public boolean registerUser(User user) {
-        // Update SQL to include 'address'
-        String sql = "INSERT INTO users (username, password, email, role, balance, address) VALUES (?, ?, ?, 'USER', 0.00, ?)";
+        // Updated SQL: Removed 'balance' column
+        String sql = "INSERT INTO users (username, password, email, role, address) VALUES (?, ?, ?, 'USER', ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -18,8 +21,7 @@ public class UserDAO {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getEmail());
-
-            // Set address (handle null case just to be safe)
+            // Set address (handle null case safely)
             ps.setString(4, user.getAddress() != null ? user.getAddress() : "");
 
             int rows = ps.executeUpdate();
@@ -31,9 +33,9 @@ public class UserDAO {
         }
     }
 
-    // 【Function 2: Login Validation】
-    // If username & password match, return the User object (so Member 4 can put it in Session).
-    // If failed, return null.
+    // ==========================================
+    //  Feature 2: Login Validation
+    // ==========================================
     public User checkLogin(String username, String password) {
         User user = null;
         String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
@@ -53,8 +55,8 @@ public class UserDAO {
                 user.setPassword(rs.getString("password"));
                 user.setEmail(rs.getString("email"));
                 user.setRole(rs.getString("role"));
-                user.setBalance(rs.getDouble("balance"));
                 user.setAddress(rs.getString("address"));
+                // Note: 'balance' is removed
             }
 
         } catch (SQLException e) {
@@ -63,9 +65,11 @@ public class UserDAO {
         return user;
     }
 
-    // [New Function: Get All Users for Admin Panel]
-    public java.util.List<User> getAllUsers() {
-        java.util.List<User> userList = new java.util.ArrayList<>();
+    // ==========================================
+    //  Feature 3: Get All Users (For Admin Panel)
+    // ==========================================
+    public List<User> getAllUsers() {
+        List<User> userList = new ArrayList<>();
         String sql = "SELECT * FROM users ORDER BY id DESC";
 
         try (Connection conn = DBConnection.getConnection();
@@ -77,11 +81,9 @@ public class UserDAO {
                 user.setId(rs.getInt("id"));
                 user.setUsername(rs.getString("username"));
                 user.setEmail(rs.getString("email"));
-                user.setRole(rs.getString("role")); // DB likely stores "USER" or "ADMIN"
-                user.setBalance(rs.getDouble("balance"));
+                user.setRole(rs.getString("role"));
                 user.setAddress(rs.getString("address"));
-                // We typically don't send passwords to frontend list for security,
-                // but setting it is fine if your object requires it.
+                // We usually don't need password for the list, but setting it doesn't hurt
                 user.setPassword(rs.getString("password"));
 
                 userList.add(user);
@@ -93,8 +95,12 @@ public class UserDAO {
         return userList;
     }
 
-    // [New Function: Delete User by ID]
+    // ==========================================
+    //  Feature 4: Delete User (For Admin Panel)
+    // ==========================================
     public boolean deleteUser(int id) {
+        // Note: If user has foreign keys (like orders/books), this might fail
+        // unless you use ON DELETE CASCADE in DB or delete children first.
         String sql = "DELETE FROM users WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -110,25 +116,31 @@ public class UserDAO {
         }
     }
 
-    // [Main Method for Testing]
+    // ==========================================
+    //  Main Method for Testing
+    // ==========================================
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
 
-        // Test 1: Register a new user
         System.out.println("--- Testing Registration ---");
-        // Create user with address
         User newUser = new User();
-        newUser.setUsername("tan");
-        newUser.setPassword("tan1234");
-        newUser.setEmail("tan@example.com");
-        newUser.setAddress("123 Penang Road, Malaysia"); // Set an address!
+        newUser.setUsername("testuser");
+        newUser.setPassword("12345");
+        newUser.setEmail("test@example.com");
+        newUser.setAddress("123 Test Street");
 
         if (userDAO.registerUser(newUser)) {
             System.out.println("User registered successfully!");
         } else {
-            System.out.println("Registration failed (User might already exist).");
+            System.out.println("Registration failed.");
         }
 
-        // ... 后面的 login 测试代码保持不变 ...
+        System.out.println("\n--- Testing Login ---");
+        User loginUser = userDAO.checkLogin("testuser", "12345");
+        if (loginUser != null) {
+            System.out.println("Login success! Address: " + loginUser.getAddress());
+        } else {
+            System.out.println("Login failed.");
+        }
     }
 }
