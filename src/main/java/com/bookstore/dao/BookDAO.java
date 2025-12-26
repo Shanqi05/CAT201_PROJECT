@@ -153,6 +153,25 @@ public class BookDAO {
         return b;
     }
 
+    public boolean deleteBook(int id) {
+        boolean isSuccess = false;
+        String sql = "DELETE FROM books WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            int row = ps.executeUpdate();
+            if (row > 0) {
+                isSuccess = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return isSuccess;
+    }
+
     // For testing use
     public static void main(String[] args) {
         BookDAO dao = new BookDAO();

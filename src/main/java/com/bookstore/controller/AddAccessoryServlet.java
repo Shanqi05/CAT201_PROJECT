@@ -52,12 +52,11 @@ public class AddAccessoryServlet extends HttpServlet {
         part.write(savePath + File.separator + fileName);
 
         // 6. 保存到数据库 (需要你自己创建 Accessory 模型和 DAO)
-        // Accessory accessory = new Accessory(title, category, price, "images/" + fileName);
-        // AccessoryDAO dao = new AccessoryDAO();
-        // boolean success = dao.addAccessory(accessory);
+        Accessory accessory = new Accessory(title, category, price, "images/" + fileName);
+        AccessoryDAO dao = new AccessoryDAO();
+        boolean success = dao.addAccessory(accessory); // 真正存入数据库
 
-        // 模拟成功 (等你建好 DAO 后替换这里)
-        boolean success = true;
+        // boolean success = true; // 删除这行模拟代码
 
         if (success) {
             response.setStatus(HttpServletResponse.SC_OK);
