@@ -34,32 +34,33 @@ public class BookDAO {
         }
     }
 
-    // Function 2 : Select all available book for display use
-    public List<Book> getAllAvailableBooks() {
-        List<Book> bookList = new ArrayList<>();
-        String sql = "SELECT * FROM books WHERE status = 'AVAILABLE'";
+    // Function 2 : Select all available book for display user
+    public java.util.List<Book> getAllBooks() {
+        java.util.List<Book> books = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM books ORDER BY id DESC"; // 让新书排在前面
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (java.sql.Connection conn = com.bookstore.util.DBConnection.getConnection();
+             java.sql.PreparedStatement ps = conn.prepareStatement(sql);
+             java.sql.ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Book b = new Book();
-                b.setId(rs.getInt("id"));
-                b.setTitle(rs.getString("title"));
-                b.setAuthor(rs.getString("author"));
-                b.setPrice(rs.getDouble("price"));
-                b.setListingType(rs.getString("listing_type"));
-                b.setStatus(rs.getString("status"));
-                b.setSellerId(rs.getInt("seller_id"));
-                b.setImagePath(rs.getString("image_path"));
+                Book book = new Book();
+                book.setId(rs.getInt("id"));
+                book.setTitle(rs.getString("title"));
+                book.setAuthor(rs.getString("author"));
+                book.setPrice(rs.getDouble("price"));
 
-                bookList.add(b); // add book to list
+                // >>> 这里的名字必须是你数据库里的真实列名 <<<
+                book.setListingType(rs.getString("listing_type")); // 数据库列名
+                book.setImagePath(rs.getString("image_path"));     // 数据库列名
+                // book.setSellerId(rs.getInt("seller_id"));       // 如果需要的话
+
+                books.add(book);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return bookList;
+        return books;
     }
 
     // 【Function 3: Search Books by Keyword】
@@ -188,7 +189,7 @@ public class BookDAO {
 
         // search book
         System.out.println("--- Searching ---");
-        List<Book> books = dao.getAllAvailableBooks();
+        List<Book> books = dao.getAllBooks();
         for (Book b : books) {
             System.out.println("Book title: " + b.getTitle() + " | Price: " + b.getPrice());
         }
