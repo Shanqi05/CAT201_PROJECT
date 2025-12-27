@@ -10,7 +10,7 @@ const teamMembers = [
     { name: 'Tan Shan Qi', role: 'Store Manager', desc: 'Driving the vision for sustainable reading.', photo: M2 },
     { name: 'Tan Xiang Huey', role: 'Service Manager', desc: 'Ensuring every book finds its way home affordably.', photo: M3 },
     { name: 'Choo Xuan', role: 'Sales Manager', desc: 'Crafting the perfect library experience.', photo: M1 },
-    { name: 'Member D', role: 'Officer Manager', desc: 'Championing our community of readers.', photo: M4 },
+    { name: 'Ng Xin Yuan', role: 'Officer Manager', desc: 'Championing our community of readers.', photo: M4 },
 ];
 
 const AboutUsPage = () => {
