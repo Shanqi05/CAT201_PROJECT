@@ -5,7 +5,6 @@ import { BookOpen, Zap, Gift, ShoppingBag, ChevronDown, Sparkles } from 'lucide-
 
 import BookCard from '../../components/Common/BookCard';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
-import mockAccessories from '../../api/accessories.json';
 
 const keyCategories = [
     { key: 'Lighting', label: 'Book Lights', icon: Zap, color: 'text-cyan-500' },
@@ -23,12 +22,27 @@ const AccessoriesPage = () => {
     const activeCategory = searchParams.get('category');
 
     useEffect(() => {
-        // Simulate API delay
-        setTimeout(() => {
-            setAccessories(mockAccessories);
-            setLoading(false);
-        }, 500);
+        fetchAccessories();
     }, []);
+
+    const fetchAccessories = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/CAT201_project/getAccessories', {
+                method: 'GET',
+                credentials: 'include',
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setAccessories(data);
+            } else {
+                console.error('Failed to fetch accessories');
+            }
+        } catch (error) {
+            console.error('Error fetching accessories:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const filteredAccessories = activeCategory
         ? accessories.filter(acc => acc.category === activeCategory)

@@ -34,8 +34,19 @@ const Header = () => {
         };
     }, []);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (window.confirm("Are you sure you want to logout?")) {
+            try {
+                // Call backend logout to clear session
+                await fetch('http://localhost:8080/CAT201_project/logout', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            // Clear local storage
             localStorage.removeItem("userToken");
             localStorage.removeItem("userRole");
             localStorage.removeItem("registeredUser");
