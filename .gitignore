@@ -1,0 +1,21 @@
+# --- Java & IntelliJ ---
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+target/
+.smarttomcat/
+
+# --- Node.js & Frontend ---
+node_modules/
+npm-debug.log
+yarn-error.log
+.env
+
+# --- VS Code ---
+.vscode/
+
+# --- OS Files ---
+.DS_Store
+Thumbs.db
