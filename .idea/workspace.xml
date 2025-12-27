@@ -10,13 +10,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a6d909e-50cb-4c05-83ba-2911f53bac52" name="Changes" comment="Admin page backend (Analytics)">
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/data_source_mapping.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/util/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/util/DBConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/util/DBConnection.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/util/DBConnection.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cat201_project_postgresql.sql" beforeDir="false" afterPath="$PROJECT_DIR$/cat201_project_postgresql.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Header.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/AdminLayout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/Admin/AdminLayout.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddAccessoryServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddAccessoryServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddBookServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/AddBookServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DashboardServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DashboardServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DeleteAccessoryServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DeleteAccessoryServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DeleteBookServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DeleteBookServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DeleteUserServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/DeleteUserServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetAccessoriesServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetAccessoriesServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetBooksServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetBooksServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetOrdersServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetOrdersServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetUsersServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/GetUsersServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/LoginServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/LoginServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/AddAccessoryServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/AddAccessoryServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/AddBookServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/AddBookServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/DashboardServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/DashboardServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/DeleteAccessoryServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/DeleteAccessoryServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/DeleteBookServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/DeleteBookServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/DeleteUserServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/DeleteUserServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/GetAccessoriesServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/GetAccessoriesServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/GetBooksServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/GetBooksServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/GetOrdersServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/GetOrdersServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/GetUsersServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/GetUsersServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/LoginServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/LogoutServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/LogoutServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/PurchaseServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/PurchaseServlet.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +89,7 @@
     "Smart Tomcat.Tomcat.executor": "Run",
     "TomEE Server.Tomcat.executor": "Run",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "new",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
@@ -334,7 +356,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1766731914201</updated>
-      <workItem from="1766822436931" duration="1142000" />
+      <workItem from="1766822436931" duration="2228000" />
     </task>
     <task id="LOCAL-00001" summary="Fix Tomcat and AddBook function">
       <option name="closed" value="true" />

@@ -5,6 +5,7 @@
 -- Drop tables if they exist (in correct order due to foreign keys)
 DROP TABLE IF EXISTS order_items CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS donated_books CASCADE;
 DROP TABLE IF EXISTS books CASCADE;
 DROP TABLE IF EXISTS accessories CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
@@ -137,3 +138,35 @@ INSERT INTO order_items (id, order_id, book_id, quantity, price_at_purchase) VAL
 
 -- Reset sequence for order_items
 SELECT setval('order_items_id_seq', (SELECT MAX(id) FROM order_items));
+
+-- --------------------------------------------------------
+-- Table structure for table donated_books
+-- --------------------------------------------------------
+
+CREATE TABLE donated_books (
+  id SERIAL PRIMARY KEY,
+  donor_name VARCHAR(255) NOT NULL,
+  donor_email VARCHAR(100) NOT NULL,
+  donor_phone VARCHAR(50),
+  book_title VARCHAR(255) NOT NULL,
+  author VARCHAR(255),
+  book_condition VARCHAR(50) DEFAULT 'Good',
+  category VARCHAR(100),
+  quantity INTEGER DEFAULT 1,
+  pickup_address TEXT,
+  message TEXT,
+  status VARCHAR(50) DEFAULT 'Pending',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create index on status
+CREATE INDEX idx_donated_books_status ON donated_books(status);
+
+-- Sample donated books data
+INSERT INTO donated_books (donor_name, donor_email, donor_phone, book_title, author, book_condition, category, quantity, pickup_address, message, status, created_at) VALUES
+('Sarah Chen', 'sarah.chen@example.com', '012-345-6789', 'Introduction to Algorithms', 'Thomas H. Cormen', 'Excellent', 'Computer Science', 2, '123 Tech Street, Penang', 'Hope these help students!', 'Approved', '2025-12-25 10:30:00'),
+('Ahmad Ibrahim', 'ahmad@example.com', '013-456-7890', 'Calculus Early Transcendentals', 'James Stewart', 'Good', 'Mathematics', 1, '45 University Ave, KL', 'Slightly used but complete', 'Pending', '2025-12-26 14:15:00'),
+('Mei Ling', 'meiling@example.com', '014-567-8901', 'Pride and Prejudice', 'Jane Austen', 'Very Good', 'Fiction', 3, '78 Book Lane, Johor', 'Classic novels for book lovers', 'Approved', '2025-12-24 09:00:00');
+
+-- Reset sequence for donated_books
+SELECT setval('donated_books_id_seq', (SELECT MAX(id) FROM donated_books));

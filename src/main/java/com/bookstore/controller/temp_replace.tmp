@@ -1,0 +1,964 @@
+package com.bookstore.controller;
+
+import com.bookstore.dao.AccessoryDAO;
+import com.bookstore.model.Accessory;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.File;
+import java.io.IOException;
+
+@WebServlet("/addAccessory") // 前端 fetch 的就是这个地址
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 50
+)
+public class AddAccessoryServlet extends HttpServlet {
+
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        setCorsHeaders(resp);
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        setCorsHeaders(response);
+
+        // 1. 获取参数 (Accessory 没有 author, 但有 category)
+        String title = request.getParameter("title");
+        String category = request.getParameter("category"); // 前端传过来的是 "category"
+        double price = 0.0;
+        try {
+            price = Double.parseDouble(request.getParameter("price"));
+        } catch (Exception e) { price = 0.0; }
+
+        // 2. 图片处理 (代码逻辑和 Book 一样)
+        Part part = request.getPart("image");
+        String fileName = "";
+        if (part != null && part.getSize() > 0) {
+            fileName = extractFileName(part);
+            // 建议把图片存在同一个 images 文件夹，或者新建 accessories 文件夹
+            String savePath = getServletContext().getRealPath("") + File.separator + "images";
+            File fileSaveDir = new File(savePath);
+            if (!fileSaveDir.exists()) fileSaveDir.mkdir();
+            part.write(savePath + File.separator + fileName);
+        }
+
+        // 3. 保存到数据库
+        // 假设你有一个 Accessory 类
+        Accessory accessory = new Accessory();
+        accessory.setTitle(title);
+        accessory.setCategory(category);
+        accessory.setPrice(price);
+
+        if (!fileName.isEmpty()) {
+            accessory.setImagePath("images/" + fileName);
+        }
+
+        // 假设你有一个 AccessoryDAO
+        AccessoryDAO dao = new AccessoryDAO();
+        boolean success = dao.addAccessory(accessory);
+
+        if (success) {
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database Insert Failed");
+        }
+    }
+
+    private void setCorsHeaders(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+
+    private String extractFileName(Part part) {
+        String contentDisp = part.getHeader("content-disposition");
+        String[] items = contentDisp.split(";");
+        for (String s : items) {
+            if (s.trim().startsWith("filename")) {
+                return s.substring(s.indexOf("=") + 2, s.length() - 1);
+            }
+        }
+        return "";
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.BookDAO;
+import com.bookstore.model.Book;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+
+@WebServlet("/addBook")
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10,      // 10MB
+        maxRequestSize = 1024 * 1024 * 50    // 50MB
+)
+public class AddBookServlet extends HttpServlet {
+
+    private static final String UPLOAD_DIR = "uploads";
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        // 1. 设置 CORS (允许前端 React 访问)
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+
+        try {
+            // 2. 接收普通文本字段
+            String title = request.getParameter("title");
+            String author = request.getParameter("author");
+            String type = request.getParameter("type"); // 前端发来的是 "SELL" 或 "DONATE"
+            String priceStr = request.getParameter("price");
+            String condition = request.getParameter("condition");
+
+            if (title == null || priceStr == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required fields");
+                return;
+            }
+
+            double price = Double.parseDouble(priceStr);
+
+            // 3. 处理图片上传
+            Part filePart = request.getPart("image");
+            String fileName = "default.jpg";
+
+            if (filePart != null && filePart.getSize() > 0) {
+                // 获取文件名
+                fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                // 防止文件名重复 (加个时间戳)
+                fileName = System.currentTimeMillis() + "_" + fileName;
+
+                // 获取上传路径
+                String applicationPath = request.getServletContext().getRealPath("");
+                String uploadFilePath = applicationPath + File.separator + UPLOAD_DIR;
+
+                // 创建目录（如果不存在）
+                File uploadDir = new File(uploadFilePath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                // 保存文件
+                filePart.write(uploadFilePath + File.separator + fileName);
+            }
+
+            // 4. 创建 Book 对象 (使用 Setters 修复报错)
+            Book newBook = new Book();
+            newBook.setTitle(title);
+            newBook.setAuthor(author);
+            newBook.setPrice(price);
+            newBook.setCondition(condition != null ? condition : "Good");
+            newBook.setImagePath(fileName); // 存文件名，不是完整路径
+
+            // 适配新数据库字段
+            // 将前端的 'type' 存入 'category' (或者你可以根据业务逻辑改)
+            newBook.setCategory(type != null ? type : "General");
+
+            // 设置默认值 (因为前端 ManageBooks.jsx 还没传这几个值)
+            newBook.setCondition("Good");
+            newBook.setStock(1);
+            newBook.setRating(0.0);
+            newBook.setStatus("Active");
+
+            // 5. 保存到数据库
+            BookDAO bookDAO = new BookDAO();
+            boolean success = bookDAO.addBook(newBook);
+
+            if (success) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write("{\"message\": \"Book added successfully\"}");
+            } else {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database insertion failed");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error: " + e.getMessage());
+        }
+    }
+
+    // 处理 OPTIONS 预检请求 (CORS)
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        resp.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.DonatedBookDAO;
+import com.bookstore.model.DonatedBook;
+import com.google.gson.Gson;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/addDonatedBook")
+public class AddDonatedBookServlet extends HttpServlet {
+
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        resp.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            // Get parameters from request
+            String donorName = request.getParameter("donorName");
+            String donorEmail = request.getParameter("donorEmail");
+            String donorPhone = request.getParameter("donorPhone");
+            String bookTitle = request.getParameter("bookTitle");
+            String author = request.getParameter("author");
+            String bookCondition = request.getParameter("bookCondition");
+            String category = request.getParameter("category");
+            int quantity = Integer.parseInt(request.getParameter("quantity"));
+            String pickupAddress = request.getParameter("pickupAddress");
+            String message = request.getParameter("message");
+
+            // Create DonatedBook object
+            DonatedBook book = new DonatedBook(donorName, donorEmail, donorPhone, bookTitle,
+                    author, bookCondition, category, quantity, pickupAddress, message);
+
+            // Save to database
+            DonatedBookDAO dao = new DonatedBookDAO();
+            boolean success = dao.addDonatedBook(book);
+
+            Gson gson = new Gson();
+            if (success) {
+                response.getWriter().write(gson.toJson(new Response(true, "Book donation submitted successfully!")));
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write(gson.toJson(new Response(false, "Failed to submit donation")));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"success\": false, \"message\": \"" + e.getMessage() + "\"}");
+        }
+    }
+
+    // Inner class for JSON response
+    private static class Response {
+        boolean success;
+        String message;
+
+        Response(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+    }
+}
+
+package com.bookstore.controller;
+
+import com.bookstore.dao.AccessoryDAO; // [修改1] 引入 AccessoryDAO
+import com.bookstore.dao.DashboardDAO;
+import com.bookstore.model.Book;
+import com.google.gson.Gson;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@WebServlet("/dashboard-stats")
+public class DashboardServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        // 1. Setup CORS
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            // [修改2] 初始化两个 DAO
+            DashboardDAO dashboardDao = new DashboardDAO();
+            AccessoryDAO accessoryDao = new AccessoryDAO();
+
+            // 2. Fetch Stats, Recent Books AND Accessory Count
+            DashboardDAO.DashboardStats stats = dashboardDao.getStats();
+            List<Book> recentBooks = dashboardDao.getRecentBooks();
+
+            // [修改3] 获取配件总数
+            int totalAccessories = accessoryDao.getTotalAccessoriesCount();
+
+            // 3. Combine data
+            Map<String, Object> result = new HashMap<>();
+
+            // 原有的数据
+            result.put("stats", stats);
+            result.put("recentBooks", recentBooks);
+
+            // [修改4] 把配件总数放进返回结果里
+            // 注意：前端获取时，需要用 data.totalAccessories (而不是在 data.stats 里面)
+            result.put("totalAccessories", totalAccessories);
+
+            // 4. Send JSON
+            Gson gson = new Gson();
+            response.getWriter().write(gson.toJson(result));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching dashboard data");
+        }
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.AccessoryDAO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/deleteAccessory")
+public class DeleteAccessoryServlet extends HttpServlet {
+
+    // 处理预检请求 (Preflight request)
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        setCorsHeaders(resp);
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 1. 设置 CORS
+        setCorsHeaders(response);
+
+        try {
+            // 2. 获取 ID 参数 (例如: /deleteAccessory?id=5)
+            String idStr = request.getParameter("id");
+            if (idStr == null || idStr.isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing ID");
+                return;
+            }
+
+            int id = Integer.parseInt(idStr);
+
+            // 3. 调用 DAO 删除
+            AccessoryDAO dao = new AccessoryDAO();
+            boolean success = dao.deleteAccessory(id);
+
+            if (success) {
+                response.setStatus(HttpServletResponse.SC_OK); // 200 OK
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Item not found or delete failed");
+            }
+
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+        }
+    }
+
+    private void setCorsHeaders(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.BookDAO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/deleteBook")
+public class DeleteBookServlet extends HttpServlet {
+
+    // 1. 处理 CORS 预检请求 (非常重要，否则 DELETE 请求会被拦截)
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        setCorsHeaders(resp);
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    // 2. 处理 DELETE 请求
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        setCorsHeaders(resp);
+
+        // 获取要删除的书 ID (从 URL 参数获取: /deleteBook?id=123)
+        String idStr = req.getParameter("id");
+
+        if (idStr != null) {
+            try {
+                int id = Integer.parseInt(idStr);
+                BookDAO dao = new BookDAO();
+                boolean success = dao.deleteBook(id);
+
+                if (success) {
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } else {
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Book not found or could not be deleted");
+                }
+            } catch (NumberFormatException e) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format");
+            }
+        } else {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing ID parameter");
+        }
+    }
+
+    private void setCorsHeaders(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE"); // 确保包含 DELETE
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.UserDAO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/deleteUser")
+public class DeleteUserServlet extends HttpServlet {
+
+    // Handle CORS Preflight request
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        resp.setHeader("Access-Control-Allow-Methods", "DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Set CORS headers for the actual response
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Methods", "DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+
+        try {
+            // 1. Get ID from query parameter
+            String idStr = request.getParameter("id");
+            if (idStr == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing ID");
+                return;
+            }
+
+            int id = Integer.parseInt(idStr);
+
+            // 2. Call DAO
+            UserDAO dao = new UserDAO();
+            boolean success = dao.deleteUser(id);
+
+            if (success) {
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Delete failed");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+        }
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.AccessoryDAO;
+import com.bookstore.model.Accessory;
+import com.google.gson.Gson; // 确保引入了 Gson
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.List;
+
+@WebServlet("/getAccessories") // 对应前端 fetch 的路径
+public class GetAccessoriesServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 1. 设置 CORS (允许 React 访问)
+        setCorsHeaders(response);
+
+        // 2. 设置返回类型为 JSON
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            // 3. 从 DAO 获取数据
+            AccessoryDAO dao = new AccessoryDAO();
+            List<Accessory> list = dao.getAllAccessories();
+
+            // 4. 转换成 JSON 并输出
+            Gson gson = new Gson();
+            String json = gson.toJson(list);
+
+            response.getWriter().write(json);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching data");
+        }
+    }
+
+    // 辅助方法：设置 CORS
+    private void setCorsHeaders(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.BookDAO;
+import com.bookstore.model.Book;
+import com.google.gson.Gson; // 确保你引入了 Gson 库
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.List;
+
+@WebServlet("/getBooks")
+public class GetBooksServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 1. 设置跨域 (CORS) - 允许前端 React 访问
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+
+        // 2. 设置响应类型为 JSON
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            // 3. 从数据库获取所有书
+            BookDAO bookDAO = new BookDAO();
+            List<Book> books = bookDAO.getAllBooks();
+
+            // 4. 使用 Gson 自动转换成 JSON 字符串
+            // 这会自动调用 Book.java 里的所有 getXxx() 方法
+            Gson gson = new Gson();
+            String json = gson.toJson(books);
+
+            // 5. 发送给前端
+            response.getWriter().write(json);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching books");
+        }
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.DonatedBookDAO;
+import com.bookstore.model.DonatedBook;
+import com.google.gson.Gson;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.List;
+
+@WebServlet("/getDonatedBooks")
+public class GetDonatedBooksServlet extends HttpServlet {
+
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            DonatedBookDAO dao = new DonatedBookDAO();
+            List<DonatedBook> books = dao.getAllDonatedBooks();
+
+            Gson gson = new Gson();
+            String json = gson.toJson(books);
+            response.getWriter().write(json);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
+        }
+    }
+}
+
+package com.bookstore.controller;
+
+import com.bookstore.dao.OrderDAO;
+import com.google.gson.Gson;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+@WebServlet("/getOrders")
+public class GetOrdersServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        setCorsHeaders(response); // Handle CORS
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            OrderDAO dao = new OrderDAO();
+            // Get all order data
+            List<Map<String, Object>> orders = dao.getAllOrders();
+
+            Gson gson = new Gson();
+            String json = gson.toJson(orders);
+
+            response.getWriter().write(json);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching orders");
+        }
+    }
+
+    // CORS Configuration
+    private void setCorsHeaders(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.UserDAO;
+import com.bookstore.model.User;
+import com.google.gson.Gson;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.List;
+
+@WebServlet("/getUsers")
+public class GetUsersServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 1. Handle CORS
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            // 2. Fetch data from DAO
+            UserDAO dao = new UserDAO();
+            List<User> users = dao.getAllUsers();
+
+            // 3. Convert to JSON
+            Gson gson = new Gson();
+            String json = gson.toJson(users);
+
+            response.getWriter().write(json);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching users");
+        }
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.UserDAO;
+import com.bookstore.model.User;
+import com.google.gson.Gson; // Make sure Gson library is imported
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/login")
+public class LoginServlet extends HttpServlet {
+
+    // 1. Handle OPTIONS request (CORS Preflight - Required to prevent React CORS errors)
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5175"); // Your React Frontend URL
+        resp.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setHeader("Access-Control-Allow-Credentials", "true"); // Allow Cookies/Session
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 2. Set Response Headers (CORS + JSON)
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            // [DEBUG] Log to confirm request received
+            System.out.println("--- Login Request Received ---");
+
+            String user = request.getParameter("username");
+            String pass = request.getParameter("password");
+
+            UserDAO dao = new UserDAO();
+            User currentUser = dao.checkLogin(user, pass);
+
+            if (currentUser != null) {
+                // 3. Login Success
+                System.out.println("Login Success: " + currentUser.getUsername());
+
+                // Save Session (Optional for REST API, but good for hybrid approaches)
+                HttpSession session = request.getSession();
+                session.setAttribute("user", currentUser);
+
+                // [CRITICAL FIX]: Do NOT use sendRedirect! Return JSON instead!
+                Gson gson = new Gson();
+                String json = gson.toJson(currentUser);
+                response.getWriter().write(json);
+
+            } else {
+                // 4. Login Failed
+                System.out.println("Login Failed");
+
+                // Return 401 status code and error JSON
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"message\": \"Invalid Credentials\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error: " + e.getMessage());
+        }
+    }
+}
+package com.bookstore.controller;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/logout")
+public class LogoutServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HttpSession session = request.getSession();
+        session.invalidate(); // destroy Session（logout）
+        response.sendRedirect("login.jsp");
+    }
+}
+
+package com.bookstore.controller;
+
+import com.bookstore.dao.OrderDAO;
+import com.bookstore.model.Order;
+import com.bookstore.model.OrderItem;
+import com.bookstore.model.User;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/purchase")
+public class PurchaseServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        // 1. Check if user is logged in
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+
+        if (currentUser == null) {
+            // User not logged in, redirect to login page
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        try {
+            // 2. Get parameters from request
+            // Frontend MUST send 'bookId' and 'price'
+            String bookIdStr = request.getParameter("bookId");
+            String priceStr = request.getParameter("price");
+
+            if (bookIdStr == null || priceStr == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing bookId or price");
+                return;
+            }
+
+            int bookId = Integer.parseInt(bookIdStr);
+            double price = Double.parseDouble(priceStr);
+
+            // 3. Prepare the Order Object (The "Header")
+            // Constructor: Order(int userId, double totalAmount, String shippingAddress, String paymentMethod)
+            // Note: Ensure your User model has getAddress() method, or use a hardcoded string for testing
+            String address = (currentUser.getAddress() != null) ? currentUser.getAddress() : "Default Address";
+
+            Order newOrder = new Order(
+                    currentUser.getId(),
+                    price,        // Total amount
+                    address,      // Shipping address
+                    "Credit Card" // Default payment method
+            );
+
+            // 4. Prepare the OrderItem Object (The "Item")
+            // Constructor: OrderItem(int bookId, int quantity, double priceAtPurchase)
+            OrderItem item = new OrderItem(bookId, 1, price);
+
+            // 5. Add item to the order list
+            newOrder.addItem(item);
+
+            // 6. Call the new DAO method
+            OrderDAO orderDAO = new OrderDAO();
+            boolean isSuccess = orderDAO.createOrder(newOrder);
+
+            // 7. Redirect based on result
+            if (isSuccess) {
+                // Success: Redirect to the order list page
+                // Ensure you have a page to view orders (e.g., myOrders.html or viewOrders.jsp)
+                response.sendRedirect("index.jsp");
+            } else {
+                response.getWriter().write("Order Failed: Database Error");
+            }
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid number format for ID or Price");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error: " + e.getMessage());
+        }
+    }
+}
+package com.bookstore.controller;
+
+import com.bookstore.dao.DonatedBookDAO;
+import com.google.gson.Gson;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/updateDonationStatus")
+public class UpdateDonationStatusServlet extends HttpServlet {
+
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        resp.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            String status = request.getParameter("status");
+
+            DonatedBookDAO dao = new DonatedBookDAO();
+            boolean success = dao.updateStatus(id, status);
+
+            Gson gson = new Gson();
+            if (success) {
+                response.getWriter().write(gson.toJson(new Response(true, "Status updated successfully")));
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write(gson.toJson(new Response(false, "Failed to update status")));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"success\": false, \"message\": \"" + e.getMessage() + "\"}");
+        }
+    }
+
+    private static class Response {
+        boolean success;
+        String message;
+
+        Response(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+    }
+}
+

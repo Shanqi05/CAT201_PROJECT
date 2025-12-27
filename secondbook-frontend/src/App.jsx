@@ -19,6 +19,7 @@ import CartPage from './pages/User/CartPage';
 import CheckoutPage from './pages/User/CheckoutPage';
 import OrderSuccessPage from './pages/User/OrderSuccessPage';
 import UserDashboardPage from './pages/User/UserDashboardPage';
+import DonationPage from './pages/User/DonationPage';
 
 // 5. ADMIN PAGES
 import AdminLayout from './pages/Admin/AdminLayout';
@@ -28,6 +29,7 @@ import ManageUsers from './pages/Admin/ManageUsers';
 import ManageAccessories from './pages/Admin/ManageAccessories';
 import ViewOrders from './pages/Admin/ViewOrders';
 import Analytics from './pages/Admin/Analytics';
+import ManageDonations from './pages/Admin/ManageDonations';
 
 // 6. SECURITY GUARDS
 import ProtectedRoute from './components/Common/ProtectedRoute';
@@ -59,6 +61,7 @@ function App() {
                     <Route path="/books/:id" element={<ProductDetailPage />} />
                     <Route path="/accessories" element={<AccessoriesPage />} />
                     <Route path="/about" element={<AboutUsPage />} />
+                    <Route path="/donation" element={<DonationPage />} />
 
                     {/* PROTECTED USER ROUTES (Login Required) */}
                     <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
@@ -80,6 +83,7 @@ function App() {
                         <Route path="manage-books" element={<ManageBooks />} />
                         <Route path="manage-users" element={<ManageUsers />} />
                         <Route path="view-orders" element={<ViewOrders />} />
+                        <Route path="donations" element={<ManageDonations />} />
                         <Route path="analytics" element={<Analytics />} />
                         <Route path="accessories" element={<ManageAccessories />} />
                     </Route>
