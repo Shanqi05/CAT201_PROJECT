@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import BookCard from '../../components/Common/BookCard';
 import { Star, BookOpen, ShoppingBag, Info, ChevronDown } from 'lucide-react';
-import mockBooks from '../../api/mockBooks.json';
 import PROMO_BANNER_PATH from '../../assets/images/promo_banner.png';
 
 const mockReviews = [
@@ -32,9 +31,12 @@ const mockReviews = [
 
 const HomePage = () => {
     const [scrollIndex, setScrollIndex] = useState(0);
+    const [newArrivals, setNewArrivals] = useState([]);
     const heroRef = useRef(null);
 
     useEffect(() => {
+        fetchBooks();
+        
         const handleScroll = () => {
             if (!heroRef.current) return;
             const { top, height } = heroRef.current.getBoundingClientRect();
@@ -45,6 +47,21 @@ const HomePage = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const fetchBooks = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/CAT201_project/getBooks', {
+                method: 'GET',
+                credentials: 'include',
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setNewArrivals(data.slice(0, 5)); // Get first 5 books
+            }
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        }
+    };
 
     const heroContent = [
         {
@@ -58,7 +75,6 @@ const HomePage = () => {
         },
         {
             title: "Essentials",
-            subtitle: "ACCESSORIES",
             desc: "The perfect companions for your reading journey.",
             link: "/accessories",
             label: "ACCESSORIES",
@@ -76,7 +92,6 @@ const HomePage = () => {
         }
     ];
 
-    const newArrivals = mockBooks.slice(0, 5);
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating);
         return (
