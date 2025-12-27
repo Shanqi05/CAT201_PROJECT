@@ -15,7 +15,7 @@ public class GetDonatedBooksServlet extends HttpServlet {
 
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         resp.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
         resp.setHeader("Access-Control-Allow-Credentials", "true");
@@ -24,7 +24,7 @@ public class GetDonatedBooksServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

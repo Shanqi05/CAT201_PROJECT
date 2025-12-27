@@ -12,7 +12,7 @@ public class DeleteUserServlet extends HttpServlet {
     // Handle CORS Preflight request
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         resp.setHeader("Access-Control-Allow-Methods", "DELETE, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
         resp.setHeader("Access-Control-Allow-Credentials", "true");
@@ -22,7 +22,7 @@ public class DeleteUserServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Set CORS headers for the actual response
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         response.setHeader("Access-Control-Allow-Methods", "DELETE, OPTIONS");
         response.setHeader("Access-Control-Allow-Credentials", "true");
 

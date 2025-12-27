@@ -24,7 +24,7 @@ public class AddBookServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         // 1. 设置 CORS (允许前端 React 访问)
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -106,7 +106,7 @@ public class AddBookServlet extends HttpServlet {
     // 处理 OPTIONS 预检请求 (CORS)
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         resp.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
         resp.setHeader("Access-Control-Allow-Credentials", "true");
