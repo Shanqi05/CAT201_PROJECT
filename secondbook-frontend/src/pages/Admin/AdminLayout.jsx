@@ -3,7 +3,7 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, BookOpen, Users, Settings, Search,
     Bell, Mail, LogOut, ShoppingBag, Menu, Info, User,
-    ChevronDown, BarChart2, ClipboardList
+    ChevronDown, BarChart2, ClipboardList, Heart
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -44,6 +44,7 @@ const AdminLayout = () => {
         { name: 'Book', icon: <BookOpen size={20} />, link: '/admin/manage-books' },
         { name: 'Accessories', icon: <ShoppingBag size={20} />, link: '/admin/accessories' },
         { name: 'Orders', icon: <ClipboardList size={20} />, link: '/admin/view-orders' },
+        { name: 'Donations', icon: <Heart size={20} />, link: '/admin/donations' },
         { name: 'Users', icon: <Users size={20} />, link: '/admin/manage-users' },
         { name: 'Analytics', icon: <BarChart2 size={20} />, link: '/admin/analytics' },
         { name: 'Settings', icon: <Settings size={20} />, link: '/admin/settings' },
