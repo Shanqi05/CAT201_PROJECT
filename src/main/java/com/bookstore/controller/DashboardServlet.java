@@ -19,7 +19,7 @@ public class DashboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         // 1. Setup CORS
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5175");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setContentType("application/json");

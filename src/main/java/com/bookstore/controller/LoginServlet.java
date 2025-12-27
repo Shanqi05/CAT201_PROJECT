@@ -15,7 +15,7 @@ public class LoginServlet extends HttpServlet {
     // 1. Handle OPTIONS request (CORS Preflight - Required to prevent React CORS errors)
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5177"); // Your React Frontend URL
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5173"); // Your React Frontend URL
         resp.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
         resp.setHeader("Access-Control-Allow-Credentials", "true"); // Allow Cookies/Session
@@ -25,7 +25,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 2. Set Response Headers (CORS + JSON)
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5177");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
