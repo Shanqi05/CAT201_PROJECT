@@ -1,21 +1,21 @@
-# --- Java & IntelliJ ---
+# IntelliJ & Java
 .idea/
-*.iws
 *.iml
-*.ipr
-out/
 target/
-.smarttomcat/
+out/
+*.log
+*.class
 
-# --- Node.js & Frontend ---
+# Node.js & React (subfolder also)
 node_modules/
-npm-debug.log
-yarn-error.log
+dist/
+build/
 .env
+npm-debug.log
 
-# --- VS Code ---
-.vscode/
+# Remove later (?)
+db.properties
 
-# --- OS Files ---
+# OS Junk
 .DS_Store
 Thumbs.db
