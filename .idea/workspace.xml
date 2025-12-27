@@ -11,10 +11,10 @@
   <component name="ChangeListManager">
     <list default="true" id="9a6d909e-50cb-4c05-83ba-2911f53bac52" name="Changes" comment="Admin page backend (Analytics)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Header.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/AccessoriesPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/AccessoriesPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/HomePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/HomePage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/ProductListingPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/ProductListingPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Footer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/components/Common/Footer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/AboutUsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/secondbook-frontend/src/pages/User/AboutUsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/LoginServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bookstore/controller/LoginServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bookstore/controller/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bookstore/controller/LoginServlet.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -332,7 +332,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1766731914201</updated>
-      <workItem from="1766822436931" duration="3636000" />
+      <workItem from="1766822436931" duration="4877000" />
     </task>
     <task id="LOCAL-00001" summary="Fix Tomcat and AddBook function">
       <option name="closed" value="true" />
