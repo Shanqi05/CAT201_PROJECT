@@ -1,13 +1,16 @@
 // secondbook-frontend/src/pages/User/AboutUsPage.jsx
 import React from 'react';
 import { BookOpen, Target, Users, Leaf, Lightbulb, Sparkles } from 'lucide-react';
-import MemberPhoto from '../../assets/images/member.png'; 
+import M1 from '../../assets/images/m1.jpeg';
+import M2 from '../../assets/images/m2.jpeg';
+import M3 from '../../assets/images/m3.jpeg';
+import M4 from '../../assets/images/m4.jpeg';
 
 const teamMembers = [
-    { name: 'Your Name', role: 'CEO', desc: 'Driving the vision for sustainable reading.', photo: MemberPhoto },
-    { name: 'Member B', role: 'CFO', desc: 'Ensuring every book finds its way home affordably.', photo: MemberPhoto },
-    { name: 'Member C', role: 'Store Manager', desc: 'Crafting the perfect library experience.', photo: MemberPhoto },
-    { name: 'Member D', role: 'Asst. Manager', desc: 'Championing our community of readers.', photo: MemberPhoto },
+    { name: 'Tan Shan Qi', role: 'Store Manager', desc: 'Driving the vision for sustainable reading.', photo: M2 },
+    { name: 'Tan Xiang Huey', role: 'Service Manager', desc: 'Ensuring every book finds its way home affordably.', photo: M3 },
+    { name: 'Choo Xuan', role: 'Sales Manager', desc: 'Crafting the perfect library experience.', photo: M1 },
+    { name: 'Ng Xin Yuan', role: 'Officer Manager', desc: 'Championing our community of readers.', photo: M4 },
 ];
 
 const AboutUsPage = () => {

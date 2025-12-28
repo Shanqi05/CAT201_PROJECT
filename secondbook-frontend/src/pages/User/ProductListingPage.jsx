@@ -1,7 +1,6 @@
 // secondbook-frontend/src/pages/User/ProductListingPage.jsx
 import React, { useState, useEffect } from 'react';
 import BookCard from '../../components/Common/BookCard';
-import mockBooks from '../../api/mockBooks.json';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
 import { Search, SlidersHorizontal, X, Sparkles } from 'lucide-react';
 
@@ -15,11 +14,27 @@ const ProductListingPage = () => {
     const categories = ['All', 'Fiction', 'Non-Fiction', 'Mystery', 'Children'];
 
     useEffect(() => {
-        setTimeout(() => {
-            setBooks(mockBooks);
-            setLoading(false);
-        }, 500);
+        fetchBooks();
     }, []);
+
+    const fetchBooks = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/CAT201_project/getBooks', {
+                method: 'GET',
+                credentials: 'include',
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setBooks(data);
+            } else {
+                console.error('Failed to fetch books');
+            }
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const filteredBooks = books.filter(book => {
         const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

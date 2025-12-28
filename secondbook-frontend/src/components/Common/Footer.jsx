@@ -62,6 +62,11 @@ const Footer = () => {
                                 </a>
                             </li>
                             <li>
+                                <a href="/donation" className="text-gray-400 hover:text-white hover:pl-2 transition-all duration-300 inline-block">
+                                    ❤️ Donate Books
+                                </a>
+                            </li>
+                            <li>
                                 <a href="/about" className="text-gray-400 hover:text-white hover:pl-2 transition-all duration-300 inline-block">
                                     ℹ️ About Us
                                 </a>

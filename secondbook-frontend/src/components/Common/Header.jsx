@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, ShoppingCart, LogOut, LogIn, User } from 'lucide-react';
+import { BookOpen, ShoppingCart, LogOut, LogIn, User, Heart } from 'lucide-react';
 import { getCartCount } from '../../utils/cartUtils';
 
 const Header = () => {
@@ -34,8 +34,19 @@ const Header = () => {
         };
     }, []);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (window.confirm("Are you sure you want to logout?")) {
+            try {
+                // Call backend logout to clear session
+                await fetch('http://localhost:8080/CAT201_project/logout', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            // Clear local storage
             localStorage.removeItem("userToken");
             localStorage.removeItem("userRole");
             localStorage.removeItem("registeredUser");
@@ -80,6 +91,7 @@ const Header = () => {
                     <nav className="hidden md:flex items-center text-sm font-black bg-white/5 rounded-xl overflow-hidden border border-white/10">
                         <Link to="/books" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Books</Link>
                         <Link to="/accessories" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Accessories</Link>
+                        <Link to="/donation" className="py-3 px-6 text-gray-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all border-r border-white/10 uppercase tracking-widest">Donate</Link>
                         <Link to="/about" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">About Us</Link>
 
                         {/* ACCOUNT SECTION */}
