@@ -50,8 +50,8 @@ function App() {
 
             <main className={`flex-grow ${isAdminRoute ? '' : 'bg-gray-50 py-8'}`}>
                 <Routes>
-                    {/* ROOT REDIRECT -> Go to Login */}
-                    <Route path="/" element={<Navigate to="/login" replace />} />
+                    {/* ROOT REDIRECT -> Go to Homepage */}
+                    <Route path="/" element={<Navigate to="/home" replace />} />
 
                     {/* PUBLIC ROUTES */}
                     <Route path="/login" element={<LoginPage />} />
@@ -89,7 +89,7 @@ function App() {
                     </Route>
 
                     {/* 404 FALLBACK -> Redirect to Login */}
-                    <Route path="*" element={<Navigate to="/login" replace />} />
+                    <Route path="*" element={<Navigate to="/home" replace />} />
                 </Routes>
             </main>
 

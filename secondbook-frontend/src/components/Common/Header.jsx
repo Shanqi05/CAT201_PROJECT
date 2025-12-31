@@ -60,7 +60,7 @@ const Header = () => {
     // Determine the home link based on user role
     const getHomeLink = () => {
         if (userRole === 'admin') {
-            return '/admin-dashboard';
+            return '/admin/home';
         }
         return '/home';
     };
@@ -102,7 +102,7 @@ const Header = () => {
                                 onMouseLeave={() => setIsDropdownOpen(false)}
                             >
                                 <Link
-                                    to={userRole === 'admin' ? '/admin-dashboard' : '/dashboard'}
+                                    to={userRole === 'admin' ? '/admin/home' : '/dashboard'}
                                     className="flex items-center py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all cursor-pointer uppercase tracking-widest"
                                 >
                                     <User className="w-4 h-4 mr-2" /> Account
@@ -111,7 +111,7 @@ const Header = () => {
                                 {isDropdownOpen && (
                                     <div className="absolute top-full right-0 w-48 bg-[#0a0a0a] border border-white/10 rounded-b-xl shadow-2xl z-50 overflow-hidden">
                                         <Link
-                                            to={userRole === 'admin' ? '/admin-dashboard' : '/dashboard'}
+                                            to={userRole === 'admin' ? '/admin/home' : '/dashboard'}
                                             className="block px-6 py-4 text-xs font-bold text-gray-400 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5"
                                         >
                                             DASHBOARD

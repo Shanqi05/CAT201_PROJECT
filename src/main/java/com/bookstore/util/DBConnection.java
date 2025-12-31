@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DBConnection {
-    private static final String URL = "jdbc:postgresql://db.tuiiesrnwojtavinvjqc.supabase.co:5432/postgres?sslmode=require";
-    private static final String USER = "postgres";
+    private static final String URL = "jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=require";
+    private static final String USER = "postgres.tuiiesrnwojtavinvjqc";
     private static final String PASSWORD = "WearefromCAT201";
 
     public static Connection getConnection() {
