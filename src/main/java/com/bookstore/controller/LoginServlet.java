@@ -12,28 +12,13 @@ import java.io.IOException;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-    // 1. Handle OPTIONS request (CORS Preflight - Required to prevent React CORS errors)
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5173"); // Your React Frontend URL
-        resp.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        resp.setHeader("Access-Control-Allow-Credentials", "true"); // Allow Cookies/Session
-        resp.setStatus(HttpServletResponse.SC_OK);
-    }
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 2. Set Response Headers (CORS + JSON)
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
+        // Set Response Headers (JSON)
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         try {
-            // [DEBUG] Log to confirm request received
-            System.out.println("--- Login Request Received ---");
-
             String user = request.getParameter("username");
             String pass = request.getParameter("password");
 
@@ -41,23 +26,16 @@ public class LoginServlet extends HttpServlet {
             User currentUser = dao.checkLogin(user, pass);
 
             if (currentUser != null) {
-                // 3. Login Success
-                System.out.println("Login Success: " + currentUser.getUsername());
-
-                // Save Session (Optional for REST API, but good for hybrid approaches)
+                // Success
                 HttpSession session = request.getSession();
                 session.setAttribute("user", currentUser);
 
-                // [CRITICAL FIX]: Do NOT use sendRedirect! Return JSON instead!
                 Gson gson = new Gson();
                 String json = gson.toJson(currentUser);
                 response.getWriter().write(json);
 
             } else {
-                // 4. Login Failed
-                System.out.println("Login Failed");
-
-                // Return 401 status code and error JSON
+                // Failure
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("{\"message\": \"Invalid Credentials\"}");
             }

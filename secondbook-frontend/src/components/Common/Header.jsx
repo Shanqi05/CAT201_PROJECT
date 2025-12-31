@@ -36,8 +36,9 @@ const Header = () => {
 
     const handleLogout = async () => {
         if (window.confirm("Are you sure you want to logout?")) {
+            navigate('/home');
             try {
-                // Call backend logout to clear session
+                // Call backend
                 await fetch('http://localhost:8080/CAT201_project/logout', {
                     method: 'GET',
                     credentials: 'include',
@@ -45,15 +46,17 @@ const Header = () => {
             } catch (error) {
                 console.error('Logout error:', error);
             }
-            
             // Clear local storage
             localStorage.removeItem("userToken");
             localStorage.removeItem("userRole");
             localStorage.removeItem("registeredUser");
+            localStorage.removeItem("user");
             setIsLoggedIn(false);
             setUserRole('');
             setIsDropdownOpen(false);
-            navigate('/login');
+
+            // force header update
+            window.dispatchEvent(new Event("storage"));
         }
     };
 
@@ -88,7 +91,7 @@ const Header = () => {
 
                 {/* NAVIGATION */}
                 <div className="flex items-center space-x-8">
-                    <nav className="hidden md:flex items-center text-sm font-black bg-white/5 rounded-xl overflow-hidden border border-white/10">
+                    <nav className="hidden md:flex items-center text-sm font-black bg-white/5 rounded-xl border border-white/10">
                         <Link to="/books" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Books</Link>
                         <Link to="/accessories" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Accessories</Link>
                         <Link to="/donation" className="py-3 px-6 text-gray-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all border-r border-white/10 uppercase tracking-widest">Donate</Link>
