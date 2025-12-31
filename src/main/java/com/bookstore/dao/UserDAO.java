@@ -13,16 +13,19 @@ public class UserDAO {
     // ==========================================
     public boolean registerUser(User user) {
         // Updated SQL: Removed 'balance' column
-        String sql = "INSERT INTO users (username, password, email, role, address) VALUES (?, ?, ?, 'USER', ?)";
+        String sql = "INSERT INTO users (name, username, password, email, role, address) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, user.getUsername());
-            ps.setString(2, user.getPassword());
-            ps.setString(3, user.getEmail());
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getUsername());
+            ps.setString(3, user.getPassword());
+            ps.setString(4, user.getEmail());
+            // Set role to USER if null
+            String role = user.getRole();
+            ps.setString(5, (role == null || role.isEmpty()) ? "USER" : role);
             // Set address (handle null case safely)
-            ps.setString(4, user.getAddress() != null ? user.getAddress() : "");
+            ps.setString(6, user.getAddress() != null ? user.getAddress() : "");
 
             int rows = ps.executeUpdate();
             return rows > 0;
@@ -51,6 +54,7 @@ public class UserDAO {
             if (rs.next()) {
                 user = new User();
                 user.setId(rs.getInt("id"));
+                user.setName(rs.getString("name"));
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
                 user.setEmail(rs.getString("email"));
@@ -79,11 +83,11 @@ public class UserDAO {
             while (rs.next()) {
                 User user = new User();
                 user.setId(rs.getInt("id"));
+                user.setName(rs.getString("name"));
                 user.setUsername(rs.getString("username"));
                 user.setEmail(rs.getString("email"));
                 user.setRole(rs.getString("role"));
                 user.setAddress(rs.getString("address"));
-                // We usually don't need password for the list, but setting it doesn't hurt
                 user.setPassword(rs.getString("password"));
 
                 userList.add(user);

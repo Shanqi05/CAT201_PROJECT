@@ -31,7 +31,7 @@ public class RegisterServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         // Get Data
-        String name = request.getParameter("name"); // (Not used in DB yet, but good to have)
+        String name = request.getParameter("name");
         String email = request.getParameter("email");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -40,6 +40,7 @@ public class RegisterServlet extends HttpServlet {
 
         // Fill User
         User newUser = new User();
+        newUser.setName(name);
         newUser.setUsername(username);
         newUser.setPassword(password);
         newUser.setEmail(email);
