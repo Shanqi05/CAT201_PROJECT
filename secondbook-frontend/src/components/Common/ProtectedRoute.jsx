@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children }) => {
     // If no token, kick them to Login
     if (!token) {
         return <Navigate to="/login" state={{
-            from: location,
+            from: location.pathname,
             message: "Please log in to access that page."
         }}
         replace />;

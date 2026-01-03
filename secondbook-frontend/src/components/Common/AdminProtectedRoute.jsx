@@ -18,7 +18,9 @@ const AdminProtectedRoute = ({ children }) => {
     // 2. If not logged in (No Token found)
     if (!token) {
         console.warn("No token found, redirecting to login.");
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        return <Navigate to="/login" state={{
+            from: location.pathname
+        }} replace />;
     }
 
     // 3. Check if Role is valid and equals 'admin' (Case-insensitive)

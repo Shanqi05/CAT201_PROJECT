@@ -103,7 +103,11 @@ const RegisterPage = () => {
                 <div className="text-center mb-8">
                     <UserPlus className="w-12 h-12 text-pink-500 mx-auto mb-2" />
                     <h2 className="text-3xl font-black text-gray-800">Register</h2>
-                    <p className="text-gray-500">Join the preloved book movement</p>
+                    <p className="text-gray-500">Join the
+                        <Link to="/home">
+                            <span className="hover:text-cyan-600 transition-colors tracking-tighter"> SecondBook </span>
+                        </Link>
+                        family</p>
                 </div>
 
                 <form onSubmit={handleRegister} className="space-y-4">
