@@ -15,10 +15,6 @@ public class GetAccessoriesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. 设置 CORS (允许 React 访问)
-        setCorsHeaders(response);
-
-        // 2. 设置返回类型为 JSON
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
@@ -37,13 +33,5 @@ public class GetAccessoriesServlet extends HttpServlet {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching data");
         }
-    }
-
-    // 辅助方法：设置 CORS
-    private void setCorsHeaders(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
     }
 }

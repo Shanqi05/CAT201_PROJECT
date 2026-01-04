@@ -15,13 +15,6 @@ public class GetBooksServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. 设置跨域 (CORS) - 允许前端 React 访问
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-
-        // 2. 设置响应类型为 JSON
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 

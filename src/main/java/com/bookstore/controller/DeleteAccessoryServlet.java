@@ -9,17 +9,8 @@ import java.io.IOException;
 @WebServlet("/deleteAccessory")
 public class DeleteAccessoryServlet extends HttpServlet {
 
-    // 处理预检请求 (Preflight request)
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        setCorsHeaders(resp);
-        resp.setStatus(HttpServletResponse.SC_OK);
-    }
-
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. 设置 CORS
-        setCorsHeaders(response);
 
         try {
             // 2. 获取 ID 参数 (例如: /deleteAccessory?id=5)
@@ -47,12 +38,5 @@ public class DeleteAccessoryServlet extends HttpServlet {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
         }
-    }
-
-    private void setCorsHeaders(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
     }
 }

@@ -14,12 +14,6 @@ public class GetUsersServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. Handle CORS
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
