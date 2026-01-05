@@ -63,7 +63,7 @@ const AdminLayout = () => {
                         </div>
                         {sidebarOpen && (
                             <span className="font-black text-2xl tracking-tight leading-none bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent" style={{ fontFamily: 'Playfair Display, serif' }}>
-                                SecondBook
+                                BookShelter
                             </span>
                         )}
                     </Link>
