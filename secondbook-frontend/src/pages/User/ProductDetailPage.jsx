@@ -50,7 +50,7 @@ const ProductDetailPage = () => {
 
                         {/* Price & Actions */}
                         <div className="flex items-center space-x-8 border-t pt-4">
-                            <span className="text-5xl font-bold text-indigo-600">${book.price.toFixed(2)}</span>
+                            <span className="text-5xl font-bold text-indigo-600">RM {book.price.toFixed(2)}</span>
 
                             {/* --- THE CONNECTED BUTTON --- */}
                             <button

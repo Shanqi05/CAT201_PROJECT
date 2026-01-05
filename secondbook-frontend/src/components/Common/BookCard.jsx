@@ -83,7 +83,7 @@ const BookCard = ({ book }) => {
                 <div className="p-4 flex-grow">
                     <h3 className="text-xl font-bold text-gray-900 truncate group-hover:text-pink-600 transition-colors">{title}</h3>
                     <p className="text-sm text-gray-500 mb-2">{author}</p>
-                    <span className="text-2xl font-extrabold text-pink-600">${price.toFixed(2)}</span>
+                    <span className="text-2xl font-extrabold text-pink-600">RM {price.toFixed(2)}</span>
                 </div>
             </Link>
 

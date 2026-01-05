@@ -68,7 +68,7 @@ const FilterSidebar = ({ filters, onFilterChange, availableCategories }) => {
 
             {/* Price Range */}
             <div className="mb-6">
-                <h4 className="text-md font-semibold text-gray-800 mb-3">Price Range: ${filters.maxPrice}</h4>
+                <h4 className="text-md font-semibold text-gray-800 mb-3">Price Range: RM {filters.maxPrice}</h4>
                 <input
                     type="range"
                     min="0"
@@ -79,8 +79,8 @@ const FilterSidebar = ({ filters, onFilterChange, availableCategories }) => {
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                 />
                 <div className="flex justify-between text-sm text-gray-500 mt-1">
-                    <span>$0</span>
-                    <span>$50+</span>
+                    <span>RM 0</span>
+                    <span>RM 50+</span>
                 </div>
             </div>
 

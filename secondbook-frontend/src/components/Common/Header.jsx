@@ -80,7 +80,7 @@ const Header = () => {
                         
                         {/* 文字改用青色到紫色的鲜艳渐变 */}
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]">
-                            SecondBook
+                            BookShelter
                         </span>
                     </Link>
                     {/* Slogan 也给一点淡紫色，呼应 Logo */}

@@ -4,7 +4,7 @@ import { BookOpen, Users, TrendingUp, AlertTriangle, MoreVertical } from 'lucide
 
 // Banners Data (目前保持静态，因为数据库还没做这个表)
 const heroContent = [
-    { title: "SecondBook", subtitle: "PRELOVED", status: "Active", img: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=2000" },
+    { title: "BookShelter", subtitle: "PRELOVED", status: "Active", img: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=2000" },
     { title: "Essentials", subtitle: "ACCESSORIES", status: "Scheduled", img: "https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?auto=format&fit=crop&q=80&w=2000" },
     { title: "Our Story", subtitle: "ABOUT US", status: "Inactive", img: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&q=80&w=2000" }
 ];
@@ -57,7 +57,7 @@ const AdminHomePage = () => {
         },
         {
             label: "Total Earnings",
-            value: `$${stats.totalEarnings.toFixed(2)}`, // 格式化金额
+            value: `RM ${stats.totalEarnings.toFixed(2)}`, // 格式化金额
             icon: <TrendingUp />,
             color: "bg-green-500",
             increase: "+8.4%"
@@ -153,7 +153,7 @@ const AdminHomePage = () => {
                                                 <span className="line-clamp-1 max-w-[150px]">{book.title}</span>
                                             </td>
                                             <td className="px-6 py-4 text-gray-500">{book.category || "General"}</td>
-                                            <td className="px-6 py-4 font-mono text-gray-900 font-bold">${book.price.toFixed(2)}</td>
+                                            <td className="px-6 py-4 font-mono text-gray-900 font-bold">RM {book.price.toFixed(2)}</td>
                                             <td className="px-6 py-4 text-right">
                                                 <span className={`text-[10px] px-2 py-1 rounded uppercase font-bold tracking-wider ${
                                                     book.stock < 5 ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"

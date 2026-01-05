@@ -55,7 +55,7 @@ const TermsModal = ({ onClose }) => {
                     <section>
                         <h3 className="text-xl font-bold text-gray-900 mb-3">4. Pricing and Payment</h3>
                         <p className="text-gray-700 leading-relaxed">
-                            All prices are listed in USD. Payment must be made in full at the time of purchase. We accept 
+                            All prices are listed in RM (Malaysian Ringgit). Payment must be made in full at the time of purchase. We accept 
                             various payment methods as indicated during checkout. Prices are subject to change without notice.
                         </p>
                     </section>

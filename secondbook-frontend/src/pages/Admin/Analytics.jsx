@@ -62,7 +62,7 @@ const Analytics = () => {
         {
             label: "Total Revenue",
             // Note: Make sure the JSON key matches 'totalEarnings' or change this to statsData.totalRevenue
-            value: loading ? "..." : `$${statsData.totalEarnings ? statsData.totalEarnings.toFixed(2) : "0.00"}`,
+            value: loading ? "..." : `RM ${statsData.totalEarnings ? statsData.totalEarnings.toFixed(2) : "0.00"}`,
             change: "+8.4%",
             trend: "up",
             icon: <TrendingUp className="text-white" size={24} />,

@@ -217,7 +217,7 @@ const ManageBooks = () => {
                                         </td>
                                         <td className="p-5">
                                             <span className="font-mono font-bold text-gray-900 text-sm">
-                                                ${parseFloat(book.price).toFixed(2)}
+                                                RM {parseFloat(book.price).toFixed(2)}
                                             </span>
                                         </td>
                                         <td className="p-5">
@@ -301,18 +301,17 @@ const ManageBooks = () => {
                                         value={formData.condition} onChange={handleInputChange}
                                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all appearance-none"
                                     >
-                                        <option value="New">New</option>
-                                        <option value="Like New">Like New</option>
-                                        <option value="Very Good">Very Good</option>
-                                        <option value="Good">Good</option>
-                                        <option value="Fair">Fair</option>
+                                        <option value="Brand new">Brand New</option>
+                                        <option value="Like new">Like New</option>
+                                        <option value="Acceptable">Acceptable</option>
+                                        <option value="Old">Old</option>
                                     </select>
                                 </div>
                             </div>
 
                             {/* Price */}
                             <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price ($)</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price (RM)</label>
                                 <input
                                     type="number" name="price" step="0.01" required
                                     value={formData.price} onChange={handleInputChange}
