@@ -127,7 +127,7 @@ const PrivacyModal = ({ onClose }) => {
                         <p className="text-gray-700 leading-relaxed">
                             If you have questions or concerns about this Privacy Policy or our data practices, please contact us:
                             <br />
-                            <span className="font-semibold">Email:</span> privacy@secondbook.com
+                            <span className="font-semibold">Email:</span> privacy@bookshelter.com
                             <br />
                             <span className="font-semibold">Phone:</span> +1 (555) 123-4567
                             <br />

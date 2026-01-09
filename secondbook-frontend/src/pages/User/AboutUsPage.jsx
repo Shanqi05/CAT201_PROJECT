@@ -65,10 +65,10 @@ const AboutUsPage = () => {
 
                     <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-6">
                         <p className="text-lg">
-                            SecondBook was born not in a boardroom, but in a cluttered university dorm room. Our small group of founders, all passionate readers and students, were frustrated by two glaring realities: the astronomical cost of textbooks and the sight of countless perfectly readable books being tossed into landfills after just one use. <strong className="text-gray-900">We saw books as treasures, not disposable goods.</strong>
+                            BookShelter was born not in a boardroom, but in a cluttered university dorm room. Our small group of founders, all passionate readers and students, were frustrated by two glaring realities: the astronomical cost of textbooks and the sight of countless perfectly readable books being tossed into landfills after just one use. <strong className="text-gray-900">We saw books as treasures, not disposable goods.</strong>
                         </p>
                         <p className="text-lg">
-                            We started with a simple experiment: collecting overlooked titles from campus libraries and friends, creating handwritten listings, and hoping someone, somewhere, would appreciate a book's second life. The response was overwhelming! Readers embraced the affordability, the sustainability, and the charming "preloved" history each book carried. That initial spark quickly ignited into SecondBook, a platform built on the belief that <strong className="text-purple-600 italic text-xl">knowledge must be accessible and sustainable.</strong>
+                            We started with a simple experiment: collecting overlooked titles from campus libraries and friends, creating handwritten listings, and hoping someone, somewhere, would appreciate a book's second life. The response was overwhelming! Readers embraced the affordability, the sustainability, and the charming "preloved" history each book carried. That initial spark quickly ignited into BookShelter, a platform built on the belief that <strong className="text-purple-600 italic text-xl">knowledge must be accessible and sustainable.</strong>
                         </p>
                     </div>
                 </section>

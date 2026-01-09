@@ -71,7 +71,7 @@ const LoginPage = () => {
                     <h2 className="text-3xl font-black text-gray-800 tracking-tight">Welcome Back</h2>
                     <p className="text-gray-500">Sign in to
                         <Link to="/home">
-                            <span className="hover:text-cyan-600 transition-colors tracking-tighter"> SecondBook</span>
+                            <span className="hover:text-cyan-600 transition-colors tracking-tighter"> BookShelter</span>
                         </Link>
                     </p>
                 </div>
@@ -115,7 +115,7 @@ const LoginPage = () => {
 
                 <div className="mt-8 pt-6 border-t border-gray-100 text-center">
                     <p className="text-gray-600">
-                        New to SecondBook? {' '}
+                        New to BookShelter? {' '}
                         <Link to="/register" className="text-cyan-600 font-bold hover:text-cyan-700 transition-colors">
                             Create an account
                         </Link>
