@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { BookOpen, ShoppingCart, LogOut, LogIn, User, Heart } from 'lucide-react';
 import { getCartCount } from '../../utils/cartUtils';
 
 const Header = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -68,6 +69,13 @@ const Header = () => {
         return '/home';
     };
 
+    const handleNavClick = (path) => {
+        if (location.pathname === path) {
+            // Same page, scroll to top
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        }
+    };
+
     return (
         <header className="bg-black shadow-2xl sticky top-0 z-50 border-b border-white/10 backdrop-blur-md bg-opacity-95">
             <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
@@ -92,10 +100,10 @@ const Header = () => {
                     {/* NAVIGATION */}
                 <div className="flex items-center space-x-8">
                     <nav className="hidden md:flex items-center text-sm font-black bg-white/5 rounded-xl border border-white/10">
-                        <Link to="/books" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Books</Link>
-                        <Link to="/accessories" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Accessories</Link>
-                        <Link to="/donation" className="py-3 px-6 text-gray-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all border-r border-white/10 uppercase tracking-widest">Donate</Link>
-                        <Link to="/about" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">About Us</Link>
+                        <Link to="/books" onClick={() => handleNavClick('/books')} className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Books</Link>
+                        <Link to="/accessories" onClick={() => handleNavClick('/accessories')} className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Accessories</Link>
+                        <Link to="/donation" onClick={() => handleNavClick('/donation')} className="py-3 px-6 text-gray-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all border-r border-white/10 uppercase tracking-widest">Donate</Link>
+                        <Link to="/about" onClick={() => handleNavClick('/about')} className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">About Us</Link>
 
                         {/* ACCOUNT SECTION */}
                         {isLoggedIn ? (
