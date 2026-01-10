@@ -6,11 +6,19 @@ import com.bookstore.model.DonatedBook;
 import com.bookstore.model.Donor;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 @WebServlet("/addDonatedBook")
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10,      // 10MB
+        maxRequestSize = 1024 * 1024 * 50    // 50MB
+)
 public class AddDonatedBookServlet extends HttpServlet {
 
     @Override
@@ -38,6 +46,22 @@ public class AddDonatedBookServlet extends HttpServlet {
             String city = request.getParameter("city");
             String state = request.getParameter("state");
 
+            // [NEW] 4. Handle Image Upload
+            String imagePath = null;
+            Part filePart = request.getPart("image");
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                // Make unique to prevent overwriting
+                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+
+                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) uploadDir.mkdir();
+
+                filePart.write(uploadPath + File.separator + uniqueFileName);
+                imagePath = uniqueFileName;
+            }
+
             // --- Step A: Save Donor ---
             Donor donor = new Donor(donorEmail, donorName, donorPhone);
             DonorDAO donorDAO = new DonorDAO();
@@ -49,12 +73,15 @@ public class AddDonatedBookServlet extends HttpServlet {
 
             // --- Step B: Save Book ---
             DonatedBook book = new DonatedBook();
-            book.setDonorEmail(donorEmail); // Link to donor
+            book.setDonorEmail(donorEmail);
             book.setTitle(bookTitle);
             book.setAuthor(author);
             book.setBookCondition(bookCondition);
             book.setCategory(category);
             book.setMessage(message);
+
+            // Set Image
+            book.setImagePath(imagePath);
 
             // Set Address
             book.setPickupHouseNo(houseNo);
@@ -66,7 +93,6 @@ public class AddDonatedBookServlet extends HttpServlet {
             DonatedBookDAO bookDAO = new DonatedBookDAO();
             boolean success = bookDAO.addDonatedBook(book);
 
-            Gson gson = new Gson();
             if (success) {
                 response.getWriter().write("{\"success\": true, \"message\": \"Donation submitted successfully!\"}");
             } else {

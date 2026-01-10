@@ -18,7 +18,7 @@ public class DonatedBook {
 
     // Address Fields
     private String pickupHouseNo;
-    private String pickupStreet; // Renamed from pickupStreetNo/pickupStreet to match
+    private String pickupStreet;
     private String pickupPostcode;
     private String pickupCity;
     private String pickupState;
@@ -38,7 +38,7 @@ public class DonatedBook {
     public String getDonorEmail() { return donorEmail; }
     public void setDonorEmail(String donorEmail) { this.donorEmail = donorEmail; }
 
-    // [NEW] Getters/Setters for Join Data
+    // Getters/Setters for Join Data
     public String getDonorName() { return donorName; }
     public void setDonorName(String donorName) { this.donorName = donorName; }
 

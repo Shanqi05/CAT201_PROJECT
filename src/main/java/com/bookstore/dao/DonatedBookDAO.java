@@ -11,8 +11,8 @@ public class DonatedBookDAO {
     public boolean addDonatedBook(DonatedBook book) {
         String sql = "INSERT INTO donated_books (donor_email, title, " +
                 "author, book_condition, category, message, approve_collect_status, " +
-                "pickup_house_no, pickup_street, pickup_postcode, pickup_city, pickup_state) " +
-                "VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?, ?, ?, ?, ?)";
+                "pickup_house_no, pickup_street, pickup_postcode, pickup_city, pickup_state, image_path) " +
+                "VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -24,11 +24,15 @@ public class DonatedBookDAO {
             ps.setString(5, book.getCategory());
             ps.setString(6, book.getMessage());
 
+            // Address Fields
             ps.setString(7, book.getPickupHouseNo());
             ps.setString(8, book.getPickupStreet());
             ps.setString(9, book.getPickupPostcode());
             ps.setString(10, book.getPickupCity());
             ps.setString(11, book.getPickupState());
+
+            // Image Path
+            ps.setString(12, book.getImagePath());
 
             return ps.executeUpdate() > 0;
 
@@ -41,10 +45,9 @@ public class DonatedBookDAO {
     public List<DonatedBook> getAllDonatedBooks() {
         List<DonatedBook> books = new ArrayList<>();
 
-        // JOIN with Donors table to get name and phone
         String sql = "SELECT b.*, d.donor_name, d.donor_phone " +
                 "FROM donated_books b " +
-                "LEFT JOIN donors d ON b.donor_email = d.donor_email " +
+                "JOIN donors d ON b.donor_email = d.donor_email " +
                 "ORDER BY b.created_at DESC";
 
         try (Connection conn = DBConnection.getConnection();
@@ -55,12 +58,7 @@ public class DonatedBookDAO {
                 DonatedBook book = new DonatedBook();
                 book.setDonatedBookId(rs.getInt("donated_book_id"));
 
-                // [FIX] Populate the JOINED fields so frontend can see them
-                book.setDonorEmail(rs.getString("donor_email"));
-                book.setDonorName(rs.getString("donor_name"));
-                book.setDonorPhone(rs.getString("donor_phone"));
-
-                // Book Details
+                // Book Info
                 book.setTitle(rs.getString("title"));
                 book.setAuthor(rs.getString("author"));
                 book.setBookCondition(rs.getString("book_condition"));
@@ -70,12 +68,17 @@ public class DonatedBookDAO {
                 book.setCreatedAt(rs.getTimestamp("created_at"));
                 book.setImagePath(rs.getString("image_path"));
 
-                // Address Details
+                // Address
                 book.setPickupHouseNo(rs.getString("pickup_house_no"));
                 book.setPickupStreet(rs.getString("pickup_street"));
                 book.setPickupCity(rs.getString("pickup_city"));
                 book.setPickupState(rs.getString("pickup_state"));
                 book.setPickupPostcode(rs.getString("pickup_postcode"));
+
+                // Joined Info
+                book.setDonorEmail(rs.getString("donor_email"));
+                book.setDonorName(rs.getString("donor_name"));
+                book.setDonorPhone(rs.getString("donor_phone"));
 
                 books.add(book);
             }

@@ -10,14 +10,13 @@ public class AddressDAO {
 
     // 1. Add new address
     public boolean addAddress(Address address) {
-        String sql = "INSERT INTO addresses (user_id, house_no, street_no, street, postcode, city, state) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO addresses (user_id, house_no, street, postcode, city, state) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, address.getUserId());
             ps.setString(2, address.getHouseNo());
-            ps.setString(3, address.getStreetNo());
             ps.setString(4, address.getStreet());
             ps.setString(5, address.getPostcode());
             ps.setString(6, address.getCity());
@@ -45,7 +44,6 @@ public class AddressDAO {
                     addr.setAddressId(rs.getInt("address_id"));
                     addr.setUserId(rs.getInt("user_id"));
                     addr.setHouseNo(rs.getString("house_no"));
-                    addr.setStreetNo(rs.getString("street_no"));
                     addr.setStreet(rs.getString("street"));
                     addr.setPostcode(rs.getString("postcode"));
                     addr.setCity(rs.getString("city"));

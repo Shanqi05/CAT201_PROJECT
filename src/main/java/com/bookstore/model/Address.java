@@ -6,7 +6,6 @@ public class Address {
     private int addressId;
     private int userId;
     private String houseNo;
-    private String streetNo;
     private String street;
     private String postcode;
     private String city;
@@ -24,9 +23,6 @@ public class Address {
 
     public String getHouseNo() { return houseNo; }
     public void setHouseNo(String houseNo) { this.houseNo = houseNo; }
-
-    public String getStreetNo() { return streetNo; }
-    public void setStreetNo(String streetNo) { this.streetNo = streetNo; }
 
     public String getStreet() { return street; }
     public void setStreet(String street) { this.street = street; }
