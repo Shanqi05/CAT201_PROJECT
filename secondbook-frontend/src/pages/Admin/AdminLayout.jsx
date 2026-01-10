@@ -56,17 +56,22 @@ const AdminLayout = () => {
 
             {/* --- SIDEBAR --- */}
             <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-black shadow-xl transition-all duration-300 flex flex-col z-30 flex-shrink-0 text-white`}>
-                <div className="h-20 flex items-center justify-center border-b border-gray-800">
+                <div className="flex flex-col items-center justify-center border-b border-gray-800 py-6">
                     <Link to="/admin/home" className="flex items-center gap-2 overflow-hidden">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0">
                             <BookOpen className="w-8 h-8 text-cyan-400" strokeWidth={2.5} />
                         </div>
                         {sidebarOpen && (
-                            <span className="font-black text-2xl tracking-tight leading-none bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent" style={{ fontFamily: 'Playfair Display, serif' }}>
+                            <span className="font-black text-2xl tracking-tight leading-none bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]">
                                 BookShelter
                             </span>
                         )}
                     </Link>
+                    {sidebarOpen && (
+                        <p className="text-[9px] font-bold text-purple-400/80 tracking-[0.2em] uppercase mt-1">
+                            Your Preloved Bookstore
+                        </p>
+                    )}
                 </div>
 
                 {/* Sidebar User Info */}
