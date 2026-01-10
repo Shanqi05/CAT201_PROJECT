@@ -48,6 +48,23 @@ public class AccessoryDAO {
         return list;
     }
 
+    public boolean deleteAccessory(int id) {
+        boolean isSuccess = false;
+        String sql = "DELETE FROM accessories WHERE accessory_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            int row = ps.executeUpdate();
+            if (row > 0) isSuccess = true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isSuccess;
+    }
+
     public int getTotalAccessoriesCount() {
         int count = 0;
         String sql = "SELECT COUNT(*) FROM accessories";

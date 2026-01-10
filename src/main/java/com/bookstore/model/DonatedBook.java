@@ -6,15 +6,19 @@ public class DonatedBook {
     private int donatedBookId;
     private String donorEmail;
 
+    // Display Fields (Fetched from Donors table, not saved to DonatedBooks table)
+    private String donorName;
+    private String donorPhone;
+
     private String title;
     private String author;
     private String bookCondition;
     private String category;
     private String imagePath;
 
+    // Address Fields
     private String pickupHouseNo;
-    private String pickupStreetNo;
-    private String pickupStreet;
+    private String pickupStreet; // Renamed from pickupStreetNo/pickupStreet to match
     private String pickupPostcode;
     private String pickupCity;
     private String pickupState;
@@ -26,12 +30,20 @@ public class DonatedBook {
 
     public DonatedBook() {}
 
-    // Getters and Setters
+    // --- GETTERS AND SETTERS ---
+
     public int getDonatedBookId() { return donatedBookId; }
     public void setDonatedBookId(int donatedBookId) { this.donatedBookId = donatedBookId; }
 
     public String getDonorEmail() { return donorEmail; }
     public void setDonorEmail(String donorEmail) { this.donorEmail = donorEmail; }
+
+    // [NEW] Getters/Setters for Join Data
+    public String getDonorName() { return donorName; }
+    public void setDonorName(String donorName) { this.donorName = donorName; }
+
+    public String getDonorPhone() { return donorPhone; }
+    public void setDonorPhone(String donorPhone) { this.donorPhone = donorPhone; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -48,12 +60,9 @@ public class DonatedBook {
     public String getImagePath() { return imagePath; }
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 
-    // Address Getters
+    // Address Getters/Setters
     public String getPickupHouseNo() { return pickupHouseNo; }
     public void setPickupHouseNo(String pickupHouseNo) { this.pickupHouseNo = pickupHouseNo; }
-
-    public String getPickupStreetNo() { return pickupStreetNo; }
-    public void setPickupStreetNo(String pickupStreetNo) { this.pickupStreetNo = pickupStreetNo; }
 
     public String getPickupStreet() { return pickupStreet; }
     public void setPickupStreet(String pickupStreet) { this.pickupStreet = pickupStreet; }

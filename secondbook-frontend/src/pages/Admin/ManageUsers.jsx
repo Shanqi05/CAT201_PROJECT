@@ -37,7 +37,7 @@ const ManageUsers = () => {
                     });
 
                     if (response.ok) {
-                        setUsers(users.filter(user => user.id !== id));
+                        setUsers(users.filter(user => user.userId !== id));
                         alert("User deleted successfully.");
                     } else {
                         alert("Failed to delete user.");
@@ -154,7 +154,7 @@ const ManageUsers = () => {
                                 </tr>
                             ) : (
                                 filteredUsers.map((user) => (
-                                    <tr key={user.id} className="hover:bg-gray-50/80 transition-colors">
+                                    <tr key={user.userId} className="hover:bg-gray-50/80 transition-colors">
                                         <td className="p-5">
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-sm ${
@@ -166,7 +166,7 @@ const ManageUsers = () => {
                                                 <div>
                                                     {/* Changed user.name to user.username */}
                                                     <p className="font-bold text-gray-900 leading-tight">{user.username}</p>
-                                                    <p className="text-[10px] text-gray-400 font-mono mt-0.5">ID: {user.id}</p>
+                                                    <p className="text-[10px] text-gray-400 font-mono mt-0.5">ID: {user.userId}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -194,7 +194,7 @@ const ManageUsers = () => {
                                         </td>
                                         <td className="p-5 text-right">
                                             <button
-                                                onClick={() => handleDeleteUser(user.id)}
+                                                onClick={() => handleDeleteUser(user.userId)}
                                                 className={`p-2 rounded-lg transition-colors ${
                                                     (user.role || '').toUpperCase() === 'ADMIN'
                                                     ? 'text-gray-300 cursor-not-allowed'
