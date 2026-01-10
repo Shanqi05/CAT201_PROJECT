@@ -99,7 +99,7 @@ const CartPage = () => {
                                         </div>
                                     )}
 
-                                        <span className="font-bold text-cyan-600 text-lg w-20 text-right">RM {(item.price * (item.quantity || 1)).toFixed(2)}</span>
+                                    <span className="font-bold text-cyan-600 text-lg whitespace-nowrap min-w-fit">RM {(item.price * (item.quantity || 1)).toFixed(2)}</span>
                                     <button
                                         onClick={() => removeFromCart(index)}
                                         className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition"
