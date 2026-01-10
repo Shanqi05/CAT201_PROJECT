@@ -1,6 +1,7 @@
 package com.bookstore.dao;
 
 import com.bookstore.model.Book;
+import com.bookstore.model.Accessory;
 import com.bookstore.util.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
@@ -8,9 +9,6 @@ import java.util.List;
 
 public class DashboardDAO {
 
-    // ==========================================
-    //  Inner Class: Data Structure for Statistics
-    // ==========================================
     public static class DashboardStats {
         private int totalBooks;
         private int totalAccessories;
@@ -21,37 +19,30 @@ public class DashboardDAO {
         // Getters and Setters
         public int getTotalBooks() { return totalBooks; }
         public void setTotalBooks(int totalBooks) { this.totalBooks = totalBooks; }
-
         public int getTotalAccessories() { return totalAccessories; }
         public void setTotalAccessories(int totalAccessories) { this.totalAccessories = totalAccessories; }
-
         public int getActiveUsers() { return activeUsers; }
         public void setActiveUsers(int activeUsers) { this.activeUsers = activeUsers; }
-
         public double getTotalEarnings() { return totalEarnings; }
         public void setTotalEarnings(double totalEarnings) { this.totalEarnings = totalEarnings; }
-
         public int getSoldBooksCount() { return soldBooksCount; }
         public void setSoldBooksCount(int soldBooksCount) { this.soldBooksCount = soldBooksCount; }
     }
 
-    // ==========================================
-    //  Method 1: Fetch All Dashboard Statistics
-    // ==========================================
     public DashboardStats getStats() {
         DashboardStats stats = new DashboardStats();
 
         try (Connection conn = DBConnection.getConnection()) {
 
-            // 1. Count Total Active Books
-            String sqlBooks = "SELECT COUNT(*) FROM books WHERE status = 'Active' AND category != 'Accessories'";
+            // 1. Count Active Books
+            String sqlBooks = "SELECT COUNT(*) FROM books WHERE status = 'Active'";
             try (PreparedStatement ps = conn.prepareStatement(sqlBooks);
                  ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) stats.setTotalBooks(rs.getInt(1));
             }
 
             // 2. Count Total Accessories
-            String sqlAccessories = "SELECT COUNT(*) FROM books WHERE category = 'Accessories'";
+            String sqlAccessories = "SELECT COUNT(*) FROM accessories";
             try (PreparedStatement ps = conn.prepareStatement(sqlAccessories);
                  ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) stats.setTotalAccessories(rs.getInt(1));
@@ -84,9 +75,6 @@ public class DashboardDAO {
         return stats;
     }
 
-    // ==========================================
-    //  Method 2: Fetch Recent Books
-    // ==========================================
     public List<Book> getRecentBooks() {
         List<Book> books = new ArrayList<>();
         String sql = "SELECT * FROM books ORDER BY book_id DESC LIMIT 10";
@@ -97,20 +85,42 @@ public class DashboardDAO {
 
             while (rs.next()) {
                 Book book = new Book();
-                // [CHANGE] Map to new Book model fields
                 book.setBookId(rs.getInt("book_id"));
                 book.setTitle(rs.getString("title"));
                 book.setAuthor(rs.getString("author"));
                 book.setPrice(rs.getDouble("price"));
-                book.setStatus(rs.getString("status")); // Map status instead of stock
+                book.setStatus(rs.getString("status"));
                 book.setImagePath(rs.getString("image_path"));
                 book.setCategory(rs.getString("category"));
-
                 books.add(book);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return books;
+    }
+
+    public List<Accessory> getRecentAccessories() {
+        List<Accessory> list = new ArrayList<>();
+        String sql = "SELECT * FROM accessories ORDER BY accessory_id DESC LIMIT 5";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Accessory acc = new Accessory();
+                acc.setAccessoryId(rs.getInt("accessory_id"));
+                acc.setTitle(rs.getString("title"));
+                acc.setCategory(rs.getString("category"));
+                acc.setPrice(rs.getDouble("price"));
+                acc.setImagePath(rs.getString("image_path"));
+                acc.setStatus(rs.getString("status"));
+                list.add(acc);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

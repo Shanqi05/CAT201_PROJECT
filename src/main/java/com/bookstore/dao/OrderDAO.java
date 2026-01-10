@@ -11,53 +11,52 @@ import java.util.Map;
 
 public class OrderDAO {
 
-    // 1. Create Order
     public boolean createOrder(Order order) {
         Connection conn = null;
         PreparedStatement psOrder = null;
         PreparedStatement psItem = null;
-        PreparedStatement psUpdateBook = null;
         ResultSet rs = null;
 
         try {
             conn = DBConnection.getConnection();
-            conn.setAutoCommit(false); // Transaction Start
+            conn.setAutoCommit(false);
 
-            // A. Insert into Orders
+            // [FIX] Use shipping_address_id (Integer)
             String sqlOrder = "INSERT INTO orders (user_id, total_amount, status, shipping_address_id, payment_method) VALUES (?, ?, ?, ?, ?)";
             psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
             psOrder.setInt(1, order.getUserId());
             psOrder.setDouble(2, order.getTotalAmount());
             psOrder.setString(3, "PENDING");
-            psOrder.setInt(4, order.getShippingAddressId());
+            psOrder.setInt(4, order.getShippingAddressId()); // Expects Int
             psOrder.setString(5, order.getPaymentMethod());
 
-            if (psOrder.executeUpdate() == 0) throw new SQLException("Order creation failed.");
+            int rowAffected = psOrder.executeUpdate();
+            if (rowAffected == 0) throw new SQLException("Order creation failed");
 
             int orderId = 0;
             rs = psOrder.getGeneratedKeys();
             if (rs.next()) orderId = rs.getInt(1);
 
-            // B. Insert Items & Update Stock Status
+            // [FIX] Insert Order Items (Handle Book vs Accessory)
             String sqlItem = "INSERT INTO order_items (order_id, book_id, accessory_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?, ?)";
-            String sqlBookUpdate = "UPDATE books SET status = 'Sold' WHERE book_id = ?";
-
             psItem = conn.prepareStatement(sqlItem);
-            psUpdateBook = conn.prepareStatement(sqlBookUpdate);
+
+            // Optional: Update Book Status to 'Sold'
+            String sqlUpdateBook = "UPDATE books SET status = 'Sold' WHERE book_id = ?";
+            PreparedStatement psUpdateBook = conn.prepareStatement(sqlUpdateBook);
 
             for (OrderItem item : order.getItems()) {
                 psItem.setInt(1, orderId);
 
-                // Handle Book vs Accessory
-                if (item.getBookId() != null) {
+                // Determine if it's a Book or Accessory based on IDs
+                if (item.getBookId() > 0) {
                     psItem.setInt(2, item.getBookId());
-                    psItem.setNull(3, java.sql.Types.INTEGER); // accessory_id is null
-
-                    // Mark book as sold
+                    psItem.setNull(3, java.sql.Types.INTEGER);
+                    // Mark unique book as sold
                     psUpdateBook.setInt(1, item.getBookId());
                     psUpdateBook.addBatch();
                 } else {
-                    psItem.setNull(2, java.sql.Types.INTEGER); // book_id is null
+                    psItem.setNull(2, java.sql.Types.INTEGER);
                     psItem.setInt(3, item.getAccessoryId());
                 }
 
@@ -67,9 +66,9 @@ public class OrderDAO {
             }
 
             psItem.executeBatch();
-            psUpdateBook.executeBatch(); // Only affects books
+            psUpdateBook.executeBatch(); // Execute book status updates
 
-            conn.commit(); // Save All
+            conn.commit();
             return true;
 
         } catch (SQLException e) {
@@ -79,15 +78,13 @@ public class OrderDAO {
         } finally {
             try {
                 if (rs != null) rs.close();
-                if (psItem != null) psItem.close();
                 if (psOrder != null) psOrder.close();
-                if (psUpdateBook != null) psUpdateBook.close();
-                if (conn != null) { conn.setAutoCommit(true); conn.close(); }
+                if (psItem != null) psItem.close();
+                if (conn != null) conn.close();
             } catch (Exception e) {}
         }
     }
 
-    // 2. Get All Orders (With Address Join)
     public List<Map<String, Object>> getAllOrders() {
         Map<Integer, Map<String, Object>> ordersMap = new java.util.LinkedHashMap<>();
         Connection conn = null;
@@ -97,16 +94,19 @@ public class OrderDAO {
         try {
             conn = DBConnection.getConnection();
 
-            // Updated Query: Joins with Address table
+            // [FIX] JOIN addresses table to get the text address
+            // [FIX] JOIN order_items to get books/accessories
             String sql = "SELECT o.order_id, o.created_at, o.total_amount, o.status, " +
                     "u.username AS customer_name, u.email, " +
-                    "a.city, a.postcode, a.street, " + // Address columns
-                    "b.title AS book_title, b.image_path, b.price " +
+                    "a.house_no, a.street, a.city, a.postcode, a.state, " + // Address columns
+                    "b.title AS book_title, b.image_path AS book_image, b.price AS book_price, " +
+                    "acc.title AS acc_title, acc.image_path AS acc_image, acc.price AS acc_price " +
                     "FROM orders o " +
                     "LEFT JOIN users u ON o.user_id = u.user_id " +
                     "LEFT JOIN addresses a ON o.shipping_address_id = a.address_id " +
                     "LEFT JOIN order_items oi ON o.order_id = oi.order_id " +
                     "LEFT JOIN books b ON oi.book_id = b.book_id " +
+                    "LEFT JOIN accessories acc ON oi.accessory_id = acc.accessory_id " +
                     "ORDER BY o.created_at DESC";
 
             ps = conn.prepareStatement(sql);
@@ -125,26 +125,37 @@ public class OrderDAO {
                     order.put("customerName", rs.getString("customer_name"));
                     order.put("email", rs.getString("email"));
 
-                    // Construct address string
-                    String fullAddress = rs.getString("street") + ", " + rs.getString("city") + " " + rs.getString("postcode");
+                    // Construct Address String
+                    String fullAddress = String.format("%s, %s, %s %s, %s",
+                            rs.getString("house_no"), rs.getString("street"),
+                            rs.getString("postcode"), rs.getString("city"), rs.getString("state"));
                     order.put("address", fullAddress);
 
                     order.put("products", new ArrayList<Map<String, Object>>());
                     ordersMap.put(orderId, order);
                 }
 
+                // Add Products (Book OR Accessory)
+                List<Map<String, Object>> productList = (List<Map<String, Object>>) order.get("products");
+
                 if (rs.getString("book_title") != null) {
-                    Map<String, Object> product = new HashMap<>();
-                    product.put("bookTitle", rs.getString("book_title"));
-                    product.put("bookImage", rs.getString("image_path"));
-                    product.put("bookPrice", rs.getDouble("price"));
-                    ((List<Map<String, Object>>) order.get("products")).add(product);
+                    Map<String, Object> p = new HashMap<>();
+                    p.put("name", rs.getString("book_title")); // Frontend expects 'name'
+                    p.put("img", rs.getString("book_image"));
+                    p.put("price", rs.getDouble("book_price"));
+                    productList.add(p);
+                } else if (rs.getString("acc_title") != null) {
+                    Map<String, Object> p = new HashMap<>();
+                    p.put("name", rs.getString("acc_title"));
+                    p.put("img", rs.getString("acc_image"));
+                    p.put("price", rs.getDouble("acc_price"));
+                    productList.add(p);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            try { if (conn != null) conn.close(); } catch (SQLException e) {}
+            try { if (conn != null) conn.close(); } catch (Exception e) {}
         }
         return new ArrayList<>(ordersMap.values());
     }

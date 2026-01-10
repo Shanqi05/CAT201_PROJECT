@@ -38,7 +38,6 @@ public class PlaceOrderServlet extends HttpServlet {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
 
             // 3. Extract Data
-            // Note: We expect 'addressId' (int) from the new DB structure
             int addressId = json.get("addressId").getAsInt();
             String paymentMethod = json.get("paymentMethod").getAsString();
             double totalAmount = json.get("total").getAsDouble();
