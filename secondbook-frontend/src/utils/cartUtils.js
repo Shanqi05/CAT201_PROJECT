@@ -1,7 +1,7 @@
 // src/utils/cartUtils.js
 
 // 1. ADD TO CART LOGIC
-export const addToCart = (product, quantity = 1, itemType = 'book') => {
+export const addToCart = (product, quantity = 1, itemType = 'book', showToast = true) => {
     const existingCartString = localStorage.getItem("shoppingCart");
     const cart = existingCartString ? JSON.parse(existingCartString) : [];
 
@@ -24,8 +24,10 @@ export const addToCart = (product, quantity = 1, itemType = 'book') => {
     // Dispatch a custom event so the Header knows to update the count
     window.dispatchEvent(new Event("cartUpdated"));
     
-    // Dispatch success event
-    window.dispatchEvent(new CustomEvent("cartAdded", { detail: { product, quantity, itemType } }));
+    // Dispatch success event only if showToast is true
+    if (showToast) {
+        window.dispatchEvent(new CustomEvent("cartAdded", { detail: { product, quantity, itemType } }));
+    }
     
     return true;
 };

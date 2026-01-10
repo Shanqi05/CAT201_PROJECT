@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { addToCart } from '../../utils/cartUtils';
 import { ShoppingCart, Plus, Minus, Check, X } from 'lucide-react';
 
 const AccessoryCard = ({ accessory }) => {
+    const navigate = useNavigate();
     const [showQty, setShowQty] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
@@ -41,9 +42,15 @@ const AccessoryCard = ({ accessory }) => {
 
     const handleConfirmAdd = (e) => {
         e.preventDefault();
-        addToCart({ ...safeAccessory, imageUrl: displayImage }, quantity, 'accessory');
+        addToCart({ ...safeAccessory, imageUrl: displayImage }, quantity, 'accessory', true);
         setShowQty(false);
         setQuantity(1);
+    };
+
+    const handleBuyNow = (e) => {
+        e.preventDefault();
+        addToCart({ ...safeAccessory, imageUrl: displayImage }, quantity, 'accessory', false);
+        navigate('/checkout');
     };
 
     return (
@@ -106,10 +113,10 @@ const AccessoryCard = ({ accessory }) => {
                                 <ShoppingCart size={20} />
                             </button>
                             <button
-                                onClick={handleInitClick}
+                                onClick={handleBuyNow}
                                 className="flex-grow font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-300 bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:shadow-lg hover:scale-105"
                             >
-                                Add to Cart
+                                Buy Now
                             </button>
                         </div>
                     )}

@@ -50,14 +50,14 @@ const BookCard = ({ book }) => {
             <div className="p-4 pt-0 mt-auto">
                 <div className="flex gap-2">
                     <button
-                        onClick={(e) => { e.preventDefault(); addToCart({ ...safeBook, imageUrl: displayImage }, 1); }}
+                        onClick={(e) => { e.preventDefault(); addToCart({ ...safeBook, imageUrl: displayImage }, 1, 'book', true); }}
                         className={`p-3 rounded-xl border shadow-sm transition-all duration-300 bg-pink-50 text-pink-600 border-pink-100 hover:bg-pink-100 hover:border-pink-200 hover:scale-105`}
                         title="Add to Cart"
                     >
                         <ShoppingCart size={20} />
                     </button>
                     <button
-                        onClick={(e) => { e.preventDefault(); addToCart({ ...safeBook, imageUrl: displayImage }, 1); navigate('/checkout'); }}
+                        onClick={(e) => { e.preventDefault(); addToCart({ ...safeBook, imageUrl: displayImage }, 1, 'book', false); navigate('/checkout'); }}
                         className={`flex-grow font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-300 bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:shadow-lg hover:scale-105`}
                     >
                         Buy Now
