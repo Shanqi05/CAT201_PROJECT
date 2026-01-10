@@ -104,22 +104,15 @@ const Header = () => {
                                 onMouseEnter={() => setIsDropdownOpen(true)}
                                 onMouseLeave={() => setIsDropdownOpen(false)}
                             >
-                                <button
-                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                <Link
+                                    to={userRole === 'admin' ? '/admin/home' : '/dashboard'}
                                     className="flex items-center py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all cursor-pointer uppercase tracking-widest"
                                 >
                                     <User className="w-4 h-4 mr-2" /> Account
-                                </button>
+                                </Link>
 
                                 {isDropdownOpen && (
                                     <div className="absolute top-full right-0 mt-0 w-48 bg-[#0a0a0a] border border-white/10 rounded-lg shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <Link
-                                            to={userRole === 'admin' ? '/admin/home' : '/dashboard'}
-                                            onClick={() => setIsDropdownOpen(false)}
-                                            className="block px-6 py-4 text-xs font-bold text-gray-400 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5"
-                                        >
-                                            DASHBOARD
-                                        </Link>
                                         <button
                                             onClick={handleLogout}
                                             className="w-full text-left px-6 py-4 text-xs font-bold text-red-500 hover:bg-red-500/10 flex items-center transition-colors"

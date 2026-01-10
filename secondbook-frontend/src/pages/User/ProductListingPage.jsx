@@ -11,7 +11,7 @@ const ProductListingPage = () => {
     const [loading, setLoading] = useState(true);
 
     // Filter categories (Matches what you might have in DB)
-    const categories = ['All', 'Fiction', 'Non-Fiction', 'Children & Young Adults'];
+    const categories = ['All', 'Fiction', 'Non-Fiction', 'Children & Young Adults','Others'];
 
     useEffect(() => {
         fetchBooks();
@@ -77,7 +77,7 @@ const ProductListingPage = () => {
             <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm transition-all">
                 {/* Categories - Evenly Distributed */}
                 <div className="w-full border-b border-gray-50">
-                    <div className="grid grid-cols-4 w-full">
+                    <div className="grid grid-cols-5 w-full">
                         {categories.map((cat) => (
                             <button
                                 key={cat}
