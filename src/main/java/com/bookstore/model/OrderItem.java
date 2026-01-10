@@ -1,34 +1,39 @@
 package com.bookstore.model;
 
 public class OrderItem {
-    private int id;
+    private int orderItemId;
     private int orderId;
-    private int bookId;
+
+    // Can contain EITHER bookId OR accessoryId
+    private Integer bookId;
+    private Integer accessoryId;
+
     private int quantity;
     private double priceAtPurchase;
-
-    // Optional: for frontend display
-    private String bookTitle;
-    private String bookImage;
+    private String title;
+    private String imagePath;
 
     public OrderItem() {}
 
-    public OrderItem(int bookId, int quantity, double priceAtPurchase) {
+    public OrderItem(Integer bookId, Integer accessoryId, int quantity, double priceAtPurchase) {
         this.bookId = bookId;
+        this.accessoryId = accessoryId;
         this.quantity = quantity;
         this.priceAtPurchase = priceAtPurchase;
     }
 
-    // --- GETTERS AND SETTERS ---
-
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    // Getters and Setters
+    public int getOrderItemId() { return orderItemId; }
+    public void setOrderItemId(int orderItemId) { this.orderItemId = orderItemId; }
 
     public int getOrderId() { return orderId; }
     public void setOrderId(int orderId) { this.orderId = orderId; }
 
-    public int getBookId() { return bookId; }
-    public void setBookId(int bookId) { this.bookId = bookId; }
+    public Integer getBookId() { return bookId; }
+    public void setBookId(Integer bookId) { this.bookId = bookId; }
+
+    public Integer getAccessoryId() { return accessoryId; }
+    public void setAccessoryId(Integer accessoryId) { this.accessoryId = accessoryId; }
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
@@ -36,9 +41,9 @@ public class OrderItem {
     public double getPriceAtPurchase() { return priceAtPurchase; }
     public void setPriceAtPurchase(double priceAtPurchase) { this.priceAtPurchase = priceAtPurchase; }
 
-    public String getBookTitle() { return bookTitle; }
-    public void setBookTitle(String bookTitle) { this.bookTitle = bookTitle; }
-
-    public String getBookImage() { return bookImage; }
-    public void setBookImage(String bookImage) { this.bookImage = bookImage; }
+    // Frontend helpers
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public String getImagePath() { return imagePath; }
+    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 }

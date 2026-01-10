@@ -2,8 +2,7 @@ package com.bookstore.controller;
 
 import com.bookstore.dao.BookDAO;
 import com.bookstore.model.Book;
-import com.google.gson.Gson; // 确保你引入了 Gson 库
-
+import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -19,16 +18,9 @@ public class GetBooksServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try {
-            // 3. 从数据库获取所有书
-            BookDAO bookDAO = new BookDAO();
-            List<Book> books = bookDAO.getAllBooks();
-
-            // 4. 使用 Gson 自动转换成 JSON 字符串
-            // 这会自动调用 Book.java 里的所有 getXxx() 方法
-            Gson gson = new Gson();
-            String json = gson.toJson(books);
-
-            // 5. 发送给前端
+            BookDAO dao = new BookDAO();
+            List<Book> books = dao.getAllBooks();
+            String json = new Gson().toJson(books);
             response.getWriter().write(json);
 
         } catch (Exception e) {

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import BookCard from '../../components/Common/BookCard';
-import LoadingSpinner from '../../components/Common/LoadingSpinner';
 import { Search, SlidersHorizontal, X, Sparkles } from 'lucide-react';
 
 const ProductListingPage = () => {
@@ -10,8 +9,7 @@ const ProductListingPage = () => {
     const [maxPrice, setMaxPrice] = useState(200);
     const [loading, setLoading] = useState(true);
 
-    // Filter categories (Matches what you might have in DB)
-    const categories = ['All', 'Fiction', 'Non-Fiction', 'Children & Young Adults','Others'];
+    const categories = ['All', 'Fiction', 'Non-Fiction', 'Children', 'Others'];
 
     useEffect(() => {
         fetchBooks();
@@ -19,7 +17,6 @@ const ProductListingPage = () => {
 
     const fetchBooks = async () => {
         try {
-            // [FIX]: Connect to your Java Backend
             const response = await fetch('http://localhost:8080/CAT201_project/getBooks');
             if (response.ok) {
                 const data = await response.json();
@@ -73,59 +70,50 @@ const ProductListingPage = () => {
                 </div>
             </div>
 
-            {/* 2. Sticky Toolbar */}
+            {/* Toolbar */}
             <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm transition-all">
-                {/* Categories - Evenly Distributed */}
                 <div className="w-full border-b border-gray-50">
-                    <div className="grid grid-cols-5 w-full">
+                    <div className="flex justify-center w-full">
                         {categories.map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setSelectedCategory(cat)}
-                                className={`px-6 py-4 text-xs font-black tracking-widest transition-all duration-300 relative group text-center ${selectedCategory === cat ? 'text-purple-600 bg-purple-50' : 'text-gray-400 hover:text-gray-600 hover:bg-purple-50/30'}`}
+                                className={`px-6 py-4 text-xs font-black tracking-widest transition-all duration-300 relative group text-center ${selectedCategory === cat ? 'text-purple-600 bg-purple-50' : 'text-gray-400 hover:text-gray-600'}`}
                             >
                                 {cat.toUpperCase()}
-                                {selectedCategory === cat && (
-                                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-600" />
-                                )}
+                                {selectedCategory === cat && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-purple-600" />}
                             </button>
                         ))}
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-6">
-                    {/* Search & Filter Controls */}
-                    <div className="py-4 flex flex-col md:flex-row items-center gap-4">
-                        <div className="relative flex-1 w-full group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4 group-focus-within:text-purple-600 transition-colors" />
-                            <input
-                                type="text"
-                                placeholder="Find by title, author..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-11 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-purple-200 focus:ring-2 focus:ring-purple-50 outline-none transition-all placeholder:text-gray-400 font-medium text-sm"
-                            />
-                            {searchQuery && (
-                                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full transition-colors">
-                                    <X className="w-3 h-3 text-gray-500" />
-                                </button>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-4 bg-gray-50 border border-gray-100 px-4 py-2 rounded-xl w-full md:w-auto min-w-[280px]">
-                            <SlidersHorizontal className="w-4 h-4 text-purple-500" />
-                            <div className="flex-1">
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Max Price</span>
-                                    <span className="text-xs font-black text-purple-600">RM {maxPrice}</span>
-                                </div>
-                                <input type="range" min="0" max="200" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600" />
+                <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center gap-4">
+                    {/* Search */}
+                    <div className="relative flex-1 w-full group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 w-4 h-4 group-focus-within:text-purple-600" />
+                        <input
+                            type="text"
+                            placeholder="Find by title, author..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-11 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-purple-200 outline-none transition-all text-sm"
+                        />
+                        {searchQuery && <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full"><X className="w-3 h-3 text-gray-500" /></button>}
+                    </div>
+                    <div className="flex items-center gap-4 bg-gray-50 border border-gray-100 px-4 py-2 rounded-xl w-full md:w-auto min-w-[280px]">
+                        <SlidersHorizontal className="w-4 h-4 text-purple-500" />
+                        <div className="flex-1">
+                            <div className="flex justify-between items-center mb-1">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Max Price</span>
+                                <span className="text-xs font-black text-purple-600">RM {maxPrice}</span>
                             </div>
+                            <input type="range" min="0" max="200" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600" />
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* 3. Book Grid */}
+            {/* Book Grid */}
             <div className="max-w-7xl mx-auto px-6 py-10 min-h-[60vh]">
                 <div className="mb-8">
                     <h3 className="text-2xl font-black text-gray-900 tracking-tight">
@@ -137,7 +125,7 @@ const ProductListingPage = () => {
                 {filteredBooks.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                         {filteredBooks.map((book) => (
-                            <div key={book.id} className="h-full">
+                            <div key={book.bookId} className="h-full">
                                 <BookCard book={book} />
                             </div>
                         ))}
@@ -145,8 +133,8 @@ const ProductListingPage = () => {
                 ) : (
                     <div className="text-center py-20 bg-white border border-dashed border-gray-200 rounded-3xl">
                         <h2 className="text-xl font-bold text-gray-900 mb-2">No matches found</h2>
-                        <button onClick={() => {setSelectedCategory('All'); setSearchQuery(''); setMaxPrice(200);}} className="px-8 py-3 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition-all text-sm">
-                            Clear All Filters
+                        <button onClick={() => {setSelectedCategory('All'); setSearchQuery('');}} className="px-8 py-3 bg-black text-white rounded-xl font-bold text-sm">
+                            Clear Filters
                         </button>
                     </div>
                 )}

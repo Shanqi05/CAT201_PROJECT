@@ -5,90 +5,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Order {
-    private int id;
+    private int orderId;
     private int userId;
     private double totalAmount;
     private String status;
-    private String shippingAddress;
+    private int shippingAddressId;
     private String paymentMethod;
     private Timestamp createdAt;
 
-    // IMPORTANT: An Order contains a list of items
     private List<OrderItem> items = new ArrayList<>();
 
-    // Default Constructor
     public Order() {}
 
-    // Constructor with main fields
-    public Order(int userId, double totalAmount, String shippingAddress, String paymentMethod) {
-        this.userId = userId;
-        this.totalAmount = totalAmount;
-        this.shippingAddress = shippingAddress;
-        this.paymentMethod = paymentMethod;
-        this.status = "PENDING";
-    }
+    // Getters and Setters
+    public int getOrderId() { return orderId; }
+    public void setOrderId(int orderId) { this.orderId = orderId; }
 
-    // --- GETTERS AND SETTERS (Required by Java) ---
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
 
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
+    public double getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
 
-    public int getUserId() { // <--- This was missing
-        return userId;
-    }
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public double getTotalAmount() {
-        return totalAmount;
-    }
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
+    public int getShippingAddressId() { return shippingAddressId; }
+    public void setShippingAddressId(int shippingAddressId) { this.shippingAddressId = shippingAddressId; }
 
-    public String getStatus() {
-        return status;
-    }
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 
-    public String getShippingAddress() {
-        return shippingAddress;
-    }
-    public void setShippingAddress(String shippingAddress) {
-        this.shippingAddress = shippingAddress;
-    }
+    public Timestamp getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
+    public List<OrderItem> getItems() { return items; }
+    public void setItems(List<OrderItem> items) { this.items = items; }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    // List Management
-    public List<OrderItem> getItems() {
-        return items;
-    }
-    public void setItems(List<OrderItem> items) {
-        this.items = items;
-    }
-
-    // Helper method to add item easily
-    public void addItem(OrderItem item) {
-        this.items.add(item);
-    }
+    public void addItem(OrderItem item) { this.items.add(item); }
 }

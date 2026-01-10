@@ -6,16 +6,12 @@ import { ShoppingCart } from 'lucide-react';
 const BookCard = ({ book }) => {
     const navigate = useNavigate();
 
-
     const API_BASE = "http://localhost:8080/CAT201_project/uploads/";
     const safeBook = book || {
-        title: "Loading...", author: "", price: 0, imagePath: null, id: 0, stock: 0
+        title: "Loading...", author: "", price: 0, imagePath: null, bookId: 0, status: 'Active'
     };
+    const { title, author, price, bookId } = safeBook;
 
-    const { title, author, price, id } = safeBook;
-
-    // Logic: If it starts with 'http', it's an external link (placeholder).
-    // If not, it's your local file, so add the API_BASE.
     const displayImage = safeBook.imagePath
         ? (safeBook.imagePath.startsWith('http') ? safeBook.imagePath : API_BASE + safeBook.imagePath)
         : "https://via.placeholder.com/300x450?text=No+Cover";
@@ -25,16 +21,14 @@ const BookCard = ({ book }) => {
                         hover:shadow-2xl hover:scale-[1.02] hover:border-pink-200 transition-all duration-300 overflow-hidden group flex flex-col h-full">
 
             {/* CARD LINK */}
-            <Link to={`/books/${id}`} className="flex-grow flex flex-col">
+            <Link to={`/books/${bookId}`} className="flex-grow flex flex-col">
                 <div className="relative overflow-hidden h-80 bg-pink-50">
-                    {/* Increased height to h-80 to see cover better */}
                     <img
                         src={displayImage}
                         alt={title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         onError={(e) => {e.target.src = "https://via.placeholder.com/300x450?text=Error"}}
                     />
-                    {/* No stock badge for secondhand single items */}
                 </div>
 
                 <div className="p-4 flex-grow flex flex-col justify-between">
@@ -46,7 +40,7 @@ const BookCard = ({ book }) => {
                 </div>
             </Link>
 
-            {/* BUTTONS AREA: direct add-to-cart for single-copy secondhand books */}
+            {/* BUTTONS AREA: direct add-to-cart for books */}
             <div className="p-4 pt-0 mt-auto">
                 <div className="flex gap-2">
                     <button

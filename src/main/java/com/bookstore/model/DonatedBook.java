@@ -3,140 +3,79 @@ package com.bookstore.model;
 import java.sql.Timestamp;
 
 public class DonatedBook {
-    private int id;
-    private String donorName;
+    private int donatedBookId;
     private String donorEmail;
-    private String donorPhone;
-    private String bookTitle;
+
+    private String title;
     private String author;
     private String bookCondition;
     private String category;
-    private int quantity;
-    private String pickupAddress;
+    private String imagePath;
+
+    private String pickupHouseNo;
+    private String pickupStreetNo;
+    private String pickupStreet;
+    private String pickupPostcode;
+    private String pickupCity;
+    private String pickupState;
+
     private String message;
-    private String status;
+    private String approveCollectStatus;
+    private boolean storedStatus;
     private Timestamp createdAt;
 
-    // Constructors
     public DonatedBook() {}
 
-    public DonatedBook(String donorName, String donorEmail, String donorPhone, String bookTitle, 
-                      String author, String bookCondition, String category, int quantity, 
-                      String pickupAddress, String message) {
-        this.donorName = donorName;
-        this.donorEmail = donorEmail;
-        this.donorPhone = donorPhone;
-        this.bookTitle = bookTitle;
-        this.author = author;
-        this.bookCondition = bookCondition;
-        this.category = category;
-        this.quantity = quantity;
-        this.pickupAddress = pickupAddress;
-        this.message = message;
-    }
-
     // Getters and Setters
-    public int getId() {
-        return id;
-    }
+    public int getDonatedBookId() { return donatedBookId; }
+    public void setDonatedBookId(int donatedBookId) { this.donatedBookId = donatedBookId; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getDonorEmail() { return donorEmail; }
+    public void setDonorEmail(String donorEmail) { this.donorEmail = donorEmail; }
 
-    public String getDonorName() {
-        return donorName;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public void setDonorName(String donorName) {
-        this.donorName = donorName;
-    }
+    public String getAuthor() { return author; }
+    public void setAuthor(String author) { this.author = author; }
 
-    public String getDonorEmail() {
-        return donorEmail;
-    }
+    public String getBookCondition() { return bookCondition; }
+    public void setBookCondition(String bookCondition) { this.bookCondition = bookCondition; }
 
-    public void setDonorEmail(String donorEmail) {
-        this.donorEmail = donorEmail;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public String getDonorPhone() {
-        return donorPhone;
-    }
+    public String getImagePath() { return imagePath; }
+    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 
-    public void setDonorPhone(String donorPhone) {
-        this.donorPhone = donorPhone;
-    }
+    // Address Getters
+    public String getPickupHouseNo() { return pickupHouseNo; }
+    public void setPickupHouseNo(String pickupHouseNo) { this.pickupHouseNo = pickupHouseNo; }
 
-    public String getBookTitle() {
-        return bookTitle;
-    }
+    public String getPickupStreetNo() { return pickupStreetNo; }
+    public void setPickupStreetNo(String pickupStreetNo) { this.pickupStreetNo = pickupStreetNo; }
 
-    public void setBookTitle(String bookTitle) {
-        this.bookTitle = bookTitle;
-    }
+    public String getPickupStreet() { return pickupStreet; }
+    public void setPickupStreet(String pickupStreet) { this.pickupStreet = pickupStreet; }
 
-    public String getAuthor() {
-        return author;
-    }
+    public String getPickupPostcode() { return pickupPostcode; }
+    public void setPickupPostcode(String pickupPostcode) { this.pickupPostcode = pickupPostcode; }
 
-    public void setAuthor(String author) {
-        this.author = author;
-    }
+    public String getPickupCity() { return pickupCity; }
+    public void setPickupCity(String pickupCity) { this.pickupCity = pickupCity; }
 
-    public String getBookCondition() {
-        return bookCondition;
-    }
+    public String getPickupState() { return pickupState; }
+    public void setPickupState(String pickupState) { this.pickupState = pickupState; }
 
-    public void setBookCondition(String bookCondition) {
-        this.bookCondition = bookCondition;
-    }
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
 
-    public String getCategory() {
-        return category;
-    }
+    public String getApproveCollectStatus() { return approveCollectStatus; }
+    public void setApproveCollectStatus(String approveCollectStatus) { this.approveCollectStatus = approveCollectStatus; }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    public boolean isStoredStatus() { return storedStatus; }
+    public void setStoredStatus(boolean storedStatus) { this.storedStatus = storedStatus; }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getPickupAddress() {
-        return pickupAddress;
-    }
-
-    public void setPickupAddress(String pickupAddress) {
-        this.pickupAddress = pickupAddress;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
+    public Timestamp getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 }
