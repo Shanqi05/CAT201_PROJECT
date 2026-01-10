@@ -41,8 +41,8 @@ function App() {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("✓ Added to cart successfully!");
 
-    // Hide Header/Footer on Login, Register, and all Admin pages
-    const hideHeaderFooter = ['/login', '/register'].includes(location.pathname) || location.pathname.startsWith('/admin');
+    // Hide Header/Footer on Register and all Admin pages (keep header on Login)
+    const hideHeaderFooter = ['/register'].includes(location.pathname) || location.pathname.startsWith('/admin');
 
     const isAdminRoute = location.pathname.startsWith('/admin');
 
