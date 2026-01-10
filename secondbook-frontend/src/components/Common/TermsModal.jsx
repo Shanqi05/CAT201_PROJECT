@@ -110,7 +110,9 @@ const TermsModal = ({ onClose }) => {
                             <br />
                             <span className="font-semibold">Email:</span> support@bookshelter.com
                             <br />
-                            <span className="font-semibold">Phone:</span> +60 12 345 6666
+                            <span className="font-semibold">Phone:</span> 012-8888888
+                            <br />
+                            <span className="font-semibold">Address:</span> 37, Jalan Desa, Taman Desa, 11700 Gelugor, Pulau Pinang, Malaysia
                         </p>
                     </section>
                 </div>

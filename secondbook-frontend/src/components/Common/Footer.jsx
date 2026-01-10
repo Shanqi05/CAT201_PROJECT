@@ -104,8 +104,8 @@ const Footer = () => {
                                 <Phone className="w-5 h-5 mt-0.5 text-yellow-400 flex-shrink-0" />
                                 <div>
                                     <p className="text-sm font-semibold text-white">Phone</p>
-                                    <a href="tel:+15551234567" className="text-sm hover:text-yellow-400 transition-colors">
-                                        +1 (555) 123-4567
+                                    <a href="tel:012-8888888" className="text-sm hover:text-yellow-400 transition-colors">
+                                        012-8888888
                                     </a>
                                 </div>
                             </li>
@@ -113,7 +113,7 @@ const Footer = () => {
                                 <MapPin className="w-5 h-5 mt-0.5 text-yellow-400 flex-shrink-0" />
                                 <div>
                                     <p className="text-sm font-semibold text-white">Location</p>
-                                    <p className="text-sm">123 Book Street<br />Reading City, RC 12345</p>
+                                    <p className="text-sm">37, Jalan Desa, Taman Desa<br />11700 Gelugor, Pulau Pinang<br />Malaysia</p>
                                 </div>
                             </li>
                         </ul>
