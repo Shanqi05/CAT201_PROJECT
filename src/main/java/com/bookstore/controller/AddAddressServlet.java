@@ -20,27 +20,20 @@ public class AddAddressServlet extends HttpServlet {
             return;
         }
 
-        String houseNo = request.getParameter("houseNo");
-        String street = request.getParameter("street");
-        String postcode = request.getParameter("postcode");
-        String city = request.getParameter("city");
-        String state = request.getParameter("state");
-
         Address address = new Address();
         address.setUserId(user.getUserId());
-        address.setHouseNo(houseNo);
-        address.setStreet(street);
-        address.setPostcode(postcode);
-        address.setCity(city);
-        address.setState(state);
+        address.setHouseNo(request.getParameter("houseNo"));
+        address.setStreet(request.getParameter("street"));
+        address.setPostcode(request.getParameter("postcode"));
+        address.setCity(request.getParameter("city"));
+        address.setState(request.getParameter("state"));
+        address.setPhone(request.getParameter("phone"));
 
         AddressDAO dao = new AddressDAO();
-        boolean success = dao.addAddress(address);
-
-        if (success) {
+        if (dao.addAddress(address)) {
             response.setStatus(HttpServletResponse.SC_OK);
         } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
         }
     }
 }

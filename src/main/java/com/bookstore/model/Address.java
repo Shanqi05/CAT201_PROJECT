@@ -10,6 +10,7 @@ public class Address {
     private String postcode;
     private String city;
     private String state;
+    private String phone;
     private Timestamp createdAt;
 
     public Address() {}
@@ -35,6 +36,9 @@ public class Address {
 
     public String getState() { return state; }
     public void setState(String state) { this.state = state; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
