@@ -12,9 +12,8 @@ const UserDashboardPage = () => {
     const [orders, setOrders] = useState([]);
     const [savedAddresses, setSavedAddresses] = useState([]);
 
-    // --- UI STATES ---
-    const [isAddingAddress, setIsAddingAddress] = useState(false);
-    const [newAddress, setNewAddress] = useState({ fullName: '', phone: '', address: '', city: '', zip: '' });
+    // --- STATE FOR ADDRESS FORM ---
+    const [states, setStates] = useState(['Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Perak', 'Perlis', 'Pulau Pinang', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu', 'Kuala Lumpur', 'Labuan', 'Putrajaya']);
 
     // --- SETTINGS STATES ---
     const [editMode, setEditMode] = useState({ username: false, phone: false });
@@ -23,6 +22,10 @@ const UserDashboardPage = () => {
     // Password Logic
     const [showPasswordForm, setShowPasswordForm] = useState(false);
     const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
+
+    // --- UI STATES ---
+    const [isAddingAddress, setIsAddingAddress] = useState(false);
+    const [newAddress, setNewAddress] = useState({ fullName: '', phone: '', houseNo: '', street: '', city: '', zip: '', state: '' });
 
     // --- 1. LOAD DATA ---
     useEffect(() => {
@@ -98,7 +101,7 @@ const UserDashboardPage = () => {
         setSavedAddresses(updatedAddresses);
         localStorage.setItem("userAddresses", JSON.stringify(updatedAddresses));
         setIsAddingAddress(false);
-        setNewAddress({ fullName: '', phone: '', address: '', city: '', zip: '' });
+        setNewAddress({ fullName: '', phone: '', houseNo: '', street: '', city: '', zip: '', state: '' });
     };
 
     const handleDeleteAddress = (index) => {
@@ -138,7 +141,6 @@ const UserDashboardPage = () => {
     const dashboardItems = [
         { key: 'profile', icon: User, label: 'My Profile' },
         { key: 'orders', icon: BookOpen, label: 'My Orders' },
-        { key: 'settings', icon: Settings, label: 'Account Settings' },
         { key: 'logout', icon: LogOut, label: 'Logout' }
     ];
 
@@ -186,12 +188,19 @@ const UserDashboardPage = () => {
                                 <form onSubmit={handleAddAddress} className="mb-6 p-6 bg-gray-50 rounded-xl border border-cyan-100">
                                     <div className="grid grid-cols-2 gap-4 mb-4">
                                         <input required placeholder="Full Name" className="p-3 border rounded-lg focus:ring-2 focus:ring-cyan-200 outline-none" value={newAddress.fullName} onChange={e => setNewAddress({...newAddress, fullName: e.target.value})} />
-                                        <input required placeholder="Phone" className="p-3 border rounded-lg focus:ring-2 focus:ring-cyan-200 outline-none" value={newAddress.phone} onChange={e => setNewAddress({...newAddress, phone: e.target.value})} />
+                                        <input required placeholder="Phone (XXX-XXXXXXX)" className="p-3 border rounded-lg focus:ring-2 focus:ring-cyan-200 outline-none" value={newAddress.phone} onChange={e => setNewAddress({...newAddress, phone: e.target.value})} />
                                     </div>
-                                    <textarea required placeholder="Address" className="w-full p-3 border rounded-lg mb-4 focus:ring-2 focus:ring-cyan-200 outline-none" rows="2" value={newAddress.address} onChange={e => setNewAddress({...newAddress, address: e.target.value})} />
                                     <div className="grid grid-cols-2 gap-4 mb-4">
+                                        <input required placeholder="House No / Taman" className="p-3 border rounded-lg focus:ring-2 focus:ring-cyan-200 outline-none" value={newAddress.houseNo} onChange={e => setNewAddress({...newAddress, houseNo: e.target.value})} />
+                                        <input required placeholder="Street / Jalan" className="p-3 border rounded-lg focus:ring-2 focus:ring-cyan-200 outline-none" value={newAddress.street} onChange={e => setNewAddress({...newAddress, street: e.target.value})} />
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-4 mb-4">
+                                        <input required placeholder="Postcode (5 digits)" maxLength="5" className="p-3 border rounded-lg focus:ring-2 focus:ring-cyan-200 outline-none" value={newAddress.zip} onChange={e => setNewAddress({...newAddress, zip: e.target.value})} />
                                         <input required placeholder="City" className="p-3 border rounded-lg focus:ring-2 focus:ring-cyan-200 outline-none" value={newAddress.city} onChange={e => setNewAddress({...newAddress, city: e.target.value})} />
-                                        <input required placeholder="Zip Code" className="p-3 border rounded-lg focus:ring-2 focus:ring-cyan-200 outline-none" value={newAddress.zip} onChange={e => setNewAddress({...newAddress, zip: e.target.value})} />
+                                        <select required className="p-3 border rounded-lg focus:ring-2 focus:ring-cyan-200 outline-none text-gray-700" value={newAddress.state} onChange={e => setNewAddress({...newAddress, state: e.target.value})}>
+                                            <option value="">Select State</option>
+                                            {states.map(s => <option key={s} value={s}>{s}</option>)}
+                                        </select>
                                     </div>
                                     <button type="submit" className="bg-cyan-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-cyan-700 shadow-md">Save Address</button>
                                 </form>
@@ -204,7 +213,7 @@ const UserDashboardPage = () => {
                                             <div>
                                                 <h4 className="font-bold text-gray-800">{addr.fullName}</h4>
                                                 <p className="text-sm text-gray-500 mb-1">{addr.phone}</p>
-                                                <p className="text-sm text-gray-600 leading-relaxed">{addr.address}, {addr.city}, {addr.zip}</p>
+                                                <p className="text-sm text-gray-600 leading-relaxed">{addr.houseNo}, {addr.street}, {addr.zip} {addr.city}, {addr.state}</p>
                                             </div>
                                         </div>
                                         <button onClick={() => handleDeleteAddress(idx)} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition"><Trash2 size={18} /></button>
@@ -217,6 +226,85 @@ const UserDashboardPage = () => {
                                     </div>
                                 )}
                             </div>
+                        </div>
+
+                        {/* Account Settings Section */}
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 className="font-bold text-lg mb-6 flex items-center text-gray-800">
+                                <User className="mr-2 text-cyan-500" /> Public Profile
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">Username</label>
+                                    <p className="text-xs text-gray-400 mb-2">Must be unique.</p>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            disabled={!editMode.username}
+                                            value={settingsInput.username}
+                                            onChange={(e) => setSettingsInput({...settingsInput, username: e.target.value})}
+                                            className={`w-full p-3 border rounded-xl transition-all ${editMode.username ? 'bg-white ring-2 ring-cyan-100 border-cyan-500' : 'bg-gray-50 border-gray-200 text-gray-500'}`}
+                                        />
+                                        {editMode.username ? (
+                                            <button onClick={updateUsername} className="bg-green-600 text-white px-4 rounded-xl hover:bg-green-700 text-sm font-bold shadow-md">Save</button>
+                                        ) : (
+                                            <button onClick={() => setEditMode({...editMode, username: true})} className="text-cyan-600 px-3 rounded-xl border border-gray-200 hover:bg-cyan-50 transition"><Edit3 size={18}/></button>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
+                                    <p className="text-xs text-red-400 mb-2 flex items-center"><AlertCircle className="w-3 h-3 mr-1"/> Locked (One account per email)</p>
+                                    <input
+                                        type="email"
+                                        disabled
+                                        value={userData?.email || ''}
+                                        className="w-full p-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed opacity-70"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 className="font-bold text-lg mb-4 flex items-center text-gray-800">
+                                <Lock className="mr-2 text-cyan-500" /> Security
+                            </h3>
+                            {!showPasswordForm ? (
+                                <div className="flex items-center justify-between bg-gray-50 p-6 rounded-xl border border-gray-200">
+                                    <div>
+                                        <h4 className="font-bold text-gray-800">Password</h4>
+                                        <p className="text-sm text-gray-500">Last changed: Never</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowPasswordForm(true)}
+                                        className="flex items-center text-white bg-cyan-600 px-5 py-2.5 rounded-xl font-bold hover:bg-cyan-700 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                    >
+                                        <Edit3 className="w-4 h-4 mr-2" /> Change Password
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="max-w-lg bg-white p-6 rounded-xl border-2 border-cyan-50 shadow-lg animate-fadeIn">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h4 className="font-bold text-gray-800 text-lg">Change Password</h4>
+                                        <button onClick={() => setShowPasswordForm(false)} className="text-sm text-red-500 hover:text-red-700 font-semibold px-3 py-1 hover:bg-red-50 rounded-lg transition">Cancel</button>
+                                    </div>
+                                    <div className="space-y-5">
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Old Password</label>
+                                            <input type="password" autoComplete="new-password" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none transition" placeholder="Enter current password" value={passwords.current} onChange={e => setPasswords({...passwords, current: e.target.value})} />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">New Password</label>
+                                            <input type="password" autoComplete="new-password" placeholder="8+ chars, Upper, Symbol..." className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none transition" value={passwords.new} onChange={e => setPasswords({...passwords, new: e.target.value})} />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-1">Confirm New Password</label>
+                                            <input type="password" autoComplete="new-password" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none transition" placeholder="Retype new password" value={passwords.confirm} onChange={e => setPasswords({...passwords, confirm: e.target.value})} />
+                                        </div>
+                                        <button onClick={updatePassword} className="w-full bg-cyan-600 text-white font-bold py-3 rounded-xl hover:bg-cyan-700 transition shadow-md mt-2">Confirm Change</button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 );
@@ -355,90 +443,6 @@ const UserDashboardPage = () => {
                     </div>
                 );
 
-            case 'settings':
-                return (
-                    <div className="space-y-8 animate-fadeIn">
-                        <h2 className="text-3xl font-bold text-gray-900">Account Settings</h2>
-
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                            <h3 className="font-bold text-lg mb-6 flex items-center text-gray-800">
-                                <User className="mr-2 text-cyan-500" /> Public Profile
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Username</label>
-                                    <p className="text-xs text-gray-400 mb-2">Must be unique.</p>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            disabled={!editMode.username}
-                                            value={settingsInput.username}
-                                            onChange={(e) => setSettingsInput({...settingsInput, username: e.target.value})}
-                                            className={`w-full p-3 border rounded-xl transition-all ${editMode.username ? 'bg-white ring-2 ring-cyan-100 border-cyan-500' : 'bg-gray-50 border-gray-200 text-gray-500'}`}
-                                        />
-                                        {editMode.username ? (
-                                            <button onClick={updateUsername} className="bg-green-600 text-white px-4 rounded-xl hover:bg-green-700 text-sm font-bold shadow-md">Save</button>
-                                        ) : (
-                                            <button onClick={() => setEditMode({...editMode, username: true})} className="text-cyan-600 px-3 rounded-xl border border-gray-200 hover:bg-cyan-50 transition"><Edit3 size={18}/></button>
-                                        )}
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
-                                    <p className="text-xs text-red-400 mb-2 flex items-center"><AlertCircle className="w-3 h-3 mr-1"/> Locked (One account per email)</p>
-                                    <input
-                                        type="email"
-                                        disabled
-                                        value={userData?.email || ''}
-                                        className="w-full p-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed opacity-70"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                            <h3 className="font-bold text-lg mb-4 flex items-center text-gray-800">
-                                <Lock className="mr-2 text-cyan-500" /> Security
-                            </h3>
-                            {!showPasswordForm ? (
-                                <div className="flex items-center justify-between bg-gray-50 p-6 rounded-xl border border-gray-200">
-                                    <div>
-                                        <h4 className="font-bold text-gray-800">Password</h4>
-                                        <p className="text-sm text-gray-500">Last changed: Never</p>
-                                    </div>
-                                    <button
-                                        onClick={() => setShowPasswordForm(true)}
-                                        className="flex items-center text-white bg-cyan-600 px-5 py-2.5 rounded-xl font-bold hover:bg-cyan-700 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                                    >
-                                        <Edit3 className="w-4 h-4 mr-2" /> Change Password
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="max-w-lg bg-white p-6 rounded-xl border-2 border-cyan-50 shadow-lg animate-fadeIn">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h4 className="font-bold text-gray-800 text-lg">Change Password</h4>
-                                        <button onClick={() => setShowPasswordForm(false)} className="text-sm text-red-500 hover:text-red-700 font-semibold px-3 py-1 hover:bg-red-50 rounded-lg transition">Cancel</button>
-                                    </div>
-                                    <div className="space-y-5">
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-700 mb-1">Old Password</label>
-                                            <input type="password" autoComplete="new-password" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none transition" placeholder="Enter current password" value={passwords.current} onChange={e => setPasswords({...passwords, current: e.target.value})} />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-700 mb-1">New Password</label>
-                                            <input type="password" autoComplete="new-password" placeholder="8+ chars, Upper, Symbol..." className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none transition" value={passwords.new} onChange={e => setPasswords({...passwords, new: e.target.value})} />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-gray-700 mb-1">Confirm New Password</label>
-                                            <input type="password" autoComplete="new-password" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none transition" placeholder="Retype new password" value={passwords.confirm} onChange={e => setPasswords({...passwords, confirm: e.target.value})} />
-                                        </div>
-                                        <button onClick={updatePassword} className="w-full bg-cyan-600 text-white font-bold py-3 rounded-xl hover:bg-cyan-700 transition shadow-md mt-2">Confirm Change</button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                );
             default: return null;
         }
     };
