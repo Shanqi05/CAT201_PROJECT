@@ -1,5 +1,6 @@
 // secondbook-frontend/src/components/Common/Footer.jsx
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import TermsModal from './TermsModal';
 import PrivacyModal from './PrivacyModal';
 import { BookOpen, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, Send } from 'lucide-react';
@@ -23,9 +24,16 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                     {/* Section 1 - Brand */}
                     <div className="space-y-4">
-                        <div className="flex items-center space-x-2">
-                            <BookOpen className="w-8 h-8 text-yellow-400" />
-                            <h4 className="font-black text-2xl" style={{fontFamily: 'Playfair Display, serif'}}>BookShelter</h4>
+                        <div className="flex flex-col items-start">
+                            <Link to="/" className="flex items-center space-x-2 text-2xl font-black tracking-tighter group">
+                                <BookOpen className="w-8 h-8 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
+                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]">
+                                    BookShelter
+                                </span>
+                            </Link>
+                            <p className="text-[10px] font-bold text-purple-400/80 tracking-[0.2em] ml-10 -mt-1 uppercase">
+                                Your Preloved Bookstore
+                            </p>
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed">
                             Giving preloved books a second life. Join our sustainable reading community and discover thousands of quality pre-loved books.
@@ -96,8 +104,8 @@ const Footer = () => {
                                 <Phone className="w-5 h-5 mt-0.5 text-yellow-400 flex-shrink-0" />
                                 <div>
                                     <p className="text-sm font-semibold text-white">Phone</p>
-                                    <a href="tel:+15551234567" className="text-sm hover:text-yellow-400 transition-colors">
-                                        +1 (555) 123-4567
+                                    <a href="tel:012-8888888" className="text-sm hover:text-yellow-400 transition-colors">
+                                        012-8888888
                                     </a>
                                 </div>
                             </li>
@@ -105,7 +113,7 @@ const Footer = () => {
                                 <MapPin className="w-5 h-5 mt-0.5 text-yellow-400 flex-shrink-0" />
                                 <div>
                                     <p className="text-sm font-semibold text-white">Location</p>
-                                    <p className="text-sm">123 Book Street<br />Reading City, RC 12345</p>
+                                    <p className="text-sm">37, Jalan Desa, Taman Desa<br />11700 Gelugor, Pulau Pinang<br />Malaysia</p>
                                 </div>
                             </li>
                         </ul>

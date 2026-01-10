@@ -129,9 +129,9 @@ const PrivacyModal = ({ onClose }) => {
                             <br />
                             <span className="font-semibold">Email:</span> privacy@bookshelter.com
                             <br />
-                            <span className="font-semibold">Phone:</span> +1 (555) 123-4567
+                            <span className="font-semibold">Phone:</span> 012-8888888
                             <br />
-                            <span className="font-semibold">Address:</span> 123 Book Street, Reading City, RC 12345
+                            <span className="font-semibold">Address:</span> 37, Jalan Desa, Taman Desa, 11700 Gelugor, Pulau Pinang, Malaysia
                         </p>
                     </section>
                 </div>

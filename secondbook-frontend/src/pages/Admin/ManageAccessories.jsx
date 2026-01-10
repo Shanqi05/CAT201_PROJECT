@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react'; // 1. 引入 useEffect
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Search, Filter, X, Upload, ShoppingBag } from 'lucide-react';
 
 const ManageAccessories = () => {
-    // 1. 状态管理 - 初始为空数组
     const [accessories, setAccessories] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
 
-    // 表单数据
     const [formData, setFormData] = useState({
         title: '',
         category: 'Bookmark',
@@ -17,14 +15,12 @@ const ManageAccessories = () => {
 
     const [previewUrl, setPreviewUrl] = useState(null);
 
-    // --- 2. 页面加载时获取数据 ---
     useEffect(() => {
         fetchAccessories();
     }, []);
 
     const fetchAccessories = async () => {
         try {
-            // 确保你后端有 GetAccessoriesServlet 对应这个路径
             const response = await fetch('http://localhost:8080/CAT201_project/getAccessories', {
                 method: 'GET',
             });
@@ -73,7 +69,7 @@ const ManageAccessories = () => {
             if (response.ok) {
                 alert("Accessory added successfully!");
                 setShowModal(false);
-                fetchAccessories(); // 成功后直接重新拉取最新列表，比手动更新 state 更稳
+                fetchAccessories();
                 setFormData({ title: '', category: 'Bookmark', price: '', image: null });
                 setPreviewUrl(null);
             } else {
@@ -85,11 +81,9 @@ const ManageAccessories = () => {
         }
     };
 
-    // --- 3. 删除功能对接后端 ---
     const handleDelete = async (id) => {
         if(window.confirm("Are you sure you want to remove this item?")) {
             try {
-                // 确保你后端有 DeleteAccessoryServlet
                 const response = await fetch(`http://localhost:8080/CAT201_project/deleteAccessory?id=${id}`, {
                     method: 'DELETE',
                     credentials: 'include',
@@ -160,7 +154,7 @@ const ManageAccessories = () => {
                                         <td className="p-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200 bg-gray-100 flex items-center justify-center">
-                                                    {/* 4. 图片逻辑修改：兼容数据库路径和本地预览 */}
+
                                                     {item.imagePath ? (
                                                         <img
                                                             src={item.imagePath.startsWith('blob') ? item.imagePath : `http://localhost:8080/CAT201_project/${item.imagePath}`}

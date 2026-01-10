@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ProductImageGallery from '../../components/Products/ProductImageGallery';
+import Toast from '../../components/Common/Toast';
 import { Heart, Star, ShoppingCart, Check, ArrowLeft } from 'lucide-react';
 import { addToCart } from '../../utils/cartUtils';
 
@@ -9,6 +10,7 @@ const ProductDetailPage = () => {
     const [book, setBook] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAdded, setIsAdded] = useState(false);
+    const [showToast, setShowToast] = useState(false);
 
     // [FIX]: Fetch Real Data
     useEffect(() => {
@@ -32,11 +34,11 @@ const ProductDetailPage = () => {
 
     const handleAddToCart = () => {
         if (!book) return;
-        // Construct correct image URL for cart
         const API_BASE = "http://localhost:8080/CAT201_project/uploads/";
         const imageUrl = book.imagePath ? API_BASE + book.imagePath : "https://via.placeholder.com/600x900?text=No+Cover";
 
         addToCart({ ...book, imageUrl }, 1);
+        setShowToast(true);
         setIsAdded(true);
         setTimeout(() => setIsAdded(false), 2000);
     };
@@ -51,6 +53,7 @@ const ProductDetailPage = () => {
 
     return (
         <div className="page-container py-10 max-w-7xl mx-auto px-6">
+            {showToast && <Toast message="Successfully added to cart!" type="success" onClose={() => setShowToast(false)} />}
             <Link to="/books" className="inline-flex items-center text-gray-500 hover:text-cyan-600 mb-6 transition-colors font-bold">
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back to Browse
             </Link>
@@ -73,11 +76,10 @@ const ProductDetailPage = () => {
                             <span className="text-5xl font-black text-gray-900 tracking-tighter">RM {book.price?.toFixed(2)}</span>
                             <button
                                 onClick={handleAddToCart}
-                                disabled={isAdded || book.stock <= 0}
                                 className={`flex items-center font-bold py-4 px-8 rounded-xl text-lg transition-all shadow-lg transform active:scale-95
-                                    ${isAdded ? 'bg-green-500 text-white' : book.stock <= 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800'}`}
+                                    ${isAdded ? 'bg-green-500 text-white' : 'bg-black text-white hover:bg-gray-800'}`}
                             >
-                                {isAdded ? <><Check className="w-6 h-6 mr-2" /> Added</> : book.stock <= 0 ? "Out of Stock" : <><ShoppingCart className="w-5 h-5 mr-2" /> Add to Cart</>}
+                                {isAdded ? <><Check className="w-6 h-6 mr-2" /> Added</> : <><ShoppingCart className="w-5 h-5 mr-2" /> Add to Cart</>}
                             </button>
                         </div>
 

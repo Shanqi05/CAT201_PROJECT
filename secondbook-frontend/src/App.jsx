@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // 2. LAYOUT COMPONENTS
 import Header from './components/Common/Header';
 import Footer from './components/Common/Footer';
+import Toast from './components/Common/Toast';
 
 // 3. AUTH PAGES
 import LoginPage from './pages/Auth/LoginPage';
@@ -37,18 +38,48 @@ import AdminProtectedRoute from './components/Common/AdminProtectedRoute';
 
 function App() {
     const location = useLocation();
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("✓ Added to cart successfully!");
 
     // Hide Header/Footer on Login, Register, and all Admin pages
     const hideHeaderFooter = ['/login', '/register'].includes(location.pathname) || location.pathname.startsWith('/admin');
 
     const isAdminRoute = location.pathname.startsWith('/admin');
 
+    // Listen for cart added events
+    useEffect(() => {
+        const handleCartAdded = (event) => {
+            setToastMessage("✓ Added to cart successfully!");
+            setShowToast(true);
+        };
+
+        const handleCartAlreadyExists = (event) => {
+            setToastMessage("Cannot added, already in your cart");
+            setShowToast(true);
+        };
+
+        window.addEventListener('cartAdded', handleCartAdded);
+        window.addEventListener('cartAlreadyExists', handleCartAlreadyExists);
+        return () => {
+            window.removeEventListener('cartAdded', handleCartAdded);
+            window.removeEventListener('cartAlreadyExists', handleCartAlreadyExists);
+        };
+    }, []);
+
+    // Scroll to top on location change
+    useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, [location.pathname]);
+
     return (
         <div className="flex flex-col min-h-screen">
+            {/* Global Toast Notification */}
+            {showToast && <Toast message={toastMessage} type={toastMessage.includes("Cannot") ? "warning" : "success"} duration={3000} onClose={() => setShowToast(false)} />}
+
             {/* Header (Visible only on User pages) */}
             {!hideHeaderFooter && <Header />}
 
-            <main className={`flex-grow ${isAdminRoute ? '' : 'bg-gray-50 py-8'}`}>
+            <main className={`flex-grow ${isAdminRoute ? '' : 'bg-gray-50 pt-0 pb-8'}`}>
                 <Routes>
                     {/* ROOT REDIRECT -> Go to Homepage */}
                     <Route path="/" element={<Navigate to="/home" replace />} />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, Eye, EyeOff, MapPin } from 'lucide-react';
+import { UserPlus, Eye, EyeOff } from 'lucide-react';
 import TermsModal from '../../components/Common/TermsModal';
 import PrivacyModal from '../../components/Common/PrivacyModal';
 
@@ -11,7 +11,6 @@ const RegisterPage = () => {
         email: '',
         username: '',
         password: '',
-        address: '',
         role: 'USER' // Default role - always customer user, not admin
     });
     const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -73,7 +72,6 @@ const RegisterPage = () => {
         dataToSend.append('email', formData.email);
         dataToSend.append('username', formData.username);
         dataToSend.append('password', formData.password);
-        dataToSend.append('address', formData.address);
         dataToSend.append('role', 'USER'); // fixed for customer reg
 
         try {
@@ -127,18 +125,7 @@ const RegisterPage = () => {
                         onChange={(e) => setFormData({...formData, username: e.target.value})}
                         required
                     />
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <MapPin className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Shipping Address"
-                            className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 outline-none"
-                            onChange={(e) => setFormData({...formData, address: e.target.value})}
-                            required
-                        />
-                    </div>
+                    
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}

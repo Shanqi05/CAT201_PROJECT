@@ -205,7 +205,7 @@ const ManageBooks = () => {
                                                 {book.type || book.category}
                                             </span>
                                         </td>
-                                        {/* [UPDATE 4]: 显示 Condition */}
+                                        {/* Display Condition */}
                                         <td className="p-5">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                                                 (book.condition === 'New' || book.condition === 'Like New')
@@ -278,7 +278,7 @@ const ManageBooks = () => {
                                 </div>
                             </div>
 
-                            {/* [UPDATE 5]: Type 和 Condition 放一排 */}
+                            {/* Type and Condition side-by-side */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
                                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
