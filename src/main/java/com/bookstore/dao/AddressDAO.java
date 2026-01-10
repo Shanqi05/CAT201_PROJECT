@@ -17,10 +17,10 @@ public class AddressDAO {
 
             ps.setInt(1, address.getUserId());
             ps.setString(2, address.getHouseNo());
-            ps.setString(4, address.getStreet());
-            ps.setString(5, address.getPostcode());
-            ps.setString(6, address.getCity());
-            ps.setString(7, address.getState());
+            ps.setString(3, address.getStreet());
+            ps.setString(4, address.getPostcode());
+            ps.setString(5, address.getCity());
+            ps.setString(6, address.getState());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {

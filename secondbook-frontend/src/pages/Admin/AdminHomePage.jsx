@@ -152,7 +152,7 @@ const AdminHomePage = () => {
                         ) : (
                             <div className="divide-y divide-gray-100">
                                 {recentAccessories.map((item) => (
-                                    <div key={item.id} className="p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors">
+                                    <div key={item.accessoryId} className="p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors">
                                         <div className="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
                                             {item.imagePath ? (
                                                 <img

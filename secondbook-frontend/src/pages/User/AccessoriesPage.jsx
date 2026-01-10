@@ -133,7 +133,7 @@ const AccessoriesPage = () => {
                 {filteredAccessories.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
                         {filteredAccessories.map((accessory) => (
-                            <div key={accessory.id} className="transform transition-transform hover:-translate-y-2 duration-300">
+                            <div key={accessory.accessoryId} className="transform transition-transform hover:-translate-y-2 duration-300">
                                 <AccessoryCard accessory={accessory} />
                             </div>
                         ))}

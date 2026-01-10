@@ -95,4 +95,25 @@ public class UserDAO {
             return false;
         }
     }
+
+    // 5. Get User details
+    public User getUserById(int userId) {
+        User user = null;
+        String sql = "SELECT * FROM users WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setName(rs.getString("name"));
+                user.setEmail(rs.getString("email"));
+                user.setRole(rs.getString("role"));
+                // Password usually not sent back for security, or keep it hashed
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return user;
+    }
 }

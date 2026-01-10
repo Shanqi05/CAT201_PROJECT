@@ -40,6 +40,7 @@ const CheckoutPage = () => {
         fetchAddresses();
     }, []);
 
+    // [FIX] This function was missing causing the crash
     const handleCardChange = (e) => {
         setCardDetails({ ...cardDetails, [e.target.name]: e.target.value });
     };
@@ -66,7 +67,8 @@ const CheckoutPage = () => {
             paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : (paymentMethod === 'tng' ? 'Touch n Go' : 'Credit Card'),
             total: total + 5,
             items: cartItems.map(item => ({
-                id: item.bookId || item.id, // Handle both ID formats
+                id: item.bookId || item.id || item.accessoryId, // Handle IDs
+                type: item.itemType || 'book', // Send Type (Critical for backend)
                 quantity: item.quantity,
                 price: item.price
             }))
@@ -80,12 +82,13 @@ const CheckoutPage = () => {
                 credentials: 'include'
             });
 
+            const result = await response.json();
+
             if (response.ok) {
                 localStorage.removeItem("shoppingCart");
                 window.dispatchEvent(new Event("cartUpdated"));
                 navigate('/order-success');
             } else {
-                const result = await response.json();
                 alert("Order Failed: " + (result.error || "Unknown error"));
             }
         } catch (error) {
@@ -204,7 +207,7 @@ const CheckoutPage = () => {
                         <h2 className="text-xl font-bold mb-4 text-gray-800">Order Summary</h2>
                         <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                             {cartItems.map((item, index) => (
-                                <div key={index} className="flex justify-between items-start text-sm pb-2 border-b border-gray-100">
+                                <div key={index} className="flex justify-between text-sm pb-2 border-b border-gray-100">
                                     <div className="flex-1">
                                         <p className="font-medium text-gray-800 line-clamp-1">{item.title}</p>
                                         <p className="text-xs text-gray-500">Qty: {item.quantity}</p>

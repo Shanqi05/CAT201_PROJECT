@@ -35,29 +35,31 @@ const Header = () => {
         };
     }, []);
 
+    // Inside handleLogout in Header.jsx:
     const handleLogout = async () => {
         if (window.confirm("Are you sure you want to logout?")) {
             navigate('/home');
             try {
-                // Call backend
                 await fetch('http://localhost:8080/CAT201_project/logout', {
                     method: 'GET',
                     credentials: 'include',
                 });
-            } catch (error) {
-                console.error('Logout error:', error);
-            }
-            // Clear local storage
+            } catch (error) { console.error(error); }
+
+            // Clear all storage
             localStorage.removeItem("userToken");
             localStorage.removeItem("userRole");
             localStorage.removeItem("registeredUser");
             localStorage.removeItem("user");
+            localStorage.removeItem("shoppingCart");
+
             setIsLoggedIn(false);
             setUserRole('');
             setIsDropdownOpen(false);
 
-            // force header update
+            // Force updates
             window.dispatchEvent(new Event("storage"));
+            window.dispatchEvent(new Event("cartUpdated")); // Reset cart badge
         }
     };
 

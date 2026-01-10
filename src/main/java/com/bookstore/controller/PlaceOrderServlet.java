@@ -22,7 +22,6 @@ public class PlaceOrderServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        // 1. Check Login
         HttpSession session = request.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
 
@@ -33,17 +32,14 @@ public class PlaceOrderServlet extends HttpServlet {
         }
 
         try {
-            // 2. Read JSON Payload
             BufferedReader reader = request.getReader();
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
 
-            // 3. Extract Data
             int addressId = json.get("addressId").getAsInt();
             String paymentMethod = json.get("paymentMethod").getAsString();
             double totalAmount = json.get("total").getAsDouble();
             JsonArray itemsArray = json.getAsJsonArray("items");
 
-            // 4. Create Order Object
             Order order = new Order();
             order.setUserId(user.getUserId());
             order.setShippingAddressId(addressId);
@@ -51,7 +47,6 @@ public class PlaceOrderServlet extends HttpServlet {
             order.setTotalAmount(totalAmount);
             order.setStatus("Processing");
 
-            // 5. Add Items
             for (int i = 0; i < itemsArray.size(); i++) {
                 JsonObject itemJson = itemsArray.get(i).getAsJsonObject();
 
@@ -59,15 +54,26 @@ public class PlaceOrderServlet extends HttpServlet {
                 int quantity = itemJson.get("quantity").getAsInt();
                 double price = itemJson.get("price").getAsDouble();
 
+                // [FIX] Read the type
+                String type = itemJson.has("type") ? itemJson.get("type").getAsString() : "book";
+
                 OrderItem item = new OrderItem();
-                item.setBookId(id); // Maps item ID to book_id
+
+                // [FIX] Conditionally set ID
+                if ("accessory".equalsIgnoreCase(type)) {
+                    item.setAccessoryId(id);
+                    item.setBookId(0); // Ensure bookId is 0 or null
+                } else {
+                    item.setBookId(id);
+                    item.setAccessoryId(0);
+                }
+
                 item.setQuantity(quantity);
                 item.setPriceAtPurchase(price);
 
                 order.addItem(item);
             }
 
-            // 6. Save to DB
             OrderDAO dao = new OrderDAO();
             boolean success = dao.createOrder(order);
 
@@ -75,7 +81,7 @@ public class PlaceOrderServlet extends HttpServlet {
                 response.getWriter().write("{\"success\": true, \"message\": \"Order placed successfully\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"error\": \"Order failed. Items might be sold out.\"}");
+                response.getWriter().write("{\"error\": \"Order failed.\"}");
             }
 
         } catch (Exception e) {
