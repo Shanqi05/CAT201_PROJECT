@@ -1,7 +1,7 @@
 // src/utils/cartUtils.js
 
 // 1. ADD TO CART LOGIC
-export const addToCart = (product, quantity = 1) => {
+export const addToCart = (product, quantity = 1, itemType = 'book') => {
     const existingCartString = localStorage.getItem("shoppingCart");
     const cart = existingCartString ? JSON.parse(existingCartString) : [];
 
@@ -12,10 +12,10 @@ export const addToCart = (product, quantity = 1) => {
         // For secondhand single-copy items, do not increase quantity if already in cart
         // Keep quantity as-is (prevent duplicates)
         // No-op: avoid adding more than one copy
-        return;
+        return false;
     } else {
         // If no, add new item with specified quantity
-        cart.push({ ...product, quantity: quantity });
+        cart.push({ ...product, quantity: quantity, itemType: itemType });
     }
 
     // Save back to Local Storage
@@ -23,6 +23,11 @@ export const addToCart = (product, quantity = 1) => {
 
     // Dispatch a custom event so the Header knows to update the count
     window.dispatchEvent(new Event("cartUpdated"));
+    
+    // Dispatch success event
+    window.dispatchEvent(new CustomEvent("cartAdded", { detail: { product, quantity, itemType } }));
+    
+    return true;
 };
 
 // 2. GET CART COUNT (For Header badge)

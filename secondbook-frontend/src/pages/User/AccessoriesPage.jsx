@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { BookOpen, Zap, Gift, ShoppingBag, ChevronDown, Sparkles } from 'lucide-react';
 
-import BookCard from '../../components/Common/BookCard';
+import AccessoryCard from '../../components/Common/AccessoryCard';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
 
 const keyCategories = [
@@ -125,7 +125,7 @@ const AccessoriesPage = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
                         {filteredAccessories.map((accessory) => (
                             <div key={accessory.id} className="transform transition-transform hover:-translate-y-2 duration-300">
-                                <BookCard book={accessory} />
+                                <AccessoryCard accessory={accessory} />
                             </div>
                         ))}
                     </div>

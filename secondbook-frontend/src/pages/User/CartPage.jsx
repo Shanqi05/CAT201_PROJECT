@@ -14,7 +14,18 @@ const CartPage = () => {
         }
     }, []);
 
-    // Quantities are fixed to 1 for secondhand single-copy items
+    const updateQuantity = (index, change) => {
+        const newCart = [...cartItems];
+        const newQuantity = newCart[index].quantity + change;
+        
+        if (newQuantity < 1) return;
+        if (newCart[index].stock && newQuantity > newCart[index].stock) return;
+        
+        newCart[index].quantity = newQuantity;
+        setCartItems(newCart);
+        localStorage.setItem("shoppingCart", JSON.stringify(newCart));
+        window.dispatchEvent(new Event("cartUpdated"));
+    };
 
     const removeFromCart = (indexToRemove) => {
         const newCart = cartItems.filter((_, index) => index !== indexToRemove);
@@ -54,17 +65,39 @@ const CartPage = () => {
                                     <div>
                                         <h3 className="font-bold text-gray-800">{item.title}</h3>
                                         <p className="text-gray-500 text-sm">RM {item.price.toFixed(2)} each</p>
-                                        {(item.stock || item.quantity) && (
+                                        {item.itemType === 'accessory' && (item.stock || item.quantity) && (
                                             <p className="text-xs text-green-600">{item.stock || item.quantity} available</p>
                                         )}
                                     </div>
                                 </div>
 
                                 <div className="flex items-center space-x-4">
-                                    {/* Quantity Controls */}
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-12 text-center font-bold text-gray-800">1</span>
-                                    </div>
+                                    {/* Quantity Controls - Only for Accessories */}
+                                    {item.itemType === 'accessory' && (
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => updateQuantity(index, -1)}
+                                                disabled={item.quantity <= 1}
+                                                className="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition"
+                                            >
+                                                <Minus size={16} />
+                                            </button>
+                                            <span className="w-12 text-center font-bold text-gray-800">{item.quantity}</span>
+                                            <button
+                                                onClick={() => updateQuantity(index, 1)}
+                                                disabled={item.stock && item.quantity >= item.stock}
+                                                className="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition"
+                                            >
+                                                <Plus size={16} />
+                                            </button>
+                                        </div>
+                                    )}
+                                    {/* Books show fixed quantity of 1 */}
+                                    {item.itemType !== 'accessory' && (
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-12 text-center font-bold text-gray-800">1</span>
+                                        </div>
+                                    )}
 
                                         <span className="font-bold text-cyan-600 text-lg w-20 text-right">RM {(item.price * (item.quantity || 1)).toFixed(2)}</span>
                                     <button

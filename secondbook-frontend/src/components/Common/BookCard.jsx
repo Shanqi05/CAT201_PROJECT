@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { addToCart } from '../../utils/cartUtils';
-import { ShoppingCart, Plus, Minus, Check, X } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 
 const BookCard = ({ book }) => {
     const navigate = useNavigate();
+
 
     const API_BASE = "http://localhost:8080/CAT201_project/uploads/";
     const safeBook = book || {
@@ -19,45 +20,9 @@ const BookCard = ({ book }) => {
         ? (safeBook.imagePath.startsWith('http') ? safeBook.imagePath : API_BASE + safeBook.imagePath)
         : "https://via.placeholder.com/300x450?text=No+Cover";
 
-    // --- HANDLERS ---
-    const handleInitClick = (e) => {
-        e.preventDefault();
-        setShowQty(true);
-    };
-
-    const handleCancel = (e) => {
-        e.preventDefault();
-        setShowQty(false);
-        setQuantity(1);
-    };
-
-    const increaseQty = (e) => {
-        e.preventDefault();
-        if (quantity < stock) setQuantity(prev => prev + 1);
-    };
-
-    const decreaseQty = (e) => {
-        e.preventDefault();
-        if (quantity > 1) setQuantity(prev => prev - 1);
-    };
-
-    const handleConfirmAdd = (e) => {
-        e.preventDefault();
-        // Pass the corrected image URL to the cart
-        addToCart({ ...safeBook, imageUrl: displayImage }, quantity);
-        setShowQty(false);
-        setQuantity(1);
-    };
-
-    const handleBuyNow = (e) => {
-        e.preventDefault();
-        addToCart({ ...safeBook, imageUrl: displayImage }, 1);
-        navigate('/checkout');
-    };
-
     return (
         <div className="bg-white rounded-2xl shadow-lg border border-pink-100
-                    hover:shadow-2xl hover:scale-[1.02] hover:border-pink-200 transition-all duration-300 overflow-hidden group flex flex-col h-full">
+                        hover:shadow-2xl hover:scale-[1.02] hover:border-pink-200 transition-all duration-300 overflow-hidden group flex flex-col h-full">
 
             {/* CARD LINK */}
             <Link to={`/books/${id}`} className="flex-grow flex flex-col">

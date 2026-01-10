@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 // 2. LAYOUT COMPONENTS
 import Header from './components/Common/Header';
 import Footer from './components/Common/Footer';
+import Toast from './components/Common/Toast';
 
 // 3. AUTH PAGES
 import LoginPage from './pages/Auth/LoginPage';
@@ -37,14 +38,33 @@ import AdminProtectedRoute from './components/Common/AdminProtectedRoute';
 
 function App() {
     const location = useLocation();
+    const [showToast, setShowToast] = useState(false);
 
     // Hide Header/Footer on Login, Register, and all Admin pages
     const hideHeaderFooter = ['/login', '/register'].includes(location.pathname) || location.pathname.startsWith('/admin');
 
     const isAdminRoute = location.pathname.startsWith('/admin');
 
+    // Listen for cart added events
+    useEffect(() => {
+        const handleCartAdded = () => {
+            setShowToast(true);
+        };
+
+        window.addEventListener('cartAdded', handleCartAdded);
+        return () => window.removeEventListener('cartAdded', handleCartAdded);
+    }, []);
+
+    // Scroll to top on location change
+    useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, [location.pathname]);
+
     return (
         <div className="flex flex-col min-h-screen">
+            {/* Global Toast Notification */}
+            {showToast && <Toast message="✓ Added to cart successfully!" type="success" duration={3000} onClose={() => setShowToast(false)} />}
+
             {/* Header (Visible only on User pages) */}
             {!hideHeaderFooter && <Header />}
 

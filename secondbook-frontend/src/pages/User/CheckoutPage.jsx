@@ -283,6 +283,7 @@ const CheckoutPage = () => {
                                     <div className="flex-1">
                                         <p className="font-medium text-gray-800">{item.title}</p>
                                         <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                                        {item.category && <p className="text-xs text-gray-500 mt-1">{item.stock || item.quantity} available</p>}
                                     </div>
                                     <span className="text-gray-700 font-semibold ml-2">RM {(item.price * item.quantity).toFixed(2)}</span>
                                 </div>
