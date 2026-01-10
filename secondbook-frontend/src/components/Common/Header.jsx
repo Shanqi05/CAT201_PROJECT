@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, ShoppingCart, LogOut, LogIn, User, Heart } from 'lucide-react';
+import { BookOpen, ShoppingCart, LogOut, LogIn, User, LayoutDashboard } from 'lucide-react';
 import { getCartCount } from '../../utils/cartUtils';
 
 const Header = () => {
@@ -12,71 +12,60 @@ const Header = () => {
     const [userRole, setUserRole] = useState('');
 
     useEffect(() => {
-        const updateCart = () => setCartCount(getCartCount());
-        updateCart();
-        window.addEventListener('cartUpdated', updateCart);
-        const token = localStorage.getItem("userToken");
-        const role = localStorage.getItem("userRole");
-        setIsLoggedIn(!!token);
-        setUserRole(role || '');
-        
-        // Listen for storage changes (e.g., after login)
-        const handleStorageChange = () => {
-            const newToken = localStorage.getItem("userToken");
-            const newRole = localStorage.getItem("userRole");
-            setIsLoggedIn(!!newToken);
-            setUserRole(newRole || '');
+        const updateState = () => {
+            const token = localStorage.getItem("userToken");
+            const role = localStorage.getItem("userRole");
+
+            // Debugging: Check what the header sees
+            console.log("Header Update -> Token:", !!token, "Role:", role);
+
+            setIsLoggedIn(!!token);
+            setUserRole(role || '');
+            setCartCount(getCartCount());
         };
-        
-        window.addEventListener('storage', handleStorageChange);
+
+        // Initial Load
+        updateState();
+
+        // Listeners for updates
+        window.addEventListener('cartUpdated', updateState);
+        window.addEventListener('storage', updateState);
+
         return () => {
-            window.removeEventListener('cartUpdated', updateCart);
-            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('cartUpdated', updateState);
+            window.removeEventListener('storage', updateState);
         };
     }, []);
 
-    // Inside handleLogout in Header.jsx:
     const handleLogout = async () => {
         if (window.confirm("Are you sure you want to logout?")) {
             navigate('/home');
             try {
-                await fetch('http://localhost:8080/CAT201_project/logout', {
-                    method: 'GET',
-                    credentials: 'include',
-                });
+                await fetch('http://localhost:8080/CAT201_project/logout', { method: 'GET', credentials: 'include' });
             } catch (error) { console.error(error); }
 
-            // Clear all storage
-            localStorage.removeItem("userToken");
-            localStorage.removeItem("userRole");
-            localStorage.removeItem("registeredUser");
-            localStorage.removeItem("user");
-            localStorage.removeItem("shoppingCart");
+            localStorage.clear(); // Clear all data
 
+            // Reset State
             setIsLoggedIn(false);
             setUserRole('');
             setIsDropdownOpen(false);
+            setCartCount(0);
 
-            // Force updates
+            // Force event to update other components
             window.dispatchEvent(new Event("storage"));
-            window.dispatchEvent(new Event("cartUpdated")); // Reset cart badge
+            window.dispatchEvent(new Event("cartUpdated"));
         }
-    };
-
-    // Determine the home link based on user role
-    const getHomeLink = () => {
-        if (userRole === 'admin') {
-            return '/admin/home';
-        }
-        return '/home';
     };
 
     const handleNavClick = (path) => {
         if (location.pathname === path) {
-            // Same page, scroll to top
             window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         }
     };
+
+    // Helper to check if admin (Case Insensitive)
+    const isUserAdmin = userRole && userRole.toLowerCase() === 'admin';
 
     return (
         <header className="bg-black shadow-2xl sticky top-0 z-50 border-b border-white/10 backdrop-blur-md bg-opacity-95">
@@ -84,22 +73,18 @@ const Header = () => {
 
                 {/* LOGO */}
                 <div className="flex flex-col items-start group">
-                    <Link to={getHomeLink()} className="flex items-center space-x-2 text-2xl font-black tracking-tighter">
-                        
+                    <Link to={isUserAdmin ? "/admin/home" : "/home"} className="flex items-center space-x-2 text-2xl font-black tracking-tighter">
                         <BookOpen className="w-8 h-8 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
-                        
-                        
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]">
                             BookShelter
                         </span>
                     </Link>
-                    {/* Slogan */}
                     <p className="text-[10px] font-bold text-purple-400/80 tracking-[0.2em] ml-10 -mt-1 uppercase">
                         Your Preloved Bookstore
                     </p>
                 </div>
 
-                    {/* NAVIGATION */}
+                {/* NAVIGATION */}
                 <div className="flex items-center space-x-8">
                     <nav className="hidden md:flex items-center text-sm font-black bg-white/5 rounded-xl border border-white/10">
                         <Link to="/books" onClick={() => handleNavClick('/books')} className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Books</Link>
@@ -107,26 +92,28 @@ const Header = () => {
                         <Link to="/donation" onClick={() => handleNavClick('/donation')} className="py-3 px-6 text-gray-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all border-r border-white/10 uppercase tracking-widest">Donate</Link>
                         <Link to="/about" onClick={() => handleNavClick('/about')} className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">About Us</Link>
 
-                        {/* ACCOUNT SECTION */}
+                        {/* DYNAMIC ACCOUNT LINK */}
                         {isLoggedIn ? (
-                            <div
-                                className="relative group"
-                                onMouseEnter={() => setIsDropdownOpen(true)}
-                                onMouseLeave={() => setIsDropdownOpen(false)}
-                            >
+                            <div className="relative group" onMouseEnter={() => setIsDropdownOpen(true)} onMouseLeave={() => setIsDropdownOpen(false)}>
                                 <Link
-                                    to={userRole === 'admin' ? '/admin/home' : '/dashboard'}
+                                    to={isUserAdmin ? '/admin/home' : '/dashboard'}
                                     className="flex items-center py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all cursor-pointer uppercase tracking-widest"
                                 >
-                                    <User className="w-4 h-4 mr-2" /> Account
+                                    {isUserAdmin ? (
+                                        <>
+                                            <LayoutDashboard className="w-4 h-4 mr-2 text-cyan-400" />
+                                            <span className="text-cyan-400">Admin Dashboard</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <User className="w-4 h-4 mr-2" /> Account
+                                        </>
+                                    )}
                                 </Link>
 
                                 {isDropdownOpen && (
                                     <div className="absolute top-full right-0 mt-0 w-48 bg-[#0a0a0a] border border-white/10 rounded-lg shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full text-left px-6 py-4 text-xs font-bold text-red-500 hover:bg-red-500/10 flex items-center transition-colors"
-                                        >
+                                        <button onClick={handleLogout} className="w-full text-left px-6 py-4 text-xs font-bold text-red-500 hover:bg-red-500/10 flex items-center transition-colors">
                                             <LogOut className="w-4 h-4 mr-2" /> LOGOUT
                                         </button>
                                     </div>
