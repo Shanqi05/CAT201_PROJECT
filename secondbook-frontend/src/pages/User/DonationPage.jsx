@@ -184,12 +184,12 @@ const DonationPage = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-2">House No / Taman *</label>
-                                        <input name="address" value={formData.address} onChange={handleChange} className={inputClass('address')} placeholder="e.g. 38, Taman Sepakat" />
+                                        <input name="address" value={formData.address} onChange={handleChange} className={inputClass('address')} placeholder="e.g. 1, Taman ABC" />
                                         {errors.address && <p className="text-red-500 text-xs mt-1 font-bold italic">{errors.address}</p>}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-2">Street Name (Jalan) *</label>
-                                        <input name="jalan" value={formData.jalan} onChange={handleChange} className={inputClass('jalan')} placeholder="e.g. Jalan Batas Paip" />
+                                        <input name="jalan" value={formData.jalan} onChange={handleChange} className={inputClass('jalan')} placeholder="e.g. Jalan USM" />
                                         {errors.jalan && <p className="text-red-500 text-xs mt-1 font-bold italic">{errors.jalan}</p>}
                                     </div>
                                 </div>
