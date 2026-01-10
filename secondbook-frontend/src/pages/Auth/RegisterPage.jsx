@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, Mail, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { UserPlus, Eye, EyeOff, MapPin } from 'lucide-react';
 import TermsModal from '../../components/Common/TermsModal';
 import PrivacyModal from '../../components/Common/PrivacyModal';
 
@@ -11,7 +11,8 @@ const RegisterPage = () => {
         email: '',
         username: '',
         password: '',
-        role: 'customer' // Default role - always customer
+        address: '',
+        role: 'USER' // Default role - always customer user, not admin
     });
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -50,7 +51,7 @@ const RegisterPage = () => {
         setPasswordError(validatePassword(newPassword));
     };
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
 
         // Validate password
@@ -60,19 +61,40 @@ const RegisterPage = () => {
             alert(passwordValidationError);
             return;
         }
-
-        // Check terms acceptance
+        // Check terms and conditions
         if (!acceptedTerms) {
             alert('Please accept the Terms and Conditions and Privacy Policy');
             return;
         }
 
-        // In a real app, you'd send this to an API.
-        // Here we simulate saving the user to the "session"
-        localStorage.setItem("registeredUser", JSON.stringify(formData));
+        // Prepare data to send
+        const dataToSend = new URLSearchParams();
+        dataToSend.append('name', formData.name);
+        dataToSend.append('email', formData.email);
+        dataToSend.append('username', formData.username);
+        dataToSend.append('password', formData.password);
+        dataToSend.append('address', formData.address);
+        dataToSend.append('role', 'USER'); // fixed for customer reg
 
-        alert('Account created successfully! Please login.');
-        navigate('/login');
+        try {
+            const response = await fetch('http://localhost:8080/CAT201_project/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: dataToSend
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'success') {
+                alert('✅ Account created! Please login.');
+                navigate('/login');
+            } else {
+                alert('❌ Registration Failed: ' + (result.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error("Register Error:", error);
+            alert('❌ Server Error: Could not connect to backend.');
+        }
     };
 
     return (
@@ -81,17 +103,16 @@ const RegisterPage = () => {
                 <div className="text-center mb-8">
                     <UserPlus className="w-12 h-12 text-pink-500 mx-auto mb-2" />
                     <h2 className="text-3xl font-black text-gray-800">Register</h2>
-                    <p className="text-gray-500">Join the preloved book movement</p>
+                    <p className="text-gray-500">Join the
+                        <Link to="/home">
+                            <span className="hover:text-cyan-600 transition-colors tracking-tighter"> BookShelter </span>
+                        </Link>
+                        family</p>
                 </div>
 
                 <form onSubmit={handleRegister} className="space-y-4">
-                    <input
-                        type="text"
-                        placeholder="Full Name"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 outline-none"
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        required
-                    />
+                    <input type="text" placeholder="Full Name" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 outline-none"
+                        onChange={(e) => setFormData({...formData, name: e.target.value})} required />
                     <input
                         type="email"
                         placeholder="Email Address"
@@ -106,7 +127,18 @@ const RegisterPage = () => {
                         onChange={(e) => setFormData({...formData, username: e.target.value})}
                         required
                     />
-                    {/* Password with visibility toggle */}
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <MapPin className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Shipping Address"
+                            className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 outline-none"
+                            onChange={(e) => setFormData({...formData, address: e.target.value})}
+                            required
+                        />
+                    </div>
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}

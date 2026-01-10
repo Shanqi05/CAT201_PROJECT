@@ -6,19 +6,20 @@ import { ShoppingCart, Plus, Minus, Check, X } from 'lucide-react';
 const BookCard = ({ book }) => {
     const navigate = useNavigate();
 
-    // 1. STATE
     const [showQty, setShowQty] = useState(false);
     const [quantity, setQuantity] = useState(1);
-
-    // Placeholder data
-    const { title, author, price, imageUrl, id, stock } = book || {
-        title: "Vivid Adventures",
-        author: "L. Carroll",
-        price: 18.99,
-        imageUrl: "https://via.placeholder.com/200",
-        id: 1,
-        stock: 5
+    const API_BASE = "http://localhost:8080/CAT201_project/uploads/";
+    const safeBook = book || {
+        title: "Loading...", author: "", price: 0, imagePath: null, id: 0, stock: 0
     };
+
+    const { title, author, price, id, stock } = safeBook;
+
+    // Logic: If it starts with 'http', it's an external link (placeholder).
+    // If not, it's your local file, so add the API_BASE.
+    const displayImage = safeBook.imagePath
+        ? (safeBook.imagePath.startsWith('http') ? safeBook.imagePath : API_BASE + safeBook.imagePath)
+        : "https://via.placeholder.com/300x450?text=No+Cover";
 
     // --- HANDLERS ---
     const handleInitClick = (e) => {
@@ -44,14 +45,15 @@ const BookCard = ({ book }) => {
 
     const handleConfirmAdd = (e) => {
         e.preventDefault();
-        addToCart({ id, title, price, imageUrl, stock }, quantity);
+        // Pass the corrected image URL to the cart
+        addToCart({ ...safeBook, imageUrl: displayImage }, quantity);
         setShowQty(false);
         setQuantity(1);
     };
 
     const handleBuyNow = (e) => {
         e.preventDefault();
-        addToCart({ id, title, price, imageUrl, stock }, 1);
+        addToCart({ ...safeBook, imageUrl: displayImage }, 1);
         navigate('/checkout');
     };
 
@@ -61,11 +63,13 @@ const BookCard = ({ book }) => {
 
             {/* CARD LINK */}
             <Link to={`/books/${id}`} className="flex-grow flex flex-col">
-                <div className="relative overflow-hidden h-64 bg-pink-50">
+                <div className="relative overflow-hidden h-80 bg-pink-50">
+                    {/* Increased height to h-80 to see cover better */}
                     <img
-                        src={imageUrl}
+                        src={displayImage}
                         alt={title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        onError={(e) => {e.target.src = "https://via.placeholder.com/300x450?text=Error"}}
                     />
                     {/* Stock Badge */}
                     {stock < 5 && stock > 0 && (
@@ -73,17 +77,19 @@ const BookCard = ({ book }) => {
                             Only {stock} left!
                         </div>
                     )}
-                    {stock === 0 && (
+                    {stock <= 0 && (
                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                             <span className="bg-gray-800 text-white font-bold px-4 py-2 rounded-lg">Out of Stock</span>
                         </div>
                     )}
                 </div>
 
-                <div className="p-4 flex-grow">
-                    <h3 className="text-xl font-bold text-gray-900 truncate group-hover:text-pink-600 transition-colors">{title}</h3>
-                    <p className="text-sm text-gray-500 mb-2">{author}</p>
-                    <span className="text-2xl font-extrabold text-pink-600">${price.toFixed(2)}</span>
+                <div className="p-4 flex-grow flex flex-col justify-between">
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-pink-600 transition-colors">{title}</h3>
+                        <p className="text-sm text-gray-500 mb-2">{author}</p>
+                    </div>
+                    <span className="text-2xl font-extrabold text-pink-600 block mt-2">RM {parseFloat(price).toFixed(2)}</span>
                 </div>
             </Link>
 
@@ -98,44 +104,32 @@ const BookCard = ({ book }) => {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            {/* Decrease */}
                             <button onClick={decreaseQty} className="p-1 rounded-lg bg-white border border-pink-100 hover:bg-pink-100 text-pink-600">
                                 <Minus size={16} />
                             </button>
-
-                            {/* Number */}
                             <span className="flex-grow text-center font-bold text-gray-800">{quantity}</span>
-
-                            {/* Increase */}
-                            <button
-                                onClick={increaseQty}
-                                disabled={quantity >= stock}
-                                className={`p-1 rounded-lg border border-pink-100 ${quantity >= stock ? 'bg-gray-100 text-gray-300' : 'bg-white hover:bg-pink-100 text-pink-600'}`}
-                            >
+                            <button onClick={increaseQty} disabled={quantity >= stock} className={`p-1 rounded-lg border border-pink-100 ${quantity >= stock ? 'bg-gray-100 text-gray-300' : 'bg-white hover:bg-pink-100 text-pink-600'}`}>
                                 <Plus size={16} />
                             </button>
                         </div>
 
                         <div className="flex gap-2 mt-2">
-                            {/* Cancel */}
                             <button onClick={handleCancel} className="flex-1 py-1 bg-white border border-pink-200 text-gray-400 rounded-lg hover:bg-gray-50 hover:text-red-400 flex justify-center">
                                 <X size={16} />
                             </button>
-                            {/* Confirm */}
                             <button onClick={handleConfirmAdd} className="flex-1 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:from-pink-600 hover:to-purple-600 shadow-md flex justify-center">
                                 <Check size={16} />
                             </button>
                         </div>
                     </div>
                 ) : (
-                    // --- NORMAL BUTTONS (PINK THEME) ---
+                    // --- NORMAL BUTTONS ---
                     <div className="flex gap-2">
-                        {/* Add to Cart */}
                         <button
                             onClick={handleInitClick}
-                            disabled={stock === 0}
+                            disabled={stock <= 0}
                             className={`p-3 rounded-xl border shadow-sm transition-all duration-300
-                                ${stock === 0
+                                ${stock <= 0
                                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                 : 'bg-pink-50 text-pink-600 border-pink-100 hover:bg-pink-100 hover:border-pink-200 hover:scale-105'
                             }`}
@@ -143,18 +137,16 @@ const BookCard = ({ book }) => {
                         >
                             <ShoppingCart size={20} />
                         </button>
-
-                        {/* Buy Now */}
                         <button
                             onClick={handleBuyNow}
-                            disabled={stock === 0}
+                            disabled={stock <= 0}
                             className={`flex-grow font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-300
-                                ${stock === 0
+                                ${stock <= 0
                                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                 : 'bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:shadow-lg hover:scale-105'
                             }`}
                         >
-                            {stock === 0 ? "Sold Out" : "Buy Now"}
+                            {stock <= 0 ? "Sold Out" : "Buy Now"}
                         </button>
                     </div>
                 )}

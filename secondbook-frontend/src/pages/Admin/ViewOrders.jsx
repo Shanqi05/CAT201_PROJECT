@@ -106,7 +106,7 @@ const ViewOrders = () => {
                     <div className="bg-green-50 p-3 rounded-xl text-green-600"><CheckCircle size={24} /></div>
                 </div>
                 <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-                    <div><p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Revenue</p><h3 className="text-2xl font-black text-cyan-600 mt-1">${totalRevenue.toFixed(2)}</h3></div>
+                    <div><p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Revenue</p><h3 className="text-2xl font-black text-cyan-600 mt-1">RM {totalRevenue.toFixed(2)}</h3></div>
                     <div className="bg-cyan-50 p-3 rounded-xl text-cyan-600"><DollarSign size={24} /></div>
                 </div>
                 {/* Placeholder Card */}
@@ -159,7 +159,7 @@ const ViewOrders = () => {
                                         </td>
                                         <td className="p-5 text-sm text-gray-600">{order.date}</td>
                                         <td className="p-5 text-sm text-gray-600">{order.items} items</td>
-                                        <td className="p-5 font-bold text-gray-900">${order.total.toFixed(2)}</td>
+                                        <td className="p-5 font-bold text-gray-900">RM {order.total.toFixed(2)}</td>
                                         <td className="p-5">{getStatusBadge(order.status)}</td>
                                         <td className="p-5 text-right">
                                             <button onClick={() => setSelectedOrder(order)} className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors">
@@ -207,7 +207,7 @@ const ViewOrders = () => {
                                                         <img src={item.img} className="w-10 h-10 rounded bg-gray-100 object-cover" alt=""/>
                                                         <span className="font-bold">{item.name}</span>
                                                     </td>
-                                                    <td className="px-4 py-3 text-right font-bold">${item.price.toFixed(2)}</td>
+                                                    <td className="px-4 py-3 text-right font-bold">RM {item.price.toFixed(2)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>

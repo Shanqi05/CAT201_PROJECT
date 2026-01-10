@@ -184,7 +184,7 @@ const ManageAccessories = () => {
                                             </span>
                                         </td>
                                         <td className="p-5 font-mono font-bold text-gray-900 text-sm">
-                                            ${parseFloat(item.price).toFixed(2)}
+                                            RM {parseFloat(item.price).toFixed(2)}
                                         </td>
                                         <td className="p-5">
                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-100">

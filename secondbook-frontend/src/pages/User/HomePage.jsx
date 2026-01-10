@@ -65,7 +65,7 @@ const HomePage = () => {
 
     const heroContent = [
         {
-            title: "SecondBook",
+            title: "BookShelter",
             subtitle: "PRELOVED BOOKS",
             desc: "Discover 40,000+ preloved treasures.",
             link: "/books",

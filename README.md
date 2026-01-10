@@ -1,4 +1,4 @@
-# Secondhand Bookstore (CAT201 Project)
+# BookShelter: Secondhand Bookstore (CAT201 Project)
 
 A bookstore ecommerce website using Java (Backend) and React (Frontend).
 

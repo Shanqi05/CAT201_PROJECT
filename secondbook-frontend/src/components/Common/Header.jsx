@@ -36,8 +36,9 @@ const Header = () => {
 
     const handleLogout = async () => {
         if (window.confirm("Are you sure you want to logout?")) {
+            navigate('/home');
             try {
-                // Call backend logout to clear session
+                // Call backend
                 await fetch('http://localhost:8080/CAT201_project/logout', {
                     method: 'GET',
                     credentials: 'include',
@@ -45,22 +46,24 @@ const Header = () => {
             } catch (error) {
                 console.error('Logout error:', error);
             }
-            
             // Clear local storage
             localStorage.removeItem("userToken");
             localStorage.removeItem("userRole");
             localStorage.removeItem("registeredUser");
+            localStorage.removeItem("user");
             setIsLoggedIn(false);
             setUserRole('');
             setIsDropdownOpen(false);
-            navigate('/login');
+
+            // force header update
+            window.dispatchEvent(new Event("storage"));
         }
     };
 
     // Determine the home link based on user role
     const getHomeLink = () => {
         if (userRole === 'admin') {
-            return '/admin-dashboard';
+            return '/admin/home';
         }
         return '/home';
     };
@@ -77,7 +80,7 @@ const Header = () => {
                         
                         {/* 文字改用青色到紫色的鲜艳渐变 */}
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]">
-                            SecondBook
+                            BookShelter
                         </span>
                     </Link>
                     {/* Slogan 也给一点淡紫色，呼应 Logo */}
@@ -88,7 +91,7 @@ const Header = () => {
 
                 {/* NAVIGATION */}
                 <div className="flex items-center space-x-8">
-                    <nav className="hidden md:flex items-center text-sm font-black bg-white/5 rounded-xl overflow-hidden border border-white/10">
+                    <nav className="hidden md:flex items-center text-sm font-black bg-white/5 rounded-xl border border-white/10">
                         <Link to="/books" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Books</Link>
                         <Link to="/accessories" className="py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all border-r border-white/10 uppercase tracking-widest">Accessories</Link>
                         <Link to="/donation" className="py-3 px-6 text-gray-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all border-r border-white/10 uppercase tracking-widest">Donate</Link>
@@ -102,7 +105,7 @@ const Header = () => {
                                 onMouseLeave={() => setIsDropdownOpen(false)}
                             >
                                 <Link
-                                    to={userRole === 'admin' ? '/admin-dashboard' : '/dashboard'}
+                                    to={userRole === 'admin' ? '/admin/home' : '/dashboard'}
                                     className="flex items-center py-3 px-6 text-gray-300 hover:bg-white hover:text-black transition-all cursor-pointer uppercase tracking-widest"
                                 >
                                     <User className="w-4 h-4 mr-2" /> Account
@@ -111,7 +114,7 @@ const Header = () => {
                                 {isDropdownOpen && (
                                     <div className="absolute top-full right-0 w-48 bg-[#0a0a0a] border border-white/10 rounded-b-xl shadow-2xl z-50 overflow-hidden">
                                         <Link
-                                            to={userRole === 'admin' ? '/admin-dashboard' : '/dashboard'}
+                                            to={userRole === 'admin' ? '/admin/home' : '/dashboard'}
                                             className="block px-6 py-4 text-xs font-bold text-gray-400 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5"
                                         >
                                             DASHBOARD

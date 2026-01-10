@@ -65,7 +65,7 @@ const CartPage = () => {
 
                                     <div>
                                         <h3 className="font-bold text-gray-800">{item.title}</h3>
-                                        <p className="text-gray-500 text-sm">${item.price.toFixed(2)} each</p>
+                                        <p className="text-gray-500 text-sm">RM {item.price.toFixed(2)} each</p>
                                         {(item.stock || item.quantity) && (
                                             <p className="text-xs text-green-600">{item.stock || item.quantity} available</p>
                                         )}
@@ -92,7 +92,7 @@ const CartPage = () => {
                                         </button>
                                     </div>
 
-                                    <span className="font-bold text-cyan-600 text-lg w-20 text-right">${(item.price * item.quantity).toFixed(2)}</span>
+                                    <span className="font-bold text-cyan-600 text-lg w-20 text-right">RM {(item.price * item.quantity).toFixed(2)}</span>
                                     <button
                                         onClick={() => removeFromCart(index)}
                                         className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition"
@@ -111,7 +111,7 @@ const CartPage = () => {
                             <h2 className="text-xl font-bold mb-4 text-gray-800">Order Summary</h2>
                             <div className="flex justify-between text-lg font-semibold mb-6 text-gray-700">
                                 <span>Total:</span>
-                                <span>${cartTotal.toFixed(2)}</span>
+                                <span>RM {cartTotal.toFixed(2)}</span>
                             </div>
 
                             {/* THIS BUTTON NOW GOES TO CHECKOUT */}

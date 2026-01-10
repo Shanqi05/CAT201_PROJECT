@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { LogIn, Lock, User } from 'lucide-react';
+import React, {useEffect, useRef, useState} from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { LogIn, Lock, User, BookOpen } from 'lucide-react';
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [loginInput, setLoginInput] = useState('');
     const [password, setPassword] = useState('');
+    const API_URL = 'http://localhost:8080/CAT201_project/login';
+    const hasAlerted = useRef(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -15,29 +18,23 @@ const LoginPage = () => {
         formData.append('password', password);
 
         try {
-            // [FIX 1]: Add credentials: 'include' so the browser saves the JSESSIONID cookie
-            const response = await fetch('http://localhost:8080/CAT201_project/login', {
+            const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: formData,
-                credentials: 'include' // <--- 必须加这行，否则后端 Session 无效
+                credentials: 'include'
             });
 
             if (response.ok) {
                 const user = await response.json();
                 console.log("Login Successful:", user);
-
-                // [FIX 2]: Save "userToken" because Header.js checks for it!
-                // Since your backend uses Sessions (Cookies) and not JWT,
-                // we just save a dummy string or the user ID to satisfy the frontend check.
                 localStorage.setItem("userToken", "logged-in");
-
                 localStorage.setItem("user", JSON.stringify(user));
                 localStorage.setItem("userRole", user.role);
 
-                // Trigger storage event to update Header immediately
+                // Update header
                 window.dispatchEvent(new Event("storage"));
 
                 // Redirect based on Role
@@ -55,13 +52,28 @@ const LoginPage = () => {
         }
     };
 
+    useEffect(() => {
+        // Check if there is a message in the navigation state
+        if (location.state?.message && !hasAlerted.current) {
+            hasAlerted.current = true;
+            window.alert(location.state.message);
+
+            // Clear the message so it doesn't pop up again if they refresh
+            window.history.replaceState({}, document.title);
+        }
+    }, [location]);
+
     return (
         <div className="flex items-center justify-center min-h-[80vh] px-4">
             <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md border-t-8 border-cyan-600">
                 <div className="text-center mb-8">
                     <LogIn className="w-12 h-12 text-cyan-600 mx-auto mb-2" />
                     <h2 className="text-3xl font-black text-gray-800 tracking-tight">Welcome Back</h2>
-                    <p className="text-gray-500">Sign in to SecondBook</p>
+                    <p className="text-gray-500">Sign in to
+                        <Link to="/home">
+                            <span className="hover:text-cyan-600 transition-colors tracking-tighter"> BookShelter</span>
+                        </Link>
+                    </p>
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-5">
@@ -103,7 +115,7 @@ const LoginPage = () => {
 
                 <div className="mt-8 pt-6 border-t border-gray-100 text-center">
                     <p className="text-gray-600">
-                        New to SecondBook? {' '}
+                        New to BookShelter? {' '}
                         <Link to="/register" className="text-cyan-600 font-bold hover:text-cyan-700 transition-colors">
                             Create an account
                         </Link>

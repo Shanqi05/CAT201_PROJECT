@@ -34,7 +34,7 @@ const ProductDetailPage = () => {
 
                         {/* Price & Actions */}
                         <div className="flex items-center space-x-8 border-t pt-4">
-                            <span className="text-5xl font-bold text-indigo-600">${book.price.toFixed(2)}</span>
+                            <span className="text-5xl font-bold text-indigo-600">RM {book.price.toFixed(2)}</span>
                             <button className="flex items-center bg-green-500 text-white font-bold py-3 px-8 rounded-full text-xl hover:bg-green-600 transition shadow-lg">
                                 <ShoppingCart className="w-5 h-5 mr-2" />
                                 Add to Cart

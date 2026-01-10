@@ -25,7 +25,7 @@ const Footer = () => {
                     <div className="space-y-4">
                         <div className="flex items-center space-x-2">
                             <BookOpen className="w-8 h-8 text-yellow-400" />
-                            <h4 className="font-black text-2xl" style={{fontFamily: 'Playfair Display, serif'}}>SecondBook</h4>
+                            <h4 className="font-black text-2xl" style={{fontFamily: 'Playfair Display, serif'}}>BookShelter</h4>
                         </div>
                         <p className="text-gray-400 text-sm leading-relaxed">
                             Giving preloved books a second life. Join our sustainable reading community and discover thousands of quality pre-loved books.
@@ -87,8 +87,8 @@ const Footer = () => {
                                 <Mail className="w-5 h-5 mt-0.5 text-yellow-400 flex-shrink-0" />
                                 <div>
                                     <p className="text-sm font-semibold text-white">Email</p>
-                                    <a href="mailto:info@secondbook.com" className="text-sm hover:text-yellow-400 transition-colors">
-                                        info@secondbook.com
+                                    <a href="mailto:info@BookShelter.com" className="text-sm hover:text-yellow-400 transition-colors">
+                                        info@bookshelter.com
                                     </a>
                                 </div>
                             </li>
@@ -145,7 +145,7 @@ const Footer = () => {
                 <div className="max-w-7xl mx-auto px-6 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                         <div className="text-gray-400 text-sm">
-                            &copy; {new Date().getFullYear()} SecondBook. All rights reserved.
+                            &copy; {new Date().getFullYear()} BookShelter. All rights reserved.
                         </div>
                         <div className="flex space-x-6 text-sm">
                             <button 

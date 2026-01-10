@@ -25,7 +25,7 @@ const TermsModal = ({ onClose }) => {
                     <section>
                         <h3 className="text-xl font-bold text-gray-900 mb-3">1. Acceptance of Terms</h3>
                         <p className="text-gray-700 leading-relaxed">
-                            By accessing and using SecondBook's services, you agree to be bound by these Terms and Conditions. 
+                            By accessing and using BookShelter's services, you agree to be bound by these Terms and Conditions. 
                             If you do not agree to these terms, please do not use our platform.
                         </p>
                     </section>
@@ -33,7 +33,7 @@ const TermsModal = ({ onClose }) => {
                     <section>
                         <h3 className="text-xl font-bold text-gray-900 mb-3">2. Use of Service</h3>
                         <p className="text-gray-700 leading-relaxed mb-2">
-                            SecondBook provides a platform for buying and selling preloved books. By using our service, you agree to:
+                            BookShelter provides a platform for buying and selling preloved books. By using our service, you agree to:
                         </p>
                         <ul className="list-disc list-inside text-gray-700 space-y-1 ml-4">
                             <li>Provide accurate and complete information during registration</li>
@@ -55,7 +55,7 @@ const TermsModal = ({ onClose }) => {
                     <section>
                         <h3 className="text-xl font-bold text-gray-900 mb-3">4. Pricing and Payment</h3>
                         <p className="text-gray-700 leading-relaxed">
-                            All prices are listed in USD. Payment must be made in full at the time of purchase. We accept 
+                            All prices are listed in RM (Malaysian Ringgit). Payment must be made in full at the time of purchase. We accept 
                             various payment methods as indicated during checkout. Prices are subject to change without notice.
                         </p>
                     </section>
@@ -64,7 +64,7 @@ const TermsModal = ({ onClose }) => {
                         <h3 className="text-xl font-bold text-gray-900 mb-3">5. Shipping and Delivery</h3>
                         <p className="text-gray-700 leading-relaxed">
                             We aim to ship all orders within 1-3 business days. Delivery times may vary depending on your 
-                            location. SecondBook is not responsible for delays caused by shipping carriers or customs.
+                            location. BookShelter is not responsible for delays caused by shipping carriers or customs.
                         </p>
                     </section>
 
@@ -80,8 +80,8 @@ const TermsModal = ({ onClose }) => {
                     <section>
                         <h3 className="text-xl font-bold text-gray-900 mb-3">7. Intellectual Property</h3>
                         <p className="text-gray-700 leading-relaxed">
-                            All content on SecondBook, including text, graphics, logos, and images, is the property of 
-                            SecondBook and protected by copyright laws. You may not reproduce, distribute, or create 
+                            All content on BookShelter, including text, graphics, logos, and images, is the property of 
+                            BookShelter and protected by copyright laws. You may not reproduce, distribute, or create 
                             derivative works without our express written permission.
                         </p>
                     </section>
@@ -89,7 +89,7 @@ const TermsModal = ({ onClose }) => {
                     <section>
                         <h3 className="text-xl font-bold text-gray-900 mb-3">8. Limitation of Liability</h3>
                         <p className="text-gray-700 leading-relaxed">
-                            SecondBook shall not be liable for any indirect, incidental, special, or consequential damages 
+                            BookShelter shall not be liable for any indirect, incidental, special, or consequential damages 
                             arising from your use of our platform or purchase of products. Our total liability shall not 
                             exceed the amount paid for the specific product in question.
                         </p>
@@ -108,9 +108,9 @@ const TermsModal = ({ onClose }) => {
                         <p className="text-gray-700 leading-relaxed">
                             If you have any questions about these Terms and Conditions, please contact us at:
                             <br />
-                            <span className="font-semibold">Email:</span> support@secondbook.com
+                            <span className="font-semibold">Email:</span> support@bookshelter.com
                             <br />
-                            <span className="font-semibold">Phone:</span> +1 (555) 123-4567
+                            <span className="font-semibold">Phone:</span> +60 12 345 6666
                         </p>
                     </section>
                 </div>

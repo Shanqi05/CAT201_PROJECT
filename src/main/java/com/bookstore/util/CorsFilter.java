@@ -1,6 +1,6 @@
-package com.bookstore.util; // Make sure this matches your package structure
+package com.bookstore.util;
 
-import jakarta.servlet.*; // Use 'javax.servlet.*' if using Tomcat 9
+import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -107,10 +107,29 @@ const UserDashboardPage = () => {
         localStorage.setItem("userAddresses", JSON.stringify(updated));
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (window.confirm("Are you sure you want to log out?")) {
+
+            // 1. Call Backend to destroy Java Session
+            try {
+                await fetch('http://localhost:8080/CAT201_project/logout', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+
+            // 2. Clear all Frontend Data
             localStorage.removeItem("userToken");
-            navigate('/login');
+            localStorage.removeItem("userRole");
+            localStorage.removeItem("registeredUser");
+            localStorage.removeItem("user");
+            localStorage.removeItem("orderHistory"); // Optional: Clear old cache
+            window.dispatchEvent(new Event("storage"));
+
+            // 3. Go home
+            navigate('/home');
         }
     };
 

@@ -2,12 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Search, Filter, X, Upload } from 'lucide-react';
 
 const ManageBooks = () => {
-    // 状态管理
     const [books, setBooks] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
-
-    // [UPDATE 1]: 在这里增加了 condition 默认值
     const [formData, setFormData] = useState({
         title: '', author: '', type: 'SELL', price: '', condition: 'Good', image: null
     });
@@ -21,7 +18,7 @@ const ManageBooks = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log("从数据库拿到的数据:", data);
+                console.log("Data fetched:", data);
                 setBooks(data);
             } else {
                 console.error("Failed to fetch books");
@@ -56,10 +53,8 @@ const ManageBooks = () => {
         const data = new FormData();
         data.append('title', formData.title);
         data.append('author', formData.author);
-        data.append('type', formData.type); // 这是 Category
+        data.append('type', formData.type);
         data.append('price', formData.price);
-
-        // [UPDATE 2]: 把 condition 发送给后端
         data.append('condition', formData.condition);
 
         if (formData.image) {
@@ -81,10 +76,8 @@ const ManageBooks = () => {
                     ...formData,
                     imageUrl: previewUrl || "https://via.placeholder.com/150",
                     price: parseFloat(formData.price),
-                    // 临时显示在前端，直到刷新页面
                     condition: formData.condition
                 }]);
-                // 重置表单 (包括 condition)
                 setFormData({ title: '', author: '', type: 'SELL', condition: 'Good', price: '', image: null });
                 setPreviewUrl(null);
             } else {
@@ -171,7 +164,6 @@ const ManageBooks = () => {
                             <tr className="bg-gray-50 border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500 font-bold">
                                 <th className="p-5">Book Details</th>
                                 <th className="p-5">Type</th>
-                                {/* [UPDATE 3]: 新增 Condition 列头 */}
                                 <th className="p-5">Condition</th>
                                 <th className="p-5">Price</th>
                                 <th className="p-5">Status</th>
@@ -225,7 +217,7 @@ const ManageBooks = () => {
                                         </td>
                                         <td className="p-5">
                                             <span className="font-mono font-bold text-gray-900 text-sm">
-                                                ${parseFloat(book.price).toFixed(2)}
+                                                RM {parseFloat(book.price).toFixed(2)}
                                             </span>
                                         </td>
                                         <td className="p-5">
@@ -236,6 +228,7 @@ const ManageBooks = () => {
                                         </td>
                                         <td className="p-5 text-right">
                                             <div className="flex justify-end gap-2">
+                                                {/* add update func here*/}
                                                 <button className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"><Edit size={18}/></button>
                                                 <button onClick={() => handleDelete(book.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
                                             </div>
@@ -308,18 +301,17 @@ const ManageBooks = () => {
                                         value={formData.condition} onChange={handleInputChange}
                                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all appearance-none"
                                     >
-                                        <option value="New">New</option>
-                                        <option value="Like New">Like New</option>
-                                        <option value="Very Good">Very Good</option>
-                                        <option value="Good">Good</option>
-                                        <option value="Fair">Fair</option>
+                                        <option value="Brand new">Brand New</option>
+                                        <option value="Like new">Like New</option>
+                                        <option value="Acceptable">Acceptable</option>
+                                        <option value="Old">Old</option>
                                     </select>
                                 </div>
                             </div>
 
                             {/* Price */}
                             <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price ($)</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price (RM)</label>
                                 <input
                                     type="number" name="price" step="0.01" required
                                     value={formData.price} onChange={handleInputChange}
