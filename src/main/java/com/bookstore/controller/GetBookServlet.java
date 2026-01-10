@@ -17,20 +17,18 @@ public class GetBookServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try {
-            // Get ID from URL
             String idStr = request.getParameter("id");
             if (idStr == null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing Book ID");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing ID");
                 return;
             }
 
             int id = Integer.parseInt(idStr);
             BookDAO dao = new BookDAO();
-            Book book = dao.getBookById(id);
+            Book book = dao.getBookById(id); // Uses new DAO logic
 
             if (book != null) {
-                Gson gson = new Gson();
-                response.getWriter().write(gson.toJson(book));
+                response.getWriter().write(new Gson().toJson(book));
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book not found");
             }

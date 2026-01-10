@@ -1,24 +1,23 @@
 package com.bookstore.model;
 
 public class Book {
-    private int id;
+    private int bookId;
     private String title;
     private String author;
     private double price;
-    private String imagePath;  // Maps to database 'image_path'
+    private String imagePath;
     private String status;     // 'Active' or 'Sold'
 
-    // [NEW FIELDS] Added to match updated Database
+    // Updated Fields
     private String category;
-    private String condition;  // Maps to database 'book_condition'
-    private double rating;
-    private int stock;
+    private String condition;  // book_condition
+    private String[] genres;
 
     public Book() {}
 
-    // Getters and Setters for ALL fields
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    // Getters and Setters
+    public int getBookId() { return bookId; }
+    public void setBookId(int bookId) { this.bookId = bookId; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -35,16 +34,12 @@ public class Book {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    // [New Getters/Setters]
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
     public String getCondition() { return condition; }
     public void setCondition(String condition) { this.condition = condition; }
 
-    public double getRating() { return rating; }
-    public void setRating(double rating) { this.rating = rating; }
-
-    public int getStock() { return stock; }
-    public void setStock(int stock) { this.stock = stock; }
+    public String[] getGenres() { return genres; }
+    public void setGenres(String[] genres) { this.genres = genres; }
 }

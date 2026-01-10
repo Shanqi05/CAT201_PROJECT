@@ -29,8 +29,8 @@ import ManageBooks from './pages/Admin/ManageBooks';
 import ManageUsers from './pages/Admin/ManageUsers';
 import ManageAccessories from './pages/Admin/ManageAccessories';
 import ViewOrders from './pages/Admin/ViewOrders';
-import Analytics from './pages/Admin/Analytics';
 import ManageDonations from './pages/Admin/ManageDonations';
+import AdminSettings from  './pages/Admin/AdminSettings.jsx';
 
 // 6. SECURITY GUARDS
 import ProtectedRoute from './components/Common/ProtectedRoute';
@@ -113,10 +113,10 @@ function App() {
                         <Route path="home" element={<AdminHomePage />} />
                         <Route path="manage-books" element={<ManageBooks />} />
                         <Route path="manage-users" element={<ManageUsers />} />
-                        <Route path="view-orders" element={<ViewOrders />} />
+                        <Route path="manage-orders" element={<ViewOrders />} />
                         <Route path="donations" element={<ManageDonations />} />
-                        <Route path="analytics" element={<Analytics />} />
                         <Route path="accessories" element={<ManageAccessories />} />
+                        <Route path="settings" element={<AdminSettings />} />
                     </Route>
 
                     {/* 404 FALLBACK -> Redirect to Login */}

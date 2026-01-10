@@ -82,23 +82,17 @@ const ManageAccessories = () => {
     };
 
     const handleDelete = async (id) => {
-        if(window.confirm("Are you sure you want to remove this item?")) {
+        if(window.confirm("Remove item?")) {
             try {
                 const response = await fetch(`http://localhost:8080/CAT201_project/deleteAccessory?id=${id}`, {
                     method: 'DELETE',
                     credentials: 'include',
                 });
-
                 if (response.ok) {
-                    setAccessories(accessories.filter(item => item.id !== id));
-                    alert("Item deleted successfully!");
-                } else {
-                    alert("Failed to delete item.");
+                    setAccessories(accessories.filter(item => item.accessoryId !== id));
+                    alert("Item deleted!");
                 }
-            } catch (error) {
-                console.error("Error deleting item:", error);
-                alert("Error connecting to server.");
-            }
+            } catch (error) { console.error(error); }
         }
     };
 
@@ -109,7 +103,7 @@ const ManageAccessories = () => {
 
     return (
         <div className="p-8 max-w-7xl mx-auto w-full relative">
-            {/* Header & Search Bar (代码保持不变，省略以节省空间，直接复制你原来的即可) */}
+            {/* Header & Search Bar */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
@@ -150,7 +144,7 @@ const ManageAccessories = () => {
                                 </tr>
                             ) : (
                                 filteredItems.map((item) => (
-                                    <tr key={item.id} className="hover:bg-gray-50/80 transition-colors group">
+                                    <tr key={item.accessoryId} className="hover:bg-gray-50/80 transition-colors group">
                                         <td className="p-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200 bg-gray-100 flex items-center justify-center">
@@ -168,7 +162,7 @@ const ManageAccessories = () => {
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-gray-900 leading-tight">{item.title}</p>
-                                                    <p className="text-xs text-gray-500 mt-1 font-medium">ID: #{item.id}</p>
+                                                    <p className="text-xs text-gray-500 mt-1 font-medium">ID: #{item.accessoryId}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -189,7 +183,7 @@ const ManageAccessories = () => {
                                         <td className="p-5 text-right">
                                             <div className="flex justify-end gap-2">
                                                 <button className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"><Edit size={18}/></button>
-                                                <button onClick={() => handleDelete(item.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
+                                                <button onClick={() => handleDelete(item.accessoryId)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -200,7 +194,7 @@ const ManageAccessories = () => {
                 </div>
             </div>
 
-            {/* Modal 部分保持不变，直接用你原本的代码即可 */}
+            {/* Modal */}
             {showModal && (
                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
                  <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100">

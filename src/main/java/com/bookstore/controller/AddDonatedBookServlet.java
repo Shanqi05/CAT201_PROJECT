@@ -1,15 +1,24 @@
 package com.bookstore.controller;
 
 import com.bookstore.dao.DonatedBookDAO;
+import com.bookstore.dao.DonorDAO;
 import com.bookstore.model.DonatedBook;
+import com.bookstore.model.Donor;
 import com.google.gson.Gson;
-
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 @WebServlet("/addDonatedBook")
+@MultipartConfig(
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10,      // 10MB
+        maxRequestSize = 1024 * 1024 * 50    // 50MB
+)
 public class AddDonatedBookServlet extends HttpServlet {
 
     @Override
@@ -18,49 +27,83 @@ public class AddDonatedBookServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try {
-            // Get parameters from request
+            // 1. Extract Donor Info
             String donorName = request.getParameter("donorName");
             String donorEmail = request.getParameter("donorEmail");
             String donorPhone = request.getParameter("donorPhone");
+
+            // 2. Extract Book Info
             String bookTitle = request.getParameter("bookTitle");
             String author = request.getParameter("author");
             String bookCondition = request.getParameter("bookCondition");
             String category = request.getParameter("category");
-            int quantity = Integer.parseInt(request.getParameter("quantity"));
-            String pickupAddress = request.getParameter("pickupAddress");
             String message = request.getParameter("message");
 
-            // Create DonatedBook object
-            DonatedBook book = new DonatedBook(donorName, donorEmail, donorPhone, bookTitle,
-                    author, bookCondition, category, quantity, pickupAddress, message);
+            // 3. Extract Address
+            String houseNo = request.getParameter("houseNo");
+            String street = request.getParameter("street");
+            String postcode = request.getParameter("postcode");
+            String city = request.getParameter("city");
+            String state = request.getParameter("state");
 
-            // Save to database
-            DonatedBookDAO dao = new DonatedBookDAO();
-            boolean success = dao.addDonatedBook(book);
+            // [NEW] 4. Handle Image Upload
+            String imagePath = null;
+            Part filePart = request.getPart("image");
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                // Make unique to prevent overwriting
+                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
 
-            Gson gson = new Gson();
+                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) uploadDir.mkdir();
+
+                filePart.write(uploadPath + File.separator + uniqueFileName);
+                imagePath = uniqueFileName;
+            }
+
+            // --- Step A: Save Donor ---
+            Donor donor = new Donor(donorEmail, donorName, donorPhone);
+            DonorDAO donorDAO = new DonorDAO();
+            boolean donorSaved = donorDAO.saveDonor(donor);
+
+            if (!donorSaved) {
+                throw new Exception("Failed to save donor info.");
+            }
+
+            // --- Step B: Save Book ---
+            DonatedBook book = new DonatedBook();
+            book.setDonorEmail(donorEmail);
+            book.setTitle(bookTitle);
+            book.setAuthor(author);
+            book.setBookCondition(bookCondition);
+            book.setCategory(category);
+            book.setMessage(message);
+
+            // Set Image
+            book.setImagePath(imagePath);
+
+            // Set Address
+            book.setPickupHouseNo(houseNo);
+            book.setPickupStreet(street);
+            book.setPickupPostcode(postcode);
+            book.setPickupCity(city);
+            book.setPickupState(state);
+
+            DonatedBookDAO bookDAO = new DonatedBookDAO();
+            boolean success = bookDAO.addDonatedBook(book);
+
             if (success) {
-                response.getWriter().write(gson.toJson(new Response(true, "Book donation submitted successfully!")));
+                response.getWriter().write("{\"success\": true, \"message\": \"Donation submitted successfully!\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write(gson.toJson(new Response(false, "Failed to submit donation")));
+                response.getWriter().write("{\"success\": false, \"message\": \"Database error saving book\"}");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"success\": false, \"message\": \"" + e.getMessage() + "\"}");
-        }
-    }
-
-    // Inner class for JSON response
-    private static class Response {
-        boolean success;
-        String message;
-
-        Response(boolean success, String message) {
-            this.success = success;
-            this.message = message;
         }
     }
 }
