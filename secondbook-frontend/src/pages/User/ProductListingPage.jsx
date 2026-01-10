@@ -11,7 +11,7 @@ const ProductListingPage = () => {
     const [loading, setLoading] = useState(true);
 
     // Filter categories (Matches what you might have in DB)
-    const categories = ['All', 'Fiction', 'Non-Fiction', 'Children', 'Mystery', 'SELL', 'DONATE'];
+    const categories = ['All', 'Fiction', 'Non-Fiction', 'Children & Young Adults'];
 
     useEffect(() => {
         fetchBooks();
@@ -75,18 +75,14 @@ const ProductListingPage = () => {
 
             {/* 2. Sticky Toolbar */}
             <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm transition-all">
-                <div className="max-w-7xl mx-auto px-6">
-                    {/* Categories */}
-                    <div className="flex w-full overflow-x-auto no-scrollbar border-b border-gray-50">
+                {/* Categories - Evenly Distributed */}
+                <div className="w-full border-b border-gray-50">
+                    <div className="grid grid-cols-3 w-full">
                         {categories.map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => setSelectedCategory(cat)}
-                                className={`flex-shrink-0 px-6 py-4 text-xs font-black tracking-widest transition-all duration-300 relative group whitespace-nowrap ${
-                                    selectedCategory === cat
-                                        ? 'text-purple-600'
-                                        : 'text-gray-400 hover:text-gray-600 hover:bg-purple-50/50'
-                                }`}
+                                className={`px-6 py-4 text-xs font-black tracking-widest transition-all duration-300 relative group text-center ${selectedCategory === cat ? 'text-purple-600 bg-purple-50' : 'text-gray-400 hover:text-gray-600 hover:bg-purple-50/30'}`}
                             >
                                 {cat.toUpperCase()}
                                 {selectedCategory === cat && (
@@ -95,7 +91,9 @@ const ProductListingPage = () => {
                             </button>
                         ))}
                     </div>
+                </div>
 
+                <div className="max-w-7xl mx-auto px-6">
                     {/* Search & Filter Controls */}
                     <div className="py-4 flex flex-col md:flex-row items-center gap-4">
                         <div className="relative flex-1 w-full group">
@@ -156,5 +154,4 @@ const ProductListingPage = () => {
         </div>
     );
 };
-
 export default ProductListingPage;
