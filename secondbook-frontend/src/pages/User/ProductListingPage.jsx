@@ -77,7 +77,7 @@ const ProductListingPage = () => {
             <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm transition-all">
                 {/* Categories - Evenly Distributed */}
                 <div className="w-full border-b border-gray-50">
-                    <div className="grid grid-cols-3 w-full">
+                    <div className="grid grid-cols-4 w-full">
                         {categories.map((cat) => (
                             <button
                                 key={cat}
