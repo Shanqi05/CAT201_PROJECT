@@ -112,7 +112,7 @@ const Header = () => {
                                 </Link>
 
                                 {isDropdownOpen && (
-                                    <div className="absolute bottom-full right-0 w-48 bg-[#0a0a0a] border border-white/10 rounded-t-xl shadow-2xl z-50 overflow-hidden">
+                                    <div className="absolute top-0 right-0 mt-0 w-48 bg-[#0a0a0a] border border-white/10 rounded-b-xl shadow-2xl z-50 overflow-hidden transform -translate-y-full animate-in fade-in slide-in-from-top-2 duration-200">
                                         <Link
                                             to={userRole === 'admin' ? '/admin/home' : '/dashboard'}
                                             className="block px-6 py-4 text-xs font-bold text-gray-400 hover:bg-white/5 hover:text-white transition-colors border-b border-white/5"

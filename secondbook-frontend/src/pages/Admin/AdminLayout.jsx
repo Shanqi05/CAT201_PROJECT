@@ -69,7 +69,7 @@ const AdminLayout = () => {
                     </Link>
                 </div>
 
-                {/* [UPDATE 1]: Sidebar User Info (显示 ID) */}
+                {/* Sidebar User Info */}
                 <div className={`text-center border-b border-gray-800 transition-all duration-300 ${sidebarOpen ? 'p-6' : 'p-4'}`}>
                     <div className={`mx-auto rounded-full mb-3 overflow-hidden border-[3px] border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300 ${sidebarOpen ? 'w-16 h-16' : 'w-10 h-10'}`}>
                         <div className="w-full h-full bg-gray-800 text-white flex items-center justify-center font-bold text-xl">

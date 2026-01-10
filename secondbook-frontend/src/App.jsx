@@ -48,7 +48,7 @@ function App() {
             {/* Header (Visible only on User pages) */}
             {!hideHeaderFooter && <Header />}
 
-            <main className={`flex-grow ${isAdminRoute ? '' : 'bg-gray-50 py-8'}`}>
+            <main className={`flex-grow ${isAdminRoute ? '' : 'bg-gray-50 pt-0 pb-8'}`}>
                 <Routes>
                     {/* ROOT REDIRECT -> Go to Homepage */}
                     <Route path="/" element={<Navigate to="/home" replace />} />
