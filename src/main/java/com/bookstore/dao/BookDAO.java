@@ -9,7 +9,7 @@ import java.util.List;
 public class BookDAO {
 
     // ==========================================
-    //  1. Add New Book (适配新的数据库列)
+    //  1. Add New Book
     // ==========================================
     public boolean addBook(Book book) {
         // [FIX]: SQL updated to match new table columns (category, book_condition, stock)
@@ -50,7 +50,7 @@ public class BookDAO {
     }
 
     // ==========================================
-    //  2. Get All Books (查询所有书)
+    //  2. Get All Books
     // ==========================================
     public List<Book> getAllBooks() {
         List<Book> books = new ArrayList<>();
@@ -102,7 +102,7 @@ public class BookDAO {
     }
 
     // ==========================================
-    //  4. Get Book By ID (用于详情页)
+    //  4. Get Book By ID
     // ==========================================
     public Book getBookById(int id) {
         Book book = null;
