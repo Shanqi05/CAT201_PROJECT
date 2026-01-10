@@ -18,7 +18,7 @@ const DonationPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const bookConditions = ['Brand new', 'Like New', 'Acceptable', 'Old'];
-    const categories = ['Fiction', 'Non-Fiction', 'Science', 'Mathematics', 'Computer Science', 'History', 'Children', 'Other'];
+    const categories = ['Fiction', 'Non-Fiction', 'Children & Young Adults'];
 
     const handleChange = (e) => {
         const { name, value } = e.target;
