@@ -36,7 +36,7 @@ const AdminLayout = () => {
     const handleLogout = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('userRole');
-        navigate('/login');
+        navigate('/');
     };
 
     const menuItems = [
