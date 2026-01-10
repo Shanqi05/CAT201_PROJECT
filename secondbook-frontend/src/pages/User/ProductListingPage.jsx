@@ -62,7 +62,7 @@ const ProductListingPage = () => {
                     alt="Serene Reading Space"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/20 to-black/30" />
-                <div className="relative z-10 text-center px-6 mt-10">
+                <div className="relative z-10 text-center px-6 mt-0">
                     <div className="flex items-center justify-center gap-2 mb-3">
                         <Sparkles className="text-purple-600 w-5 h-5 animate-pulse" />
                         <span className="text-purple-600 font-bold tracking-[0.2em] text-xs uppercase">Curated Preloved Treasures</span>

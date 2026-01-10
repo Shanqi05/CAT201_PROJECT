@@ -105,7 +105,7 @@ const HomePage = () => {
 
     return (
         <div className="w-full bg-white">
-            {/* 1. STICKY HERO SECTION (3张全屏图切换) */}
+            {/* 1. STICKY HERO SECTION */}
             <section ref={heroRef} className="relative h-[300vh] bg-black">
                 <div className="sticky top-0 h-screen w-full overflow-hidden">
                     {heroContent.map((item, index) => (
@@ -150,25 +150,25 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* 内容区域 - 紧贴下方 */}
+            {/* Content area */}
             <div className="relative z-20 bg-white space-y-24">
                 <div className="max-w-7xl mx-auto px-6 pt-20 pb-20 space-y-24">
                     
-                    {/* 2. PROMO BANNER (升级版图文排版) */}
+                    {/* 2. PROMO BANNER */}
                     <section className="relative h-[450px] md:h-[550px] rounded-[3rem] overflow-hidden shadow-2xl group transition-all duration-500">
                         <Link to="/books">
-                            {/* 背景与遮罩 */}
+                            {/* Background and overlay */}
                             <div className="absolute inset-0">
                                 <img 
                                     src={PROMO_BANNER_PATH} 
                                     alt="Promo" 
                                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                                 />
-                                {/* 渐变层，从左边深色到右边透明，方便放文字 */}
+                                {/* Gradient overlay to improve text contrast */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent" />
                             </div>
 
-                            {/* 内容 */}
+                            {/* Content */}
                             <div className="relative z-10 h-full flex flex-col justify-center px-10 md:px-20 text-white max-w-3xl space-y-6">
                                 <span className="inline-block bg-yellow-400 text-black px-4 py-1 rounded-full text-xs font-black tracking-widest w-fit transform -translate-x-10 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-700">
                                     NEW YEAR SPECIAL

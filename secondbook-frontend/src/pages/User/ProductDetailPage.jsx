@@ -73,11 +73,10 @@ const ProductDetailPage = () => {
                             <span className="text-5xl font-black text-gray-900 tracking-tighter">RM {book.price?.toFixed(2)}</span>
                             <button
                                 onClick={handleAddToCart}
-                                disabled={isAdded || book.stock <= 0}
                                 className={`flex items-center font-bold py-4 px-8 rounded-xl text-lg transition-all shadow-lg transform active:scale-95
-                                    ${isAdded ? 'bg-green-500 text-white' : book.stock <= 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800'}`}
+                                    ${isAdded ? 'bg-green-500 text-white' : 'bg-black text-white hover:bg-gray-800'}`}
                             >
-                                {isAdded ? <><Check className="w-6 h-6 mr-2" /> Added</> : book.stock <= 0 ? "Out of Stock" : <><ShoppingCart className="w-5 h-5 mr-2" /> Add to Cart</>}
+                                {isAdded ? <><Check className="w-6 h-6 mr-2" /> Added</> : <><ShoppingCart className="w-5 h-5 mr-2" /> Add to Cart</>}
                             </button>
                         </div>
 

@@ -14,19 +14,7 @@ const CartPage = () => {
         }
     }, []);
 
-    const updateQuantity = (index, change) => {
-        const newCart = [...cartItems];
-        const newQuantity = newCart[index].quantity + change;
-        
-        // Check if quantity is valid
-        if (newQuantity < 1) return;
-        if (newCart[index].stock && newQuantity > newCart[index].stock) return;
-        
-        newCart[index].quantity = newQuantity;
-        setCartItems(newCart);
-        localStorage.setItem("shoppingCart", JSON.stringify(newCart));
-        window.dispatchEvent(new Event("cartUpdated"));
-    };
+    // Quantities are fixed to 1 for secondhand single-copy items
 
     const removeFromCart = (indexToRemove) => {
         const newCart = cartItems.filter((_, index) => index !== indexToRemove);
@@ -75,24 +63,10 @@ const CartPage = () => {
                                 <div className="flex items-center space-x-4">
                                     {/* Quantity Controls */}
                                     <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => updateQuantity(index, -1)}
-                                            disabled={item.quantity <= 1}
-                                            className="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition"
-                                        >
-                                            <Minus size={16} />
-                                        </button>
-                                        <span className="w-12 text-center font-bold text-gray-800">{item.quantity}</span>
-                                        <button
-                                            onClick={() => updateQuantity(index, 1)}
-                                            disabled={item.stock && item.quantity >= item.stock}
-                                            className="w-8 h-8 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition"
-                                        >
-                                            <Plus size={16} />
-                                        </button>
+                                        <span className="w-12 text-center font-bold text-gray-800">1</span>
                                     </div>
 
-                                    <span className="font-bold text-cyan-600 text-lg w-20 text-right">RM {(item.price * item.quantity).toFixed(2)}</span>
+                                        <span className="font-bold text-cyan-600 text-lg w-20 text-right">RM {(item.price * (item.quantity || 1)).toFixed(2)}</span>
                                     <button
                                         onClick={() => removeFromCart(index)}
                                         className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition"
