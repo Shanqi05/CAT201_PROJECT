@@ -12,6 +12,15 @@ export const addToCart = (product, quantity = 1, itemType = 'book', showToast = 
         // For secondhand single-copy items, do not increase quantity if already in cart
         // Keep quantity as-is (prevent duplicates)
         // No-op: avoid adding more than one copy
+        
+        // Dispatch event for already in cart (only for books, not accessories)
+        if (showToast && itemType === 'book') {
+            window.dispatchEvent(new CustomEvent("cartAlreadyExists", { detail: { product, itemType } }));
+        } else if (showToast && itemType === 'accessory') {
+            // For accessories, show success message even if already in cart
+            window.dispatchEvent(new CustomEvent("cartAdded", { detail: { product, quantity, itemType, success: true } }));
+        }
+        
         return false;
     } else {
         // If no, add new item with specified quantity
@@ -26,7 +35,7 @@ export const addToCart = (product, quantity = 1, itemType = 'book', showToast = 
     
     // Dispatch success event only if showToast is true
     if (showToast) {
-        window.dispatchEvent(new CustomEvent("cartAdded", { detail: { product, quantity, itemType } }));
+        window.dispatchEvent(new CustomEvent("cartAdded", { detail: { product, quantity, itemType, success: true } }));
     }
     
     return true;

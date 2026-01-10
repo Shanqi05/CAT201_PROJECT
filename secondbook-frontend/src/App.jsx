@@ -39,6 +39,7 @@ import AdminProtectedRoute from './components/Common/AdminProtectedRoute';
 function App() {
     const location = useLocation();
     const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("✓ Added to cart successfully!");
 
     // Hide Header/Footer on Login, Register, and all Admin pages
     const hideHeaderFooter = ['/login', '/register'].includes(location.pathname) || location.pathname.startsWith('/admin');
@@ -47,12 +48,22 @@ function App() {
 
     // Listen for cart added events
     useEffect(() => {
-        const handleCartAdded = () => {
+        const handleCartAdded = (event) => {
+            setToastMessage("✓ Added to cart successfully!");
+            setShowToast(true);
+        };
+
+        const handleCartAlreadyExists = (event) => {
+            setToastMessage("Cannot added, already in your cart");
             setShowToast(true);
         };
 
         window.addEventListener('cartAdded', handleCartAdded);
-        return () => window.removeEventListener('cartAdded', handleCartAdded);
+        window.addEventListener('cartAlreadyExists', handleCartAlreadyExists);
+        return () => {
+            window.removeEventListener('cartAdded', handleCartAdded);
+            window.removeEventListener('cartAlreadyExists', handleCartAlreadyExists);
+        };
     }, []);
 
     // Scroll to top on location change
@@ -63,7 +74,7 @@ function App() {
     return (
         <div className="flex flex-col min-h-screen">
             {/* Global Toast Notification */}
-            {showToast && <Toast message="✓ Added to cart successfully!" type="success" duration={3000} onClose={() => setShowToast(false)} />}
+            {showToast && <Toast message={toastMessage} type={toastMessage.includes("Cannot") ? "warning" : "success"} duration={3000} onClose={() => setShowToast(false)} />}
 
             {/* Header (Visible only on User pages) */}
             {!hideHeaderFooter && <Header />}
