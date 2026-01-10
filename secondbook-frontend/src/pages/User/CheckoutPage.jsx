@@ -14,7 +14,7 @@ const CheckoutPage = () => {
         fullName: '',
         phone: '',
         houseNo: '',    
-        address: '',    
+        street: '',    
         city: '',
         zip: '',        
         state: '',      
