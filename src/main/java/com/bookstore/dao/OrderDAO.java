@@ -103,6 +103,90 @@ public class OrderDAO {
         }
     }
 
+    // Method to update status
+    public boolean updateOrderStatus(int orderId, String status) {
+        String sql = "UPDATE orders SET status = ? WHERE order_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, orderId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Cancel Order (Restores Stock & Book Status)
+    public boolean cancelOrder(int orderId) {
+        Connection conn = null;
+        PreparedStatement psGetItems = null;
+        PreparedStatement psRestoreBook = null;
+        PreparedStatement psRestoreAcc = null;
+        PreparedStatement psUpdateOrder = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            // 1. Get Items in Order
+            String sqlGetItems = "SELECT book_id, accessory_id, quantity FROM order_items WHERE order_id = ?";
+            psGetItems = conn.prepareStatement(sqlGetItems);
+            psGetItems.setInt(1, orderId);
+            rs = psGetItems.executeQuery();
+
+            // Prepare Restore Queries
+            String sqlRestoreBook = "UPDATE books SET status = 'Available' WHERE book_id = ?";
+            psRestoreBook = conn.prepareStatement(sqlRestoreBook);
+
+            String sqlRestoreAcc = "UPDATE accessories SET stock = stock + ? WHERE accessory_id = ?";
+            psRestoreAcc = conn.prepareStatement(sqlRestoreAcc);
+
+            while (rs.next()) {
+                int bookId = rs.getInt("book_id");
+                int accId = rs.getInt("accessory_id");
+                int qty = rs.getInt("quantity");
+
+                if (bookId > 0) {
+                    psRestoreBook.setInt(1, bookId);
+                    psRestoreBook.addBatch();
+                } else if (accId > 0) {
+                    psRestoreAcc.setInt(1, qty);
+                    psRestoreAcc.setInt(2, accId);
+                    psRestoreAcc.addBatch();
+                }
+            }
+
+            // 2. Execute Restores
+            psRestoreBook.executeBatch();
+            psRestoreAcc.executeBatch();
+
+            // 3. Mark Order as Cancelled
+            String sqlUpdateOrder = "UPDATE orders SET status = 'Cancelled' WHERE order_id = ?";
+            psUpdateOrder = conn.prepareStatement(sqlUpdateOrder);
+            psUpdateOrder.setInt(1, orderId);
+            psUpdateOrder.executeUpdate();
+
+            conn.commit();
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try { if(conn != null) conn.rollback(); } catch(SQLException ex) { ex.printStackTrace(); }
+            return false;
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (psGetItems != null) psGetItems.close();
+                if (psRestoreBook != null) psRestoreBook.close();
+                if (psRestoreAcc != null) psRestoreAcc.close();
+                if (psUpdateOrder != null) psUpdateOrder.close();
+                if (conn != null) conn.close();
+            } catch (Exception e) {}
+        }
+    }
+
     // Get All Orders (Admin)
     public List<Map<String, Object>> getAllOrders() {
         return getOrdersGeneric("SELECT o.order_id, o.created_at, o.total_amount, o.status, o.payment_method, " +
