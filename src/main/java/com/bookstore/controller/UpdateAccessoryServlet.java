@@ -32,8 +32,12 @@ public class UpdateAccessoryServlet extends HttpServlet {
 
         // Check if a new image was uploaded
         if (part != null && part.getSize() > 0) {
-            fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-            String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+            String rawFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
+
+            // Sanitize Filename: Remove spaces and special characters
+            String sanitizedFileName = rawFileName.replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "");
+
+            String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedFileName;
 
             String savePath = getServletContext().getRealPath("") + File.separator + "uploads";
             File fileSaveDir = new File(savePath);

@@ -60,9 +60,10 @@ const ManageAccessories = () => {
 
         // Set preview to existing image
         if (item.imagePath) {
+            // [FIX] Encode existing image paths for preview too
             const imgUrl = item.imagePath.startsWith('http')
                 ? item.imagePath
-                : `http://localhost:8080/CAT201_project/uploads/${item.imagePath}`;
+                : `http://localhost:8080/CAT201_project/uploads/${encodeURIComponent(item.imagePath)}`;
             setPreviewUrl(imgUrl);
         } else {
             setPreviewUrl(null);
@@ -187,9 +188,10 @@ const ManageAccessories = () => {
                                         <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200 bg-gray-100 flex items-center justify-center relative">
                                             {item.imagePath ? (
                                                 <img
+                                                    // Added encodeURIComponent to handle spaces/special chars in filenames
                                                     src={item.imagePath.startsWith('http') || item.imagePath.startsWith('blob')
                                                         ? item.imagePath
-                                                        : `http://localhost:8080/CAT201_project/uploads/${item.imagePath}`}
+                                                        : `http://localhost:8080/CAT201_project/uploads/${encodeURIComponent(item.imagePath)}`}
                                                     alt={item.title}
                                                     className="w-full h-full object-cover"
                                                     onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='block'}}
@@ -271,7 +273,7 @@ const ManageAccessories = () => {
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Image {isEditing && "(Optional)"}</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Image {isEditing}</label>
                                 <div className="flex items-center justify-center w-full">
                                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all hover:border-cyan-400 relative overflow-hidden group">
                                         {previewUrl ? (

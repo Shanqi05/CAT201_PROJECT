@@ -229,7 +229,7 @@ const AdminHomePage = () => {
                                                         src={item.imagePath ? (
                                                             item.imagePath.startsWith('http')
                                                                 ? item.imagePath
-                                                                : `http://localhost:8080/CAT201_project/uploads/${item.imagePath}`
+                                                                : `http://localhost:8080/CAT201_project/uploads/${encodeURIComponent(item.imagePath)}`
                                                         ) : ""}
                                                         className="w-full h-full object-cover"
                                                         onError={(e) => {e.target.style.display='none'}}

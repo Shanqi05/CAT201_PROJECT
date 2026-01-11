@@ -41,8 +41,13 @@ public class AddAccessoryServlet extends HttpServlet {
         String fileName = "";
 
         if (part != null && part.getSize() > 0) {
-            fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-            String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+            String rawFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
+
+            // Sanitize Filename: Remove spaces and special characters
+            // Replaces spaces with underscores, removes anything that isn't a letter, number, dot, underscore, or dash
+            String sanitizedFileName = rawFileName.replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "");
+
+            String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedFileName;
 
             // Ensure we save to 'uploads' matching React frontend expectation
             String savePath = getServletContext().getRealPath("") + File.separator + "uploads";
