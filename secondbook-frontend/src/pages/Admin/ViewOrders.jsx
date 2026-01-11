@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     Search, CheckCircle, Clock, XCircle, Truck,
-    Eye, Filter, Download, X, MapPin, Phone, Mail, Save
+    Eye, Filter, Package, Calendar, MapPin, Phone, Mail, Save
 } from 'lucide-react';
 
 const ViewOrders = () => {
@@ -27,20 +27,15 @@ const ViewOrders = () => {
                 const formattedData = rawData.map(item => ({
                     id: `ORD-${item.id}`,
                     rawId: item.id,
-
-                    // Customer Details
                     customerName: item.customerName || 'Unknown',
                     email: item.email || 'N/A',
                     phone: item.phone || 'N/A',
                     address: item.address || 'No Address',
-
-                    // Order Details
                     date: item.date ? new Date(item.date).toLocaleDateString() : 'N/A',
                     total: item.total || 0,
                     status: item.status || 'Processing',
                     products: item.products || []
                 }));
-
                 setOrders(formattedData);
             }
         } catch (error) {
@@ -82,7 +77,7 @@ const ViewOrders = () => {
         try {
             const params = new URLSearchParams();
             params.append('orderId', order.rawId);
-            params.append('status', 'Cancelled'); // Trigger backend cancel logic
+            params.append('status', 'Cancelled');
 
             const response = await fetch('http://localhost:8080/CAT201_project/updateOrderStatus', {
                 method: 'POST',
@@ -118,6 +113,12 @@ const ViewOrders = () => {
         return matchesSearch && matchesStatus;
     });
 
+    // Statistics Calculation
+    const totalOrders = orders.length;
+    const processingCount = orders.filter(o => o.status.toLowerCase() === 'processing' || o.status.toLowerCase() === 'pending').length;
+    const shippedCount = orders.filter(o => o.status.toLowerCase() === 'shipped').length;
+    const deliveredCount = orders.filter(o => o.status.toLowerCase() === 'delivered').length;
+
     const getStatusBadge = (status) => {
         const s = (status || '').toLowerCase();
         switch(s) {
@@ -138,6 +139,28 @@ const ViewOrders = () => {
                     <h1 className="text-3xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>Order Management</h1>
                     <p className="text-gray-500 text-sm mt-1">Track and manage customer orders.</p>
                 </div>
+            </div>
+
+            {/* Statistics Cards [NEW] */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                {[
+                    { label: "Total Orders", value: totalOrders, color: "bg-purple-500", icon: <Package/> },
+                    { label: "Processing", value: processingCount, color: "bg-yellow-500", icon: <Clock/> },
+                    { label: "Shipped", value: shippedCount, color: "bg-blue-500", icon: <Truck/> },
+                    { label: "Delivered", value: deliveredCount, color: "bg-green-500", icon: <CheckCircle/> }
+                ].map((stat, index) => (
+                    <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow">
+                        <div>
+                            <div className={`${stat.color} w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm mb-2`}>
+                                {React.cloneElement(stat.icon, { size: 20 })}
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">{stat.label}</p>
+                            <h3 className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</h3>
+                        </div>
+                    </div>
+                ))}
             </div>
 
             {/* Filters */}
@@ -193,16 +216,7 @@ const ViewOrders = () => {
                                         <td className="p-5">{getStatusBadge(order.status)}</td>
                                         <td className="p-5 text-right">
                                             <div className="flex justify-end gap-2">
-                                                {/* View Button */}
-                                                <button
-                                                    onClick={() => setSelectedOrder(order)}
-                                                    className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors border border-transparent hover:border-cyan-100"
-                                                    title="View Details"
-                                                >
-                                                    <Eye size={18} />
-                                                </button>
-
-                                                {/* Edit Status Button (Disabled if Cancelled or Delivered) */}
+                                                {/* Edit Status Button (Disabled if Finalized) */}
                                                 {!isFinalized && (
                                                     <button
                                                         onClick={() => openStatusModal(order)}
@@ -213,7 +227,7 @@ const ViewOrders = () => {
                                                     </button>
                                                 )}
 
-                                                {/* Cancel Button (Disabled if already Cancelled or Deliveered) */}
+                                                {/* Cancel Button (Disabled if Finalized) */}
                                                 {!isFinalized && (
                                                     <button
                                                         onClick={() => handleCancelOrder(order)}
@@ -223,6 +237,15 @@ const ViewOrders = () => {
                                                         <XCircle size={18} />
                                                     </button>
                                                 )}
+
+                                                {/* View Button */}
+                                                <button
+                                                    onClick={() => setSelectedOrder(order)}
+                                                    className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors border border-transparent hover:border-cyan-100"
+                                                    title="View Details"
+                                                >
+                                                    <Eye size={18} />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

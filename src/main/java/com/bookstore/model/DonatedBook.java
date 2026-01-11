@@ -16,6 +16,9 @@ public class DonatedBook {
     private String category;
     private String imagePath;
 
+    // Genres Field
+    private String[] genres;
+
     // Address Fields
     private String pickupHouseNo;
     private String pickupStreet;
@@ -59,6 +62,10 @@ public class DonatedBook {
 
     public String getImagePath() { return imagePath; }
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
+
+    // Genre Getter/Setter
+    public String[] getGenres() { return genres; }
+    public void setGenres(String[] genres) { this.genres = genres; }
 
     // Address Getters/Setters
     public String getPickupHouseNo() { return pickupHouseNo; }

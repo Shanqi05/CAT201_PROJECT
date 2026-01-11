@@ -27,32 +27,36 @@ public class AddDonatedBookServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try {
-            // 1. Extract Donor Info
+            // Extract Donor Info
             String donorName = request.getParameter("donorName");
             String donorEmail = request.getParameter("donorEmail");
             String donorPhone = request.getParameter("donorPhone");
 
-            // 2. Extract Book Info
+            // Extract Book Info
             String bookTitle = request.getParameter("bookTitle");
             String author = request.getParameter("author");
             String bookCondition = request.getParameter("bookCondition");
             String category = request.getParameter("category");
             String message = request.getParameter("message");
 
-            // 3. Extract Address
+            // Get Genres
+            String[] genres = request.getParameterValues("genres");
+
+            // Extract Address
             String houseNo = request.getParameter("houseNo");
             String street = request.getParameter("street");
             String postcode = request.getParameter("postcode");
             String city = request.getParameter("city");
             String state = request.getParameter("state");
 
-            // [NEW] 4. Handle Image Upload
+            // Handle Image Upload
             String imagePath = null;
             Part filePart = request.getPart("image");
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                // Make unique to prevent overwriting
-                String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+                // Sanitize filename
+                String sanitized = fileName.replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "");
+                String uniqueFileName = System.currentTimeMillis() + "_" + sanitized;
 
                 String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
                 File uploadDir = new File(uploadPath);
@@ -79,6 +83,7 @@ public class AddDonatedBookServlet extends HttpServlet {
             book.setBookCondition(bookCondition);
             book.setCategory(category);
             book.setMessage(message);
+            book.setGenres(genres);
 
             // Set Image
             book.setImagePath(imagePath);
