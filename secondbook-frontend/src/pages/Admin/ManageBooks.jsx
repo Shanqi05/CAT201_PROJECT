@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, Filter, X, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X, Upload, Package } from 'lucide-react';
 
 const ManageBooks = () => {
     const [books, setBooks] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
+
+    // Edit State
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState(null);
+
     const [formData, setFormData] = useState({
-        title: '', author: '', category: 'Fiction', price: '', condition: 'Brand new', image: null, genres: []
+        title: '', author: '', category: 'Fiction', price: '', condition: 'Brand new', image: null, genres: [], status: 'Active'
     });
     const [previewUrl, setPreviewUrl] = useState(null);
 
@@ -18,7 +23,6 @@ const ManageBooks = () => {
             const response = await fetch('http://localhost:8080/CAT201_project/getBooks');
             if (response.ok) {
                 const data = await response.json();
-                console.log("Books loaded:", data);
                 setBooks(data);
             }
         } catch (error) {
@@ -50,6 +54,52 @@ const ManageBooks = () => {
         }
     };
 
+    // Open Modal for Editing
+    const handleEditClick = (book) => {
+        setIsEditing(true);
+        setEditId(book.bookId);
+
+        // Robust genre parsing (handles Arrays or CSV Strings from DB)
+        let currentGenres = [];
+        if (Array.isArray(book.genres)) {
+            currentGenres = book.genres;
+        } else if (typeof book.genres === 'string') {
+            // Remove curly braces {} if they come from Postgres array string format
+            const cleanStr = book.genres.replace(/[{"}]/g, '');
+            currentGenres = cleanStr.split(',').map(g => g.trim()).filter(g => g !== '');
+        }
+
+        setFormData({
+            title: book.title,
+            author: book.author,
+            category: book.category,
+            price: book.price,
+            condition: book.condition,
+            status: book.status || 'Active',
+            genres: currentGenres,
+            image: null // Reset file input
+        });
+
+        if (book.imagePath) {
+            const imgUrl = book.imagePath.startsWith('http')
+                ? book.imagePath
+                : `http://localhost:8080/CAT201_project/uploads/${book.imagePath}`;
+            setPreviewUrl(imgUrl);
+        } else {
+            setPreviewUrl(null);
+        }
+        setShowModal(true);
+    };
+
+    // Open Modal for Adding
+    const handleAddClick = () => {
+        setIsEditing(false);
+        setEditId(null);
+        setFormData({ title: '', author: '', category: 'Fiction', price: '', condition: 'Brand new', image: null, genres: [], status: 'Active' });
+        setPreviewUrl(null);
+        setShowModal(true);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const data = new FormData();
@@ -58,25 +108,36 @@ const ManageBooks = () => {
         data.append('category', formData.category);
         data.append('price', formData.price);
         data.append('condition', formData.condition);
+        data.append('status', formData.status);
 
+        // Append Genres
         formData.genres.forEach(g => data.append('genres', g));
+
         if (formData.image) data.append('image', formData.image);
 
+        // Switch endpoint based on mode
+        const endpoint = isEditing
+            ? 'http://localhost:8080/CAT201_project/updateBook'
+            : 'http://localhost:8080/CAT201_project/addBook';
+
+        if (isEditing) data.append('id', editId);
+
         try {
-            const response = await fetch('http://localhost:8080/CAT201_project/addBook', {
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 credentials: 'include',
                 body: data,
             });
 
             if (response.ok) {
-                alert("Book added successfully!");
+                alert(isEditing ? "Book updated!" : "Book added successfully!");
                 setShowModal(false);
-                fetchBooks(); // Reload list
-                setFormData({ title: '', author: '', category: 'Fiction', condition: 'Brand new', price: '', image: null, genres: [] });
+                fetchBooks();
+                // Reset Form
+                setFormData({ title: '', author: '', category: 'Fiction', condition: 'Brand new', price: '', image: null, genres: [], status: 'Active' });
                 setPreviewUrl(null);
             } else {
-                alert("Failed to upload book. Server error.");
+                alert("Operation failed. Server error.");
             }
         } catch (error) {
             console.error("Error:", error);
@@ -86,7 +147,6 @@ const ManageBooks = () => {
     const handleDelete = async (id) => {
         if(window.confirm("Delete this book?")) {
             try {
-                // [CHANGE] URL uses 'id' parameter, but we pass book.bookId to it
                 const response = await fetch(`http://localhost:8080/CAT201_project/deleteBook?id=${id}`, {
                     method: 'DELETE',
                     credentials: 'include',
@@ -107,105 +167,190 @@ const ManageBooks = () => {
     return (
         <div className="p-8 max-w-7xl mx-auto w-full relative">
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>Manage Inventory</h1>
-                <button onClick={() => setShowModal(true)} className="bg-black text-white px-6 py-2.5 rounded-lg flex items-center font-bold shadow-lg">
-                    <Plus size={18} className="mr-2" /> Add New Book
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="text-3xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>Manage Inventory</h1>
+                    <p className="text-gray-500 text-sm mt-1">Curate your library collection.</p>
+                </div>
+                <button onClick={handleAddClick} className="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-lg flex items-center transition-all shadow-lg hover:shadow-xl group">
+                    <Plus size={18} className="mr-2 group-hover:scale-110 transition-transform" />
+                    <span className="font-bold text-sm">Add New Book</span>
                 </button>
             </div>
 
             {/* Search */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 flex gap-4">
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex gap-4">
                 <div className="relative w-full md:w-96">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                    <input type="text" placeholder="Search title, author..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-11 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none" />
+                    <input type="text" placeholder="Search title, author..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 outline-none text-sm" />
                 </div>
             </div>
 
             {/* Table */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <table className="w-full text-left">
-                    <thead className="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-bold">
-                    <tr>
-                        <th className="p-5">Book Details</th>
-                        <th className="p-5">Category</th>
-                        <th className="p-5">Genres</th>
-                        <th className="p-5">Condition</th>
-                        <th className="p-5">Price</th>
-                        <th className="p-5 text-right">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                    {filteredBooks.map((book) => (
-                        // [CHANGE] Use book.bookId
-                        <tr key={book.bookId} className="hover:bg-gray-50/80">
-                            <td className="p-5">
-                                <div className="flex items-center gap-4">
-                                    <img src={`http://localhost:8080/CAT201_project/uploads/${book.imagePath}`} className="w-10 h-14 object-cover rounded shadow-sm" onError={(e) => e.target.src="https://via.placeholder.com/150"} />
-                                    <div>
-                                        <p className="font-bold text-gray-900">{book.title}</p>
-                                        <p className="text-xs text-gray-500">{book.author}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td className="p-5 text-sm">{book.category}</td>
-                            <td className="p-5 text-xs text-gray-500">{book.genres ? book.genres.join(", ") : "-"}</td>
-                            <td className="p-5 text-sm font-bold text-gray-600">{book.condition}</td>
-                            <td className="p-5 font-bold">RM {book.price.toFixed(2)}</td>
-                            <td className="p-5 text-right">
-                                {/* [CHANGE] Pass book.bookId */}
-                                <button onClick={() => handleDelete(book.bookId)} className="text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={18}/></button>
-                            </td>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead className="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-bold">
+                        <tr>
+                            <th className="p-5">Book Details</th>
+                            <th className="p-5">Category</th>
+                            <th className="p-5">Condition</th>
+                            <th className="p-5">Price</th>
+                            <th className="p-5">Status</th>
+                            <th className="p-5 text-right">Actions</th>
                         </tr>
-                    ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                        {filteredBooks.map((book) => (
+                            <tr key={book.bookId} className="hover:bg-gray-50/80 transition-colors group">
+                                <td className="p-5">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-14 flex-shrink-0 rounded shadow-sm border border-gray-200 bg-gray-100 overflow-hidden">
+                                            {/* Image with fallback */}
+                                            {book.imagePath ? (
+                                                <img
+                                                    src={book.imagePath.startsWith('http') ? book.imagePath : `http://localhost:8080/CAT201_project/uploads/${book.imagePath}`}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => e.target.style.display='none'}
+                                                    alt=""
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-300"><Package size={20}/></div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-900 text-sm leading-tight">{book.title}</p>
+                                            <p className="text-xs text-gray-500 mt-0.5">{book.author}</p>
+
+                                            {/* [FIX] Robust Genre Display */}
+                                            <div className="flex flex-wrap gap-1 mt-1">
+                                                {(() => {
+                                                    if (!book.genres) return null;
+                                                    // Handle String (from DB dump) vs Array (from JSON)
+                                                    let gList = [];
+                                                    if (Array.isArray(book.genres)) gList = book.genres;
+                                                    else if (typeof book.genres === 'string') gList = book.genres.replace(/[{"}]/g, '').split(',');
+
+                                                    return gList.filter(g => g && g.trim() !== '').slice(0, 3).map((g, i) => (
+                                                        <span key={i} className="text-[10px] bg-gray-100 text-gray-500 px-1.5 rounded border border-gray-200">{g.trim()}</span>
+                                                    ));
+                                                })()}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="p-5 text-sm font-medium text-gray-600">{book.category}</td>
+                                <td className="p-5 text-sm font-bold text-gray-600">{book.condition}</td>
+                                <td className="p-5 font-mono font-bold text-gray-900 text-sm">RM {parseFloat(book.price).toFixed(2)}</td>
+
+                                {/* Status Badge */}
+                                <td className="p-5">
+                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
+                                        book.status === 'Sold' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-green-50 text-green-700 border-green-100'
+                                    }`}>
+                                        <span className={`w-1.5 h-1.5 rounded-full ${book.status === 'Sold' ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                                        {book.status || 'Active'}
+                                    </span>
+                                </td>
+
+                                <td className="p-5 text-right">
+                                    <div className="flex justify-end gap-2">
+                                        <button onClick={() => handleEditClick(book)} className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"><Edit size={18}/></button>
+                                        <button onClick={() => handleDelete(book.bookId)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Modal */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-gray-100 max-h-[90vh] overflow-y-auto">
                         <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
-                            <h2 className="text-xl font-black">Add New Book</h2>
-                            <button onClick={() => setShowModal(false)}><X size={24} /></button>
+                            <h2 className="text-xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
+                                {isEditing ? 'Edit Book' : 'Add New Book'}
+                            </h2>
+                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={24} /></button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
-                                <input name="title" required placeholder="Title" value={formData.title} onChange={handleInputChange} className="border p-2 rounded w-full" />
-                                <input name="author" required placeholder="Author" value={formData.author} onChange={handleInputChange} className="border p-2 rounded w-full" />
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Title</label>
+                                    <input name="title" required value={formData.title} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Author</label>
+                                    <input name="author" required value={formData.author} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" />
+                                </div>
                             </div>
+
                             <div className="grid grid-cols-2 gap-4">
-                                <select name="category" value={formData.category} onChange={handleInputChange} className="border p-2 rounded w-full">
-                                    <option value="Fiction">Fiction</option>
-                                    <option value="Non-Fiction">Non-Fiction</option>
-                                    <option value="Children">Children</option>
-                                    <option value="Others">Others</option>
-                                </select>
-                                <select name="condition" value={formData.condition} onChange={handleInputChange} className="border p-2 rounded w-full">
-                                    <option value="Brand new">Brand New</option>
-                                    <option value="Like new">Like New</option>
-                                    <option value="Acceptable">Acceptable</option>
-                                    <option value="Old">Old</option>
-                                </select>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
+                                    <select name="category" value={formData.category} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all">
+                                        <option value="Fiction">Fiction</option>
+                                        <option value="Non-Fiction">Non-Fiction</option>
+                                        <option value="Children">Children</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Condition</label>
+                                    <select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all">
+                                        <option value="Brand new">Brand New</option>
+                                        <option value="Like new">Like New</option>
+                                        <option value="Acceptable">Acceptable</option>
+                                        <option value="Old">Old</option>
+                                    </select>
+                                </div>
                             </div>
+
+                            {/* Status and Price Row */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price (RM)</label>
+                                    <input type="number" name="price" step="0.01" required value={formData.price} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Status</label>
+                                    <select name="status" value={formData.status} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all">
+                                        <option value="Active">Active</option>
+                                        <option value="Sold">Sold</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div>
                                 <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Genres</label>
                                 <div className="flex flex-wrap gap-2">
                                     {genreOptions.map(genre => (
-                                        <label key={genre} className="flex items-center space-x-1 cursor-pointer bg-gray-50 px-3 py-1 rounded-full border">
-                                            <input type="checkbox" value={genre} checked={formData.genres.includes(genre)} onChange={handleGenreChange} className="rounded text-cyan-600" />
-                                            <span className="text-sm">{genre}</span>
+                                        <label key={genre} className={`flex items-center space-x-1 cursor-pointer px-3 py-1 rounded-full border transition-all ${formData.genres.includes(genre) ? 'bg-cyan-50 border-cyan-200 text-cyan-700' : 'bg-gray-50 border-gray-200'}`}>
+                                            <input type="checkbox" value={genre} checked={formData.genres.includes(genre)} onChange={handleGenreChange} className="accent-cyan-600 rounded" />
+                                            <span className="text-xs font-bold">{genre}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
-                            <input type="number" name="price" step="0.01" required placeholder="Price" value={formData.price} onChange={handleInputChange} className="border p-2 rounded w-full" />
-                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
-                                {previewUrl ? <img src={previewUrl} className="h-full object-contain" /> : <span className="text-gray-500">Click to upload cover</span>}
+
+                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all hover:border-cyan-400 relative overflow-hidden group">
+                                {previewUrl ? (
+                                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity" />
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <Upload className="w-8 h-8 mb-3 text-gray-400 group-hover:text-cyan-500 transition-colors" />
+                                        <p className="text-sm text-gray-500">Upload Cover</p>
+                                    </div>
+                                )}
                                 <input type="file" name="image" className="hidden" accept="image/*" onChange={handleFileChange} />
                             </label>
-                            <button type="submit" className="w-full py-3 bg-black text-white rounded-xl font-bold">Upload Book</button>
+
+                            <button type="submit" className="w-full py-3 bg-black text-cyan-400 rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-cyan-500/20">
+                                {isEditing ? 'Update Book' : 'Add Book'}
+                            </button>
                         </form>
                     </div>
                 </div>
