@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { addToCart } from '../../utils/cartUtils';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Tag } from 'lucide-react'; // Added Tag icon
 
 const BookCard = ({ book }) => {
     const navigate = useNavigate();
@@ -10,11 +10,11 @@ const BookCard = ({ book }) => {
 
     // Default safe object
     const safeBook = book || {
-        title: "Loading...", author: "", price: 0, imagePath: null, bookId: 0, status: 'Available', genres: []
+        title: "Loading...", author: "", price: 0, imagePath: null, bookId: 0, status: 'Available', genres: [], condition: 'Good'
     };
 
     // Destructure properties
-    const { title, author, price, bookId, status, genres } = safeBook;
+    const { title, author, price, bookId, status, genres, condition } = safeBook;
 
     // Check if sold
     const isSoldOut = status === 'Sold';
@@ -28,19 +28,27 @@ const BookCard = ({ book }) => {
         <div className="bg-white rounded-2xl shadow-lg border border-pink-100
                         hover:shadow-2xl hover:scale-[1.02] hover:border-pink-200 transition-all duration-300 overflow-hidden group flex flex-col h-full relative">
 
-            {/* CARD LINK - Conditionally disabled if sold out */}
+            {/* CARD LINK */}
             <Link
                 to={isSoldOut ? '#' : `/books/${bookId}`}
                 onClick={(e) => isSoldOut && e.preventDefault()}
                 className={`flex-grow flex flex-col relative ${isSoldOut ? 'cursor-not-allowed' : 'cursor-pointer'}`}
             >
                 <div className="relative overflow-hidden h-80 bg-pink-50">
+                    {/* Condition Badge */}
+                    <div className="absolute top-3 right-3 z-20">
+                        <span className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-gray-700 shadow-sm border border-gray-100 flex items-center gap-1">
+                            <Tag size={10} className="text-pink-500"/>
+                            {condition || 'Preloved'}
+                        </span>
+                    </div>
+
                     {/* Image with grayscale effect if sold */}
                     <img
                         src={displayImage}
                         alt={title}
                         className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${isSoldOut ? 'opacity-40 grayscale' : ''}`}
-                        onError={(e) => {e.target.style.display = 'none'}} // Hide broken images cleanly
+                        onError={(e) => {e.target.style.display = 'none'}}
                     />
 
                     {/* Sold Out Overlay */}
@@ -78,7 +86,7 @@ const BookCard = ({ book }) => {
                         </div>
                     </div>
 
-                    {/* Price with line-through if sold */}
+                    {/* Price */}
                     <span className={`text-2xl font-extrabold block mt-auto ${isSoldOut ? 'text-gray-300 line-through decoration-2' : 'text-pink-600'}`}>
                         RM {parseFloat(price).toFixed(2)}
                     </span>
@@ -88,7 +96,7 @@ const BookCard = ({ book }) => {
             {/* BUTTONS AREA */}
             <div className="p-4 pt-0 mt-auto">
                 <div className="flex gap-2">
-                    {/* Add to Cart Button */}
+                    {/* Add to Cart */}
                     <button
                         onClick={(e) => {
                             e.preventDefault();
@@ -105,7 +113,7 @@ const BookCard = ({ book }) => {
                         <ShoppingCart size={20} />
                     </button>
 
-                    {/* Buy Now Button */}
+                    {/* Buy Now */}
                     <button
                         onClick={(e) => {
                             e.preventDefault();

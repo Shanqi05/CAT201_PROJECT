@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, X, Upload, Package, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X, Upload, Package, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 
 const ManageBooks = () => {
     const [books, setBooks] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
 
+    // Filter States
+    const [filterCategory, setFilterCategory] = useState('All');
+    const [filterCondition, setFilterCondition] = useState('All');
+    const [filterStatus, setFilterStatus] = useState('All');
+    const [filterGenre, setFilterGenre] = useState('All');
+
     // Edit State
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
 
-    // Toggle state for Genre list
+    // Toggle state for Genre list inside Modal
     const [showGenres, setShowGenres] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -18,7 +24,10 @@ const ManageBooks = () => {
     });
     const [previewUrl, setPreviewUrl] = useState(null);
 
-    // Genre Options
+    // Options Lists
+    const categories = ["Fiction", "Non-Fiction", "Children", "Others"];
+    const conditions = ["Brand new", "Like new", "Acceptable", "Old"];
+    const statuses = ["Available", "Sold"];
     const genreOptions = [
         "Action/Adventure", "Art/Photography", "Biography/Memoir", "Business/Finance",
         "Children's", "Comics/Graphic Novels", "Cookbooks/Food", "Crime", "Dystopian",
@@ -67,14 +76,13 @@ const ManageBooks = () => {
     const handleEditClick = (book) => {
         setIsEditing(true);
         setEditId(book.bookId);
-        setShowGenres(false); // Reset genre toggle
+        setShowGenres(false);
 
         // Robust genre parsing
         let currentGenres = [];
         if (Array.isArray(book.genres)) {
             currentGenres = book.genres;
         } else if (typeof book.genres === 'string') {
-            // Remove curly braces {} if they come from Postgres array string format
             const cleanStr = book.genres.replace(/[{"}]/g, '');
             currentGenres = cleanStr.split(',').map(g => g.trim()).filter(g => g !== '');
         }
@@ -105,7 +113,7 @@ const ManageBooks = () => {
     const handleAddClick = () => {
         setIsEditing(false);
         setEditId(null);
-        setShowGenres(false); // Reset genre toggle
+        setShowGenres(false);
         setFormData({ title: '', author: '', category: 'Fiction', price: '', condition: 'Brand new', image: null, genres: [], status: 'Available' });
         setPreviewUrl(null);
         setShowModal(true);
@@ -120,10 +128,7 @@ const ManageBooks = () => {
         data.append('price', formData.price);
         data.append('condition', formData.condition);
         data.append('status', formData.status);
-
-        // Append Genres
         formData.genres.forEach(g => data.append('genres', g));
-
         if (formData.image) data.append('image', formData.image);
 
         // Switch endpoint based on mode
@@ -170,10 +175,34 @@ const ManageBooks = () => {
         }
     };
 
-    const filteredBooks = books.filter(book =>
-        book.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.author?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // --- Filtering Logic ---
+    const filteredBooks = books.filter(book => {
+        // 1. Search
+        const matchesSearch = book.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            book.author?.toLowerCase().includes(searchTerm.toLowerCase());
+
+        // 2. Category
+        const matchesCategory = filterCategory === 'All' || book.category === filterCategory;
+
+        // 3. Condition
+        const matchesCondition = filterCondition === 'All' || book.condition === filterCondition;
+
+        // 4. Status
+        const matchesStatus = filterStatus === 'All' || (book.status || 'Available') === filterStatus;
+
+        // 5. Genre
+        let matchesGenre = true;
+        if (filterGenre !== 'All') {
+            let gList = [];
+            if (Array.isArray(book.genres)) gList = book.genres;
+            else if (typeof book.genres === 'string') gList = book.genres.replace(/[{"}]/g, '').split(',');
+
+            // Check if selected genre exists in book's genre list
+            matchesGenre = gList.map(g => g.trim()).includes(filterGenre);
+        }
+
+        return matchesSearch && matchesCategory && matchesCondition && matchesStatus && matchesGenre;
+    });
 
     return (
         <div className="p-8 max-w-7xl mx-auto w-full relative">
@@ -189,11 +218,85 @@ const ManageBooks = () => {
                 </button>
             </div>
 
-            {/* Search */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex gap-4">
-                <div className="relative w-full md:w-96">
+            {/* Filter Bar */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col xl:flex-row items-center justify-between gap-4">
+
+                {/* Search */}
+                <div className="relative w-full xl:w-96">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input type="text" placeholder="Search title, author..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 outline-none text-sm" />
+                </div>
+
+                {/* Filters Group */}
+                <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+
+                    {/* Category Filter */}
+                    <div className="relative flex-grow xl:flex-grow-0">
+                        <select
+                            value={filterCategory}
+                            onChange={(e) => setFilterCategory(e.target.value)}
+                            className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
+                        >
+                            <option value="All">All Categories</option>
+                            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        </select>
+                        <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
+                    </div>
+
+                    {/* Condition Filter */}
+                    <div className="relative flex-grow xl:flex-grow-0">
+                        <select
+                            value={filterCondition}
+                            onChange={(e) => setFilterCondition(e.target.value)}
+                            className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
+                        >
+                            <option value="All">All Conditions</option>
+                            {conditions.map(cond => <option key={cond} value={cond}>{cond}</option>)}
+                        </select>
+                        <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
+                    </div>
+
+                    {/* Genre Filter */}
+                    <div className="relative flex-grow xl:flex-grow-0">
+                        <select
+                            value={filterGenre}
+                            onChange={(e) => setFilterGenre(e.target.value)}
+                            className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer max-w-[150px]"
+                        >
+                            <option value="All">All Genres</option>
+                            {genreOptions.map(gen => <option key={gen} value={gen}>{gen}</option>)}
+                        </select>
+                        <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
+                    </div>
+
+                    {/* Status Filter */}
+                    <div className="relative flex-grow xl:flex-grow-0">
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                            className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
+                        >
+                            <option value="All">All Status</option>
+                            {statuses.map(st => <option key={st} value={st}>{st}</option>)}
+                        </select>
+                        <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
+                    </div>
+
+                    {/* Reset Button */}
+                    {(filterCategory !== 'All' || filterCondition !== 'All' || filterStatus !== 'All' || filterGenre !== 'All') && (
+                        <button
+                            onClick={() => {
+                                setFilterCategory('All');
+                                setFilterCondition('All');
+                                setFilterStatus('All');
+                                setFilterGenre('All');
+                            }}
+                            className="px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                            title="Reset Filters"
+                        >
+                            <X size={16} />
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -212,66 +315,70 @@ const ManageBooks = () => {
                         </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                        {filteredBooks.map((book) => (
-                            <tr key={book.bookId} className="hover:bg-gray-50/80 transition-colors group">
-                                <td className="p-5">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-14 flex-shrink-0 rounded shadow-sm border border-gray-200 bg-gray-100 overflow-hidden">
-                                            {/* Image with fallback */}
-                                            {book.imagePath ? (
-                                                <img
-                                                    src={book.imagePath.startsWith('http') ? book.imagePath : `http://localhost:8080/CAT201_project/uploads/${book.imagePath}`}
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) => e.target.style.display='none'}
-                                                    alt=""
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-300"><Package size={20}/></div>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-gray-900 text-sm leading-tight">{book.title}</p>
-                                            <p className="text-xs text-gray-500 mt-0.5">{book.author}</p>
+                        {filteredBooks.length === 0 ? (
+                            <tr><td colSpan="6" className="p-8 text-center text-gray-500">No books found matching criteria.</td></tr>
+                        ) : (
+                            filteredBooks.map((book) => (
+                                <tr key={book.bookId} className="hover:bg-gray-50/80 transition-colors group">
+                                    <td className="p-5">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-14 flex-shrink-0 rounded shadow-sm border border-gray-200 bg-gray-100 overflow-hidden">
+                                                {/* Image with fallback */}
+                                                {book.imagePath ? (
+                                                    <img
+                                                        src={book.imagePath.startsWith('http') ? book.imagePath : `http://localhost:8080/CAT201_project/uploads/${book.imagePath}`}
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) => e.target.style.display='none'}
+                                                        alt=""
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-300"><Package size={20}/></div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-gray-900 text-sm leading-tight">{book.title}</p>
+                                                <p className="text-xs text-gray-500 mt-0.5">{book.author}</p>
 
-                                            {/* Robust Genre Display */}
-                                            <div className="flex flex-wrap gap-1 mt-1">
-                                                {(() => {
-                                                    if (!book.genres) return null;
-                                                    // Handle String (from DB dump) vs Array (from JSON)
-                                                    let gList = [];
-                                                    if (Array.isArray(book.genres)) gList = book.genres;
-                                                    else if (typeof book.genres === 'string') gList = book.genres.replace(/[{"}]/g, '').split(',');
+                                                {/* Robust Genre Display */}
+                                                <div className="flex flex-wrap gap-1 mt-1">
+                                                    {(() => {
+                                                        if (!book.genres) return null;
+                                                        // Handle String (from DB dump) vs Array (from JSON)
+                                                        let gList = [];
+                                                        if (Array.isArray(book.genres)) gList = book.genres;
+                                                        else if (typeof book.genres === 'string') gList = book.genres.replace(/[{"}]/g, '').split(',');
 
-                                                    return gList.filter(g => g && g.trim() !== '').slice(0, 3).map((g, i) => (
-                                                        <span key={i} className="text-[10px] bg-gray-100 text-gray-500 px-1.5 rounded border border-gray-200">{g.trim()}</span>
-                                                    ));
-                                                })()}
+                                                        return gList.filter(g => g && g.trim() !== '').slice(0, 3).map((g, i) => (
+                                                            <span key={i} className="text-[10px] bg-gray-100 text-gray-500 px-1.5 rounded border border-gray-200">{g.trim()}</span>
+                                                        ));
+                                                    })()}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td className="p-5 text-sm font-medium text-gray-600">{book.category}</td>
-                                <td className="p-5 text-sm font-bold text-gray-600">{book.condition}</td>
-                                <td className="p-5 font-mono font-bold text-gray-900 text-sm">RM {parseFloat(book.price).toFixed(2)}</td>
+                                    </td>
+                                    <td className="p-5 text-sm font-medium text-gray-600">{book.category}</td>
+                                    <td className="p-5 text-sm font-bold text-gray-600">{book.condition}</td>
+                                    <td className="p-5 font-mono font-bold text-gray-900 text-sm">RM {parseFloat(book.price).toFixed(2)}</td>
 
-                                {/* Status Badge */}
-                                <td className="p-5">
-                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
-                                        book.status === 'Sold' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-green-50 text-green-700 border-green-100'
-                                    }`}>
-                                        <span className={`w-1.5 h-1.5 rounded-full ${book.status === 'Sold' ? 'bg-red-500' : 'bg-green-500'}`}></span>
-                                        {book.status || 'Available'}
-                                    </span>
-                                </td>
+                                    {/* Status Badge */}
+                                    <td className="p-5">
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
+                                            book.status === 'Sold' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-green-50 text-green-700 border-green-100'
+                                        }`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${book.status === 'Sold' ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                                            {book.status || 'Available'}
+                                        </span>
+                                    </td>
 
-                                <td className="p-5 text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <button onClick={() => handleEditClick(book)} className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"><Edit size={18}/></button>
-                                        <button onClick={() => handleDelete(book.bookId)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                                    <td className="p-5 text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <button onClick={() => handleEditClick(book)} className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"><Edit size={18}/></button>
+                                            <button onClick={() => handleDelete(book.bookId)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                         </tbody>
                     </table>
                 </div>
@@ -304,18 +411,14 @@ const ManageBooks = () => {
                                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
                                     <select name="category" value={formData.category} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all">
                                         <option value="Fiction">Fiction</option>
-                                        <option value="Non-Fiction">Non-Fiction</option>
-                                        <option value="Children">Children</option>
-                                        <option value="Others">Others</option>
+                                        {categories.filter(c => c !== 'Fiction').map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Condition</label>
                                     <select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all">
                                         <option value="Brand new">Brand New</option>
-                                        <option value="Like new">Like New</option>
-                                        <option value="Acceptable">Acceptable</option>
-                                        <option value="Old">Old</option>
+                                        {conditions.filter(c => c !== 'Brand new').map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
                             </div>
@@ -335,7 +438,7 @@ const ManageBooks = () => {
                                 </div>
                             </div>
 
-                            {/* [UPDATE] Collapsible Genre Section */}
+                            {/* Collapsible Genre Section */}
                             <div className="border border-gray-200 rounded-lg p-1 bg-gray-50">
                                 <button
                                     type="button"
