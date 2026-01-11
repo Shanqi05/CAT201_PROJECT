@@ -26,11 +26,23 @@ const AdminHomePage = () => {
                 if (statsResponse.ok) {
                     const data = await statsResponse.json();
                     setStats(data.stats);
-                    setRecentBooks(data.recentBooks || []);
-                    setRecentAccessories(data.recentAccessories || []);
                 }
 
-                // 2. Fetch Recent Orders
+                // 2. Fetch Recent Books
+                const booksResponse = await fetch('http://localhost:8080/CAT201_project/getBooks');
+                if (booksResponse.ok) {
+                    const booksData = await booksResponse.json();
+                    setRecentBooks(booksData.slice(0, 5));
+                }
+
+                // 3. Fetch Recent Accessories
+                const accResponse = await fetch('http://localhost:8080/CAT201_project/getAccessories');
+                if (accResponse.ok) {
+                    const accData = await accResponse.json();
+                    setRecentAccessories(accData.slice(0, 5));
+                }
+
+                // 4. Fetch Recent Orders
                 const ordersResponse = await fetch('http://localhost:8080/CAT201_project/getOrders', {
                     method: 'GET',
                     credentials: 'include'
@@ -40,7 +52,7 @@ const AdminHomePage = () => {
                     setRecentOrders(ordersData.slice(0, 5));
                 }
 
-                // 3. Fetch Recent Donations
+                // 5. Fetch Recent Donations
                 const donationsResponse = await fetch('http://localhost:8080/CAT201_project/getDonatedBooks', {
                     method: 'GET',
                     credentials: 'include'
@@ -122,12 +134,14 @@ const AdminHomePage = () => {
                             <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider font-bold text-xs">
                             <tr>
                                 <th className="px-6 py-4">Title</th>
+                                {/* [UPDATE] Removed Category Header */}
+                                <th className="px-6 py-4">Condition</th>
                                 <th className="px-6 py-4">Price</th>
                                 <th className="px-6 py-4 text-right">Status</th>
                             </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                            {recentBooks.length === 0 ? <tr><td colSpan="3" className="p-6 text-center text-gray-500">No books found.</td></tr> : (
+                            {recentBooks.length === 0 ? <tr><td colSpan="4" className="p-6 text-center text-gray-500">No books found.</td></tr> : (
                                 recentBooks.map((book, index) => (
                                     <tr key={book.bookId || index} className="hover:bg-gray-50">
                                         <td className="px-6 py-4">
@@ -138,11 +152,32 @@ const AdminHomePage = () => {
                                                     onError={(e) => e.target.style.display = 'none'}
                                                     alt=""
                                                 />
-                                                <div className="min-w-0 flex-1"><p className="font-bold text-gray-900 truncate w-48">{book.title}</p></div>
+                                                {/* [UPDATE] Removed truncate/width limits to allow long names */}
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="font-bold text-gray-900 text-sm whitespace-normal break-words leading-tight">
+                                                        {book.title}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </td>
+
+                                        {/* [UPDATE] Removed Category Data Cell */}
+
+                                        <td className="px-6 py-4 text-xs text-gray-600 font-medium">
+                                            {book.condition || 'N/A'}
+                                        </td>
+
                                         <td className="px-6 py-4 font-mono font-bold text-cyan-600">RM {book.price.toFixed(2)}</td>
-                                        <td className="px-6 py-4 text-right"><span className="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded font-bold">{book.status}</span></td>
+
+                                        <td className="px-6 py-4 text-right">
+                                            <span className={`text-[10px] px-2 py-1 rounded-full uppercase tracking-wider font-bold ${
+                                                book.status === 'Sold'
+                                                    ? 'bg-red-100 text-red-700'
+                                                    : 'bg-green-100 text-green-700'
+                                            }`}>
+                                                {book.status}
+                                            </span>
+                                        </td>
                                     </tr>
                                 ))
                             )}
@@ -165,7 +200,6 @@ const AdminHomePage = () => {
                         </div>
                         <ShoppingBag size={18} className="text-gray-400"/>
                     </div>
-                    {/* [UPDATE] Converted to Table to add headers */}
                     <div className="overflow-x-auto flex-1">
                         <table className="w-full text-left text-sm">
                             <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider font-bold text-xs">
@@ -193,7 +227,7 @@ const AdminHomePage = () => {
                                                     />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <h4 className="text-sm font-bold text-gray-900 truncate">{item.title}</h4>
+                                                    <h4 className="text-sm font-bold text-gray-900 whitespace-normal break-words leading-tight">{item.title}</h4>
                                                     <p className="text-[10px] text-gray-500">{item.category}</p>
                                                 </div>
                                             </div>
