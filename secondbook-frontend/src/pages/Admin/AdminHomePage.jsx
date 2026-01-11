@@ -82,13 +82,17 @@ const AdminHomePage = () => {
     const getStatusColor = (status) => {
         switch(status?.toLowerCase()) {
             case 'delivered':
-            case 'approved':
-            case 'collected': return 'bg-green-100 text-green-700';
+            case 'approved': return 'bg-green-100 text-green-700';
+
+            case 'collected':
             case 'shipped': return 'bg-blue-100 text-blue-700';
+
             case 'processing':
             case 'pending': return 'bg-yellow-100 text-yellow-700';
+
             case 'cancelled':
             case 'rejected': return 'bg-red-100 text-red-700';
+
             default: return 'bg-gray-100 text-gray-700';
         }
     };
@@ -134,7 +138,6 @@ const AdminHomePage = () => {
                             <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider font-bold text-xs">
                             <tr>
                                 <th className="px-6 py-4">Title</th>
-                                {/* [UPDATE] Removed Category Header */}
                                 <th className="px-6 py-4">Condition</th>
                                 <th className="px-6 py-4">Price</th>
                                 <th className="px-6 py-4 text-right">Status</th>
@@ -152,7 +155,6 @@ const AdminHomePage = () => {
                                                     onError={(e) => e.target.style.display = 'none'}
                                                     alt=""
                                                 />
-                                                {/* [UPDATE] Removed truncate/width limits to allow long names */}
                                                 <div className="min-w-0 flex-1">
                                                     <p className="font-bold text-gray-900 text-sm whitespace-normal break-words leading-tight">
                                                         {book.title}
@@ -160,8 +162,6 @@ const AdminHomePage = () => {
                                                 </div>
                                             </div>
                                         </td>
-
-                                        {/* [UPDATE] Removed Category Data Cell */}
 
                                         <td className="px-6 py-4 text-xs text-gray-600 font-medium">
                                             {book.condition || 'N/A'}
