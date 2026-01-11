@@ -7,10 +7,17 @@ const BookCard = ({ book }) => {
     const navigate = useNavigate();
 
     const API_BASE = "http://localhost:8080/CAT201_project/uploads/";
+
+    // Default safe object
     const safeBook = book || {
         title: "Loading...", author: "", price: 0, imagePath: null, bookId: 0, status: 'Active'
     };
-    const { title, author, price, bookId } = safeBook;
+
+    // Destructure properties, including status
+    const { title, author, price, bookId, status } = safeBook;
+
+    // Check if sold
+    const isSoldOut = status === 'Sold';
 
     const displayImage = safeBook.imagePath
         ? (safeBook.imagePath.startsWith('http') ? safeBook.imagePath : API_BASE + safeBook.imagePath)
@@ -18,43 +25,84 @@ const BookCard = ({ book }) => {
 
     return (
         <div className="bg-white rounded-2xl shadow-lg border border-pink-100
-                        hover:shadow-2xl hover:scale-[1.02] hover:border-pink-200 transition-all duration-300 overflow-hidden group flex flex-col h-full">
+                        hover:shadow-2xl hover:scale-[1.02] hover:border-pink-200 transition-all duration-300 overflow-hidden group flex flex-col h-full relative">
 
-            {/* CARD LINK */}
-            <Link to={`/books/${bookId}`} className="flex-grow flex flex-col">
+            {/* CARD LINK - Conditionally disabled if sold out */}
+            <Link
+                to={isSoldOut ? '#' : `/books/${bookId}`}
+                onClick={(e) => isSoldOut && e.preventDefault()}
+                className={`flex-grow flex flex-col relative ${isSoldOut ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+            >
                 <div className="relative overflow-hidden h-80 bg-pink-50">
+                    {/* Image with grayscale effect if sold */}
                     <img
                         src={displayImage}
                         alt={title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${isSoldOut ? 'opacity-40 grayscale' : ''}`}
                         onError={(e) => {e.target.src = "https://via.placeholder.com/300x450?text=Error"}}
                     />
+
+                    {/* Sold Out Overlay - Matching Site Theme */}
+                    {isSoldOut && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-900/20 backdrop-blur-[2px] z-10">
+                            <span className="bg-black text-cyan-400 px-6 py-2.5 rounded-lg font-black text-xs uppercase tracking-[0.2em] shadow-2xl border border-gray-800">
+                                Sold Out
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="p-4 flex-grow flex flex-col justify-between">
                     <div>
-                        <h3 className="text-lg font-bold text-gray-900 line-clamp-2 group-hover:text-pink-600 transition-colors">{title}</h3>
+                        <h3 className={`text-lg font-bold line-clamp-2 transition-colors ${isSoldOut ? 'text-gray-400' : 'text-gray-900 group-hover:text-pink-600'}`}>
+                            {title}
+                        </h3>
                         <p className="text-sm text-gray-500 mb-2">{author}</p>
                     </div>
-                    <span className="text-2xl font-extrabold text-pink-600 block mt-2">RM {parseFloat(price).toFixed(2)}</span>
+                    {/* Price with line-through if sold */}
+                    <span className={`text-2xl font-extrabold block mt-2 ${isSoldOut ? 'text-gray-300 line-through decoration-2' : 'text-pink-600'}`}>
+                        RM {parseFloat(price).toFixed(2)}
+                    </span>
                 </div>
             </Link>
 
-            {/* BUTTONS AREA: direct add-to-cart for books */}
+            {/* BUTTONS AREA */}
             <div className="p-4 pt-0 mt-auto">
                 <div className="flex gap-2">
+                    {/* Add to Cart Button */}
                     <button
-                        onClick={(e) => { e.preventDefault(); addToCart({ ...safeBook, imageUrl: displayImage }, 1, 'book', true); }}
-                        className={`p-3 rounded-xl border shadow-sm transition-all duration-300 bg-pink-50 text-pink-600 border-pink-100 hover:bg-pink-100 hover:border-pink-200 hover:scale-105`}
-                        title="Add to Cart"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (!isSoldOut) addToCart({ ...safeBook, imageUrl: displayImage }, 1, 'book', true);
+                        }}
+                        disabled={isSoldOut}
+                        className={`p-3 rounded-xl border shadow-sm transition-all duration-300 
+                            ${isSoldOut
+                            ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed'
+                            : 'bg-pink-50 text-pink-600 border-pink-100 hover:bg-pink-100 hover:border-pink-200 hover:scale-105'
+                        }`}
+                        title={isSoldOut ? "Item is Sold Out" : "Add to Cart"}
                     >
                         <ShoppingCart size={20} />
                     </button>
+
+                    {/* Buy Now Button */}
                     <button
-                        onClick={(e) => { e.preventDefault(); addToCart({ ...safeBook, imageUrl: displayImage }, 1, 'book', false); navigate('/checkout'); }}
-                        className={`flex-grow font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-300 bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:shadow-lg hover:scale-105`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (!isSoldOut) {
+                                addToCart({ ...safeBook, imageUrl: displayImage }, 1, 'book', false);
+                                navigate('/checkout');
+                            }
+                        }}
+                        disabled={isSoldOut}
+                        className={`flex-grow font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-300 
+                            ${isSoldOut
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
+                            : 'bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:shadow-lg hover:scale-105'
+                        }`}
                     >
-                        Buy Now
+                        {isSoldOut ? 'Unavailable' : 'Buy Now'}
                     </button>
                 </div>
             </div>
