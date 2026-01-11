@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../../utils/supabaseClient';
 import { Plus, Edit, Trash2, Search, X, Upload, Package, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 
 const ManageBooks = () => {
@@ -119,8 +120,40 @@ const ManageBooks = () => {
         setShowModal(true);
     };
 
+    // [UPDATED] Submit Logic
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        let uploadedImageUrl = null;
+
+        // 1. Upload to Supabase if file exists
+        if (formData.image instanceof File) {
+            try {
+                const file = formData.image;
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+                const filePath = `BookCover/${fileName}`; // Folder: BookCover
+
+                const { error: uploadError } = await supabase.storage
+                    .from('ProductImage')
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                const { data } = supabase.storage
+                    .from('ProductImage')
+                    .getPublicUrl(filePath);
+
+                uploadedImageUrl = data.publicUrl;
+
+            } catch (error) {
+                console.error("Supabase Upload Error:", error);
+                alert("Failed to upload image: " + error.message);
+                return;
+            }
+        }
+
+        // 2. Prepare Form Data
         const data = new FormData();
         data.append('title', formData.title);
         data.append('author', formData.author);
@@ -129,9 +162,12 @@ const ManageBooks = () => {
         data.append('condition', formData.condition);
         data.append('status', formData.status);
         formData.genres.forEach(g => data.append('genres', g));
-        if (formData.image) data.append('image', formData.image);
 
-        // Switch endpoint based on mode
+        // Pass URL string instead of file
+        if (uploadedImageUrl) {
+            data.append('imagePath', uploadedImageUrl);
+        }
+
         const endpoint = isEditing
             ? 'http://localhost:8080/CAT201_project/updateBook'
             : 'http://localhost:8080/CAT201_project/addBook';
@@ -149,7 +185,6 @@ const ManageBooks = () => {
                 alert(isEditing ? "Book updated!" : "Book added successfully!");
                 setShowModal(false);
                 fetchBooks();
-                // Reset Form
                 setFormData({ title: '', author: '', category: 'Fiction', condition: 'Brand new', price: '', image: null, genres: [], status: 'Available' });
                 setPreviewUrl(null);
             } else {
@@ -232,70 +267,31 @@ const ManageBooks = () => {
 
                     {/* Category Filter */}
                     <div className="relative flex-grow xl:flex-grow-0">
-                        <select
-                            value={filterCategory}
-                            onChange={(e) => setFilterCategory(e.target.value)}
-                            className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
-                        >
-                            <option value="All">All Categories</option>
-                            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                        </select>
+                        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"><option value="All">All Categories</option>{categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}</select>
                         <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
                     </div>
 
                     {/* Condition Filter */}
                     <div className="relative flex-grow xl:flex-grow-0">
-                        <select
-                            value={filterCondition}
-                            onChange={(e) => setFilterCondition(e.target.value)}
-                            className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
-                        >
-                            <option value="All">All Conditions</option>
-                            {conditions.map(cond => <option key={cond} value={cond}>{cond}</option>)}
-                        </select>
+                        <select value={filterCondition} onChange={(e) => setFilterCondition(e.target.value)} className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"><option value="All">All Conditions</option>{conditions.map(cond => <option key={cond} value={cond}>{cond}</option>)}</select>
                         <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
                     </div>
 
                     {/* Genre Filter */}
                     <div className="relative flex-grow xl:flex-grow-0">
-                        <select
-                            value={filterGenre}
-                            onChange={(e) => setFilterGenre(e.target.value)}
-                            className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer max-w-[150px]"
-                        >
-                            <option value="All">All Genres</option>
-                            {genreOptions.map(gen => <option key={gen} value={gen}>{gen}</option>)}
-                        </select>
+                        <select value={filterGenre} onChange={(e) => setFilterGenre(e.target.value)} className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer max-w-[150px]"><option value="All">All Genres</option>{genreOptions.map(gen => <option key={gen} value={gen}>{gen}</option>)}</select>
                         <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
                     </div>
 
                     {/* Status Filter */}
                     <div className="relative flex-grow xl:flex-grow-0">
-                        <select
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
-                        >
-                            <option value="All">All Status</option>
-                            {statuses.map(st => <option key={st} value={st}>{st}</option>)}
-                        </select>
+                        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"><option value="All">All Status</option>{statuses.map(st => <option key={st} value={st}>{st}</option>)}</select>
                         <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
                     </div>
 
                     {/* Reset Button */}
                     {(filterCategory !== 'All' || filterCondition !== 'All' || filterStatus !== 'All' || filterGenre !== 'All') && (
-                        <button
-                            onClick={() => {
-                                setFilterCategory('All');
-                                setFilterCondition('All');
-                                setFilterStatus('All');
-                                setFilterGenre('All');
-                            }}
-                            className="px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
-                            title="Reset Filters"
-                        >
-                            <X size={16} />
-                        </button>
+                        <button onClick={() => { setFilterCategory('All'); setFilterCondition('All'); setFilterStatus('All'); setFilterGenre('All'); }} className="px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-colors" title="Reset Filters"><X size={16} /></button>
                     )}
                 </div>
             </div>
@@ -305,19 +301,10 @@ const ManageBooks = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-bold">
-                        <tr>
-                            <th className="p-5">Book Details</th>
-                            <th className="p-5">Category</th>
-                            <th className="p-5">Condition</th>
-                            <th className="p-5">Price</th>
-                            <th className="p-5">Status</th>
-                            <th className="p-5 text-right">Actions</th>
-                        </tr>
+                        <tr><th className="p-5">Book Details</th><th className="p-5">Category</th><th className="p-5">Condition</th><th className="p-5">Price</th><th className="p-5">Status</th><th className="p-5 text-right">Actions</th></tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                        {filteredBooks.length === 0 ? (
-                            <tr><td colSpan="6" className="p-8 text-center text-gray-500">No books found matching criteria.</td></tr>
-                        ) : (
+                        {filteredBooks.length === 0 ? (<tr><td colSpan="6" className="p-8 text-center text-gray-500">No books found matching criteria.</td></tr>) : (
                             filteredBooks.map((book) => (
                                 <tr key={book.bookId} className="hover:bg-gray-50/80 transition-colors group">
                                     <td className="p-5">
@@ -325,15 +312,8 @@ const ManageBooks = () => {
                                             <div className="w-10 h-14 flex-shrink-0 rounded shadow-sm border border-gray-200 bg-gray-100 overflow-hidden">
                                                 {/* Image with fallback */}
                                                 {book.imagePath ? (
-                                                    <img
-                                                        src={book.imagePath.startsWith('http') ? book.imagePath : `http://localhost:8080/CAT201_project/uploads/${book.imagePath}`}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => e.target.style.display='none'}
-                                                        alt=""
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-300"><Package size={20}/></div>
-                                                )}
+                                                    <img src={book.imagePath.startsWith('http') ? book.imagePath : `http://localhost:8080/CAT201_project/uploads/${book.imagePath}`} className="w-full h-full object-cover" onError={(e) => e.target.style.display='none'} alt="" />
+                                                ) : (<div className="w-full h-full flex items-center justify-center text-gray-300"><Package size={20}/></div>)}
                                             </div>
                                             <div>
                                                 <p className="font-bold text-gray-900 text-sm leading-tight">{book.title}</p>
@@ -343,14 +323,8 @@ const ManageBooks = () => {
                                                 <div className="flex flex-wrap gap-1 mt-1">
                                                     {(() => {
                                                         if (!book.genres) return null;
-                                                        // Handle String (from DB dump) vs Array (from JSON)
-                                                        let gList = [];
-                                                        if (Array.isArray(book.genres)) gList = book.genres;
-                                                        else if (typeof book.genres === 'string') gList = book.genres.replace(/[{"}]/g, '').split(',');
-
-                                                        return gList.filter(g => g && g.trim() !== '').slice(0, 3).map((g, i) => (
-                                                            <span key={i} className="text-[10px] bg-gray-100 text-gray-500 px-1.5 rounded border border-gray-200">{g.trim()}</span>
-                                                        ));
+                                                        let gList = Array.isArray(book.genres) ? book.genres : (typeof book.genres === 'string' ? book.genres.replace(/[{"}]/g, '').split(',') : []);
+                                                        return gList.filter(g => g && g.trim()).slice(0, 3).map((g, i) => (<span key={i} className="text-[10px] bg-gray-100 text-gray-500 px-1.5 rounded border border-gray-200">{g.trim()}</span>));
                                                     })()}
                                                 </div>
                                             </div>
@@ -362,14 +336,11 @@ const ManageBooks = () => {
 
                                     {/* Status Badge */}
                                     <td className="p-5">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
-                                            book.status === 'Sold' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-green-50 text-green-700 border-green-100'
-                                        }`}>
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${book.status === 'Sold' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-green-50 text-green-700 border-green-100'}`}>
                                             <span className={`w-1.5 h-1.5 rounded-full ${book.status === 'Sold' ? 'bg-red-500' : 'bg-green-500'}`}></span>
                                             {book.status || 'Available'}
                                         </span>
                                     </td>
-
                                     <td className="p-5 text-right">
                                         <div className="flex justify-end gap-2">
                                             <button onClick={() => handleEditClick(book)} className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"><Edit size={18}/></button>
@@ -388,103 +359,29 @@ const ManageBooks = () => {
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-gray-100 max-h-[90vh] overflow-y-auto">
-                        <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
-                            <h2 className="text-xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
-                                {isEditing ? 'Edit Book' : 'Add New Book'}
-                            </h2>
-                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={24} /></button>
-                        </div>
+                        <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50"><h2 className="text-xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>{isEditing ? 'Edit Book' : 'Add New Book'}</h2><button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={24} /></button></div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Title</label>
-                                    <input name="title" required value={formData.title} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Author</label>
-                                    <input name="author" required value={formData.author} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" />
-                                </div>
+                                <div className="space-y-1"><label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Title</label><input name="title" required value={formData.title} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" /></div>
+                                <div className="space-y-1"><label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Author</label><input name="author" required value={formData.author} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" /></div>
                             </div>
-
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
-                                    <select name="category" value={formData.category} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all">
-                                        <option value="Fiction">Fiction</option>
-                                        {categories.filter(c => c !== 'Fiction').map(c => <option key={c} value={c}>{c}</option>)}
-                                    </select>
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Condition</label>
-                                    <select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all">
-                                        <option value="Brand new">Brand New</option>
-                                        {conditions.filter(c => c !== 'Brand new').map(c => <option key={c} value={c}>{c}</option>)}
-                                    </select>
-                                </div>
+                                <div className="space-y-1"><label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label><select name="category" value={formData.category} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all"><option value="Fiction">Fiction</option>{categories.filter(c => c !== 'Fiction').map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+                                <div className="space-y-1"><label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Condition</label><select name="condition" value={formData.condition} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all"><option value="Brand new">Brand New</option>{conditions.filter(c => c !== 'Brand new').map(c => <option key={c} value={c}>{c}</option>)}</select></div>
                             </div>
-
-                            {/* Status and Price Row */}
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price (RM)</label>
-                                    <input type="number" name="price" step="0.01" required value={formData.price} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Status</label>
-                                    <select name="status" value={formData.status} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all">
-                                        <option value="Available">Available</option>
-                                        <option value="Sold">Sold</option>
-                                    </select>
-                                </div>
+                                <div className="space-y-1"><label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Price (RM)</label><input type="number" name="price" step="0.01" required value={formData.price} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all" /></div>
+                                <div className="space-y-1"><label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Status</label><select name="status" value={formData.status} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all"><option value="Available">Available</option><option value="Sold">Sold</option></select></div>
                             </div>
-
-                            {/* Collapsible Genre Section */}
                             <div className="border border-gray-200 rounded-lg p-1 bg-gray-50">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowGenres(!showGenres)}
-                                    className="w-full flex justify-between items-center p-2 text-left hover:bg-gray-100 rounded-lg transition-colors"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xs font-bold text-gray-500 uppercase">Genres</span>
-                                        {formData.genres.length > 0 && (
-                                            <span className="bg-cyan-100 text-cyan-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                                {formData.genres.length} Selected
-                                            </span>
-                                        )}
-                                    </div>
-                                    {showGenres ? <ChevronUp size={16} className="text-gray-400"/> : <ChevronDown size={16} className="text-gray-400"/>}
-                                </button>
-
-                                {showGenres && (
-                                    <div className="p-2 border-t border-gray-200 mt-1 max-h-60 overflow-y-auto bg-white rounded-b-lg">
-                                        <div className="flex flex-wrap gap-2">
-                                            {genreOptions.map(genre => (
-                                                <label key={genre} className={`flex items-center space-x-1 cursor-pointer px-3 py-1 rounded-full border transition-all ${formData.genres.includes(genre) ? 'bg-cyan-50 border-cyan-200 text-cyan-700' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
-                                                    <input type="checkbox" value={genre} checked={formData.genres.includes(genre)} onChange={handleGenreChange} className="accent-cyan-600 rounded w-3 h-3" />
-                                                    <span className="text-xs font-bold">{genre}</span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                                <button type="button" onClick={() => setShowGenres(!showGenres)} className="w-full flex justify-between items-center p-2 text-left hover:bg-gray-100 rounded-lg transition-colors"><div className="flex items-center gap-2"><span className="text-xs font-bold text-gray-500 uppercase">Genres</span>{formData.genres.length > 0 && (<span className="bg-cyan-100 text-cyan-700 text-[10px] font-bold px-2 py-0.5 rounded-full">{formData.genres.length} Selected</span>)}</div>{showGenres ? <ChevronUp size={16} className="text-gray-400"/> : <ChevronDown size={16} className="text-gray-400"/>}</button>
+                                {showGenres && (<div className="p-2 border-t border-gray-200 mt-1 max-h-60 overflow-y-auto bg-white rounded-b-lg"><div className="flex flex-wrap gap-2">{genreOptions.map(genre => (<label key={genre} className={`flex items-center space-x-1 cursor-pointer px-3 py-1 rounded-full border transition-all ${formData.genres.includes(genre) ? 'bg-cyan-50 border-cyan-200 text-cyan-700' : 'bg-white border-gray-200 hover:border-gray-300'}`}><input type="checkbox" value={genre} checked={formData.genres.includes(genre)} onChange={handleGenreChange} className="accent-cyan-600 rounded w-3 h-3" /><span className="text-xs font-bold">{genre}</span></label>))}</div></div>)}
                             </div>
-
                             <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all hover:border-cyan-400 relative overflow-hidden group">
-                                {previewUrl ? (
-                                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity" />
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <Upload className="w-8 h-8 mb-3 text-gray-400 group-hover:text-cyan-500 transition-colors" />
-                                        <p className="text-sm text-gray-500">Upload Cover</p>
-                                    </div>
-                                )}
+                                {previewUrl ? (<img src={previewUrl} alt="Preview" className="w-full h-full object-cover absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity" />) : (<div className="flex flex-col items-center justify-center pt-5 pb-6"><Upload className="w-8 h-8 mb-3 text-gray-400 group-hover:text-cyan-500 transition-colors" /><p className="text-sm text-gray-500">Upload Cover</p></div>)}
                                 <input type="file" name="image" className="hidden" accept="image/*" onChange={handleFileChange} />
                             </label>
-
-                            <button type="submit" className="w-full py-3 bg-black text-cyan-400 rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-cyan-500/20">
-                                {isEditing ? 'Update Book' : 'Add Book'}
-                            </button>
+                            <button type="submit" className="w-full py-3 bg-black text-cyan-400 rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-cyan-500/20">{isEditing ? 'Update Book' : 'Add Book'}</button>
                         </form>
                     </div>
                 </div>

@@ -6,21 +6,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 @WebServlet("/addBook")
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-        maxFileSize = 1024 * 1024 * 10,      // 10MB
-        maxRequestSize = 1024 * 1024 * 50    // 50MB
-)
+@MultipartConfig // Needed for parsing FormData from frontend
 public class AddBookServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
         try {
             // 1. Retrieve Fields
@@ -29,41 +24,28 @@ public class AddBookServlet extends HttpServlet {
             double price = Double.parseDouble(request.getParameter("price"));
             String category = request.getParameter("category");
             String condition = request.getParameter("condition");
+            String status = request.getParameter("status");
             String[] genres = request.getParameterValues("genres");
 
-            // 2. Handle Image Upload
-            Part filePart = request.getPart("image");
-            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+            // Get Supabase URL string
+            String imagePath = request.getParameter("imagePath");
 
-            // Ensure unique filename
-            String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
-            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
-
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) uploadDir.mkdir();
-
-            filePart.write(uploadPath + File.separator + uniqueFileName);
-
-            // 3. Create Model
             Book book = new Book();
             book.setTitle(title);
             book.setAuthor(author);
             book.setPrice(price);
             book.setCategory(category);
             book.setCondition(condition);
-            book.setGenres(genres); // Set Array
-            book.setImagePath(uniqueFileName);
-            book.setStatus("Available");
+            book.setStatus(status != null ? status : "Available");
+            book.setGenres(genres);
+            book.setImagePath(imagePath);
 
-            // 4. Save via DAO
             BookDAO dao = new BookDAO();
-            boolean success = dao.addBook(book);
-
-            if (success) {
-                response.getWriter().write("{\"success\": true, \"message\": \"Book added successfully\"}");
+            if (dao.addBook(book)) {
+                response.getWriter().write("{\"success\": true, \"message\": \"Book added\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("{\"error\": \"Database insertion failed\"}");
+                response.getWriter().write("{\"error\": \"Database error\"}");
             }
 
         } catch (Exception e) {

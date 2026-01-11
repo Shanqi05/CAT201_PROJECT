@@ -6,16 +6,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 @WebServlet("/updateBook")
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2,
-        maxFileSize = 1024 * 1024 * 10,
-        maxRequestSize = 1024 * 1024 * 50
-)
+@MultipartConfig
 public class UpdateBookServlet extends HttpServlet {
 
     @Override
@@ -34,21 +28,8 @@ public class UpdateBookServlet extends HttpServlet {
             String status = request.getParameter("status");
             String[] genres = request.getParameterValues("genres");
 
-            // Handle Image Upload
-            Part filePart = request.getPart("image");
-            String fileName = null;
-
-            if (filePart != null && filePart.getSize() > 0) {
-                String submittedFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                String uniqueFileName = System.currentTimeMillis() + "_" + submittedFileName;
-                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
-
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) uploadDir.mkdir();
-
-                filePart.write(uploadPath + File.separator + uniqueFileName);
-                fileName = uniqueFileName;
-            }
+            // [UPDATED] Get Supabase URL string
+            String imagePath = request.getParameter("imagePath");
 
             Book book = new Book();
             book.setBookId(id);
@@ -59,16 +40,18 @@ public class UpdateBookServlet extends HttpServlet {
             book.setCondition(condition);
             book.setStatus(status);
             book.setGenres(genres);
-            book.setImagePath(fileName); // If null, DAO will ignore it
+
+            // Only updates if a new URL is provided (handled by DAO if not null)
+            book.setImagePath(imagePath);
 
             BookDAO dao = new BookDAO();
             boolean success = dao.updateBook(book);
 
             if (success) {
-                response.getWriter().write("{\"success\": true, \"message\": \"Book updated successfully\"}");
+                response.getWriter().write("{\"success\": true}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("{\"error\": \"Database update failed\"}");
+                response.getWriter().write("{\"error\": \"Update failed\"}");
             }
 
         } catch (Exception e) {
