@@ -6,16 +6,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 @WebServlet("/addAccessory")
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2,
-        maxFileSize = 1024 * 1024 * 10,
-        maxRequestSize = 1024 * 1024 * 50
-)
+@MultipartConfig
 public class AddAccessoryServlet extends HttpServlet {
 
     @Override
@@ -37,36 +31,14 @@ public class AddAccessoryServlet extends HttpServlet {
             }
         } catch (Exception e) { stock = 0; }
 
-        Part part = request.getPart("image");
-        String fileName = "";
-
-        if (part != null && part.getSize() > 0) {
-            String rawFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-
-            // Sanitize Filename: Remove spaces and special characters
-            // Replaces spaces with underscores, removes anything that isn't a letter, number, dot, underscore, or dash
-            String sanitizedFileName = rawFileName.replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "");
-
-            String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedFileName;
-
-            // Ensure we save to 'uploads' matching React frontend expectation
-            String savePath = getServletContext().getRealPath("") + File.separator + "uploads";
-            File fileSaveDir = new File(savePath);
-            if (!fileSaveDir.exists()) fileSaveDir.mkdir();
-
-            part.write(savePath + File.separator + uniqueFileName);
-            fileName = uniqueFileName;
-        }
+        String imagePath = request.getParameter("imagePath");
 
         Accessory accessory = new Accessory();
         accessory.setTitle(title);
         accessory.setCategory(category);
         accessory.setPrice(price);
         accessory.setStock(stock);
-
-        if (!fileName.isEmpty()) {
-            accessory.setImagePath(fileName);
-        }
+        accessory.setImagePath(imagePath);
 
         AccessoryDAO dao = new AccessoryDAO();
         boolean success = dao.addAccessory(accessory);

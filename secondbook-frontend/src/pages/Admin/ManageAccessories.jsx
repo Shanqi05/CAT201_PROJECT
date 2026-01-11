@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../../utils/supabaseClient'; // [NEW] Import
 import { Plus, Edit, Trash2, Search, Filter, X, Upload, ShoppingBag, Package } from 'lucide-react';
 
 const ManageAccessories = () => {
@@ -9,11 +10,7 @@ const ManageAccessories = () => {
     const [editId, setEditId] = useState(null);
 
     const [formData, setFormData] = useState({
-        title: '',
-        category: 'Bookmark',
-        price: '',
-        stock: 10,
-        image: null
+        title: '', category: 'Bookmark', price: '', stock: 10, image: null
     });
 
     const [previewUrl, setPreviewUrl] = useState(null);
@@ -32,7 +29,6 @@ const ManageAccessories = () => {
         } catch (error) { console.error("Error fetching accessories:", error); }
     };
 
-    // --- Handlers ---
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -46,7 +42,6 @@ const ManageAccessories = () => {
         }
     };
 
-    // Handle Edit Button Click
     const handleEditClick = (item) => {
         setIsEditing(true);
         setEditId(item.accessoryId);
@@ -55,12 +50,11 @@ const ManageAccessories = () => {
             category: item.category,
             price: item.price,
             stock: item.stock,
-            image: null // Reset image input
+            image: null
         });
 
-        // Set preview to existing image
         if (item.imagePath) {
-            // [FIX] Encode existing image paths for preview too
+            // Check if it's a Supabase URL or local
             const imgUrl = item.imagePath.startsWith('http')
                 ? item.imagePath
                 : `http://localhost:8080/CAT201_project/uploads/${encodeURIComponent(item.imagePath)}`;
@@ -68,11 +62,9 @@ const ManageAccessories = () => {
         } else {
             setPreviewUrl(null);
         }
-
         setShowModal(true);
     };
 
-    // Reset form on Add Click
     const handleAddClick = () => {
         setIsEditing(false);
         setEditId(null);
@@ -81,30 +73,62 @@ const ManageAccessories = () => {
         setShowModal(true);
     };
 
+    // [UPDATED] Submit Handler with Supabase Upload
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        let uploadedImageUrl = null;
+
+        // 1. Upload to Supabase if a NEW file is selected
+        if (formData.image instanceof File) {
+            try {
+                const file = formData.image;
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+                // Upload to 'Accessories' folder
+                const filePath = `Accessories/${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('ProductImage')
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                const { data } = supabase.storage
+                    .from('ProductImage')
+                    .getPublicUrl(filePath);
+
+                uploadedImageUrl = data.publicUrl;
+
+            } catch (error) {
+                console.error("Upload error:", error);
+                alert("Image upload failed: " + error.message);
+                return;
+            }
+        }
+
+        // 2. Prepare Data
         const data = new FormData();
         data.append('title', formData.title);
         data.append('category', formData.category);
         data.append('price', formData.price);
         data.append('stock', formData.stock);
-        if (formData.image) {
-            data.append('image', formData.image);
+
+        // [IMPORTANT] Send URL string
+        if (uploadedImageUrl) {
+            data.append('imagePath', uploadedImageUrl);
         }
 
-        // Determine URL and Method based on Edit Mode
         const endpoint = isEditing
             ? 'http://localhost:8080/CAT201_project/updateAccessory'
             : 'http://localhost:8080/CAT201_project/addAccessory';
 
-        if (isEditing) {
-            data.append('id', editId); // Pass ID for update
-        }
+        if (isEditing) data.append('id', editId);
 
         try {
             const response = await fetch(endpoint, {
-                method: 'POST', // Both Add and Update use POST in Servlet
+                method: 'POST',
                 credentials: 'include',
                 body: data,
             });
@@ -153,13 +177,13 @@ const ManageAccessories = () => {
                     </h1>
                     <p className="text-gray-500 text-sm mt-1">Curate your collection.</p>
                 </div>
-                {/* [UPDATE] Use handleAddClick */}
                 <button onClick={handleAddClick} className="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-lg flex items-center transition-all shadow-lg hover:shadow-xl group">
                     <Plus size={18} className="mr-2 group-hover:scale-110 transition-transform" />
                     <span className="font-bold text-sm">Add Accessory</span>
                 </button>
             </div>
 
+            {/* ... Search Bar ... */}
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="relative w-full md:w-96">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -167,6 +191,7 @@ const ManageAccessories = () => {
                 </div>
             </div>
 
+            {/* Table */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
@@ -188,7 +213,7 @@ const ManageAccessories = () => {
                                         <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200 bg-gray-100 flex items-center justify-center relative">
                                             {item.imagePath ? (
                                                 <img
-                                                    // Added encodeURIComponent to handle spaces/special chars in filenames
+                                                    // Handle both Supabase URL and legacy local paths
                                                     src={item.imagePath.startsWith('http') || item.imagePath.startsWith('blob')
                                                         ? item.imagePath
                                                         : `http://localhost:8080/CAT201_project/uploads/${encodeURIComponent(item.imagePath)}`}
@@ -216,7 +241,6 @@ const ManageAccessories = () => {
                                 </td>
                                 <td className="p-5 text-right">
                                     <div className="flex justify-end gap-2">
-                                        {/* [UPDATE] Added onClick handler for Edit */}
                                         <button onClick={() => handleEditClick(item)} className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"><Edit size={18}/></button>
                                         <button onClick={() => handleDelete(item.accessoryId)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
                                     </div>
@@ -233,7 +257,6 @@ const ManageAccessories = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100">
                         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            {/* [UPDATE] Dynamic Title */}
                             <h2 className="text-xl font-black text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
                                 {isEditing ? 'Edit Accessory' : 'Add Accessory'}
                             </h2>
@@ -273,7 +296,7 @@ const ManageAccessories = () => {
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Image {isEditing}</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Product Image {isEditing && "(Optional)"}</label>
                                 <div className="flex items-center justify-center w-full">
                                     <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all hover:border-cyan-400 relative overflow-hidden group">
                                         {previewUrl ? (
@@ -291,7 +314,6 @@ const ManageAccessories = () => {
 
                             <div className="pt-4 flex gap-3">
                                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3 border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors">Cancel</button>
-                                {/* [UPDATE] Dynamic Button Label */}
                                 <button type="submit" className="flex-1 py-3 bg-black text-cyan-400 rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-cyan-500/20">{isEditing ? 'Update Item' : 'Add Item'}</button>
                             </div>
                         </form>

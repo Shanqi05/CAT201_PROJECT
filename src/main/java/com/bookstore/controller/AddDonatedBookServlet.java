@@ -9,16 +9,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 @WebServlet("/addDonatedBook")
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-        maxFileSize = 1024 * 1024 * 10,      // 10MB
-        maxRequestSize = 1024 * 1024 * 50    // 50MB
-)
+@MultipartConfig
 public class AddDonatedBookServlet extends HttpServlet {
 
     @Override
@@ -49,33 +43,15 @@ public class AddDonatedBookServlet extends HttpServlet {
             String city = request.getParameter("city");
             String state = request.getParameter("state");
 
-            // Handle Image Upload
-            String imagePath = null;
-            Part filePart = request.getPart("image");
-            if (filePart != null && filePart.getSize() > 0) {
-                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                // Sanitize filename
-                String sanitized = fileName.replaceAll("\\s+", "_").replaceAll("[^a-zA-Z0-9._-]", "");
-                String uniqueFileName = System.currentTimeMillis() + "_" + sanitized;
+            // Get Supabase URL
+            String imagePath = request.getParameter("imagePath");
 
-                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) uploadDir.mkdir();
-
-                filePart.write(uploadPath + File.separator + uniqueFileName);
-                imagePath = uniqueFileName;
-            }
-
-            // --- Step A: Save Donor ---
+            // Save Donor
             Donor donor = new Donor(donorEmail, donorName, donorPhone);
             DonorDAO donorDAO = new DonorDAO();
-            boolean donorSaved = donorDAO.saveDonor(donor);
+            if (!donorDAO.saveDonor(donor)) throw new Exception("Failed to save donor info.");
 
-            if (!donorSaved) {
-                throw new Exception("Failed to save donor info.");
-            }
-
-            // --- Step B: Save Book ---
+            // Save Book
             DonatedBook book = new DonatedBook();
             book.setDonorEmail(donorEmail);
             book.setTitle(bookTitle);
@@ -84,8 +60,6 @@ public class AddDonatedBookServlet extends HttpServlet {
             book.setCategory(category);
             book.setMessage(message);
             book.setGenres(genres);
-
-            // Set Image
             book.setImagePath(imagePath);
 
             // Set Address
@@ -96,13 +70,11 @@ public class AddDonatedBookServlet extends HttpServlet {
             book.setPickupState(state);
 
             DonatedBookDAO bookDAO = new DonatedBookDAO();
-            boolean success = bookDAO.addDonatedBook(book);
-
-            if (success) {
+            if (bookDAO.addDonatedBook(book)) {
                 response.getWriter().write("{\"success\": true, \"message\": \"Donation submitted successfully!\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("{\"success\": false, \"message\": \"Database error saving book\"}");
+                response.getWriter().write("{\"success\": false, \"message\": \"Database error\"}");
             }
 
         } catch (Exception e) {
