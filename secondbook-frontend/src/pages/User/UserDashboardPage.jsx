@@ -136,6 +136,15 @@ const UserDashboardPage = () => {
 
     const handleSaveAddress = async (e) => {
         e.preventDefault();
+
+        // Phone Validation Logic
+        // Allows: 0123456789, 012-3456789
+        const phoneRegex = /^0\d{1,2}-?\d{7,8}$/;
+        if (!phoneRegex.test(addressForm.phone)) {
+            alert("Invalid phone number. Please use a format like 012-3456789 or 0123456789.");
+            return;
+        }
+
         try {
             const params = new URLSearchParams(addressForm);
             let url = 'http://localhost:8080/CAT201_project/addAddress';
@@ -157,7 +166,9 @@ const UserDashboardPage = () => {
                 resetForm();
                 fetchAddresses();
             } else {
-                alert("Failed to save address.");
+                // Handle backend validation error message if available
+                const errorText = await response.text();
+                alert(errorText || "Failed to save address.");
             }
         } catch (err) { console.error(err); }
     };
@@ -250,6 +261,7 @@ const UserDashboardPage = () => {
                                     </div>
                                     <div className="mb-4">
                                         <input name="phone" required placeholder="Phone Number (e.g. 012-3456789)" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-cyan-200 outline-none" value={addressForm.phone} onChange={handleAddressInputChange} />
+                                        <p className="text-xs text-gray-400 mt-1">Format: 0123456789 or 012-3456789</p>
                                     </div>
 
                                     <button type="submit" className="bg-cyan-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-cyan-700 shadow-md">
@@ -261,7 +273,6 @@ const UserDashboardPage = () => {
                             {/* ADDRESS LIST */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {savedAddresses.map((addr) => (
-                                    // [FIX] Added 'group' class to parent for hover effects
                                     <div key={addr.addressId} className="border border-gray-100 p-5 rounded-xl relative bg-white hover:shadow-md transition group">
                                         <div className="flex items-start justify-between">
                                             <div className="flex items-start">
@@ -277,7 +288,6 @@ const UserDashboardPage = () => {
                                                 </div>
                                             </div>
 
-                                            {/* [FIX] Restored Edit/Delete Buttons */}
                                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => openEditForm(addr)} className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition" title="Edit">
                                                     <Edit3 size={16}/>
