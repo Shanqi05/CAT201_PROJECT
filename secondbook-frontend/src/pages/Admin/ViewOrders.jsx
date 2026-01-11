@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     Search, Package, CheckCircle, Clock, XCircle, Truck,
-    Eye, Filter, Download, DollarSign, Calendar, X, MapPin, Phone, CreditCard
+    Eye, Filter, Download, DollarSign, Calendar, X, MapPin, Phone, CreditCard, Mail
 } from 'lucide-react';
 
 const ViewOrders = () => {
@@ -25,13 +25,13 @@ const ViewOrders = () => {
                 console.log("Orders Fetched:", rawData);
 
                 const formattedData = rawData.map(item => ({
-                    id: `ORD-${item.id}`, // Display ID
-                    rawId: item.id,       // Real ID
+                    id: `ORD-${item.id}`,
+                    rawId: item.id,
 
                     // Customer Details
                     customerName: item.customerName || 'Unknown',
                     email: item.email || 'N/A',
-                    phone: item.phone || 'N/A',
+                    phone: item.phone || 'N/A', // [CHECK] Matches backend key
                     address: item.address || 'No Address',
 
                     // Order Details
@@ -39,7 +39,7 @@ const ViewOrders = () => {
                     total: item.total || 0,
                     status: item.status || 'processing',
 
-                    // Products (Already standardized by DAO)
+                    // Products
                     products: item.products || []
                 }));
 
@@ -157,11 +157,25 @@ const ViewOrders = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                                 <div className="space-y-3">
                                     <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Customer Details</h3>
-                                    <div><p className="font-bold text-gray-900">{selectedOrder.customerName}</p><p className="text-sm text-gray-500">{selectedOrder.email}</p><p className="text-sm text-gray-500">{selectedOrder.phone}</p></div>
+                                    <div className="space-y-1">
+                                        <p className="font-bold text-gray-900">{selectedOrder.customerName}</p>
+
+                                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                                            <Mail size={14} className="text-gray-400"/> {selectedOrder.email}
+                                        </div>
+
+                                        {/* [UPDATE] Added Phone Display */}
+                                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                                            <Phone size={14} className="text-gray-400"/> {selectedOrder.phone}
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="space-y-3">
                                     <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Shipping Address</h3>
-                                    <div className="flex items-start gap-2"><MapPin size={16} className="text-gray-400 mt-1"/><p className="text-sm text-gray-600">{selectedOrder.address}</p></div>
+                                    <div className="flex items-start gap-2">
+                                        <MapPin size={16} className="text-gray-400 mt-1 flex-shrink-0"/>
+                                        <p className="text-sm text-gray-600 leading-snug">{selectedOrder.address}</p>
+                                    </div>
                                 </div>
                             </div>
                             <div>

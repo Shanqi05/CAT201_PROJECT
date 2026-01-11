@@ -10,41 +10,31 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-@WebServlet("/addAccessory")
+@WebServlet("/updateAccessory")
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024 * 2,
         maxFileSize = 1024 * 1024 * 10,
         maxRequestSize = 1024 * 1024 * 50
 )
-public class AddAccessoryServlet extends HttpServlet {
+public class UpdateAccessoryServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        int id = Integer.parseInt(request.getParameter("id"));
         String title = request.getParameter("title");
         String category = request.getParameter("category");
-        double price = 0.0;
-        int stock = 0;
-
-        try {
-            price = Double.parseDouble(request.getParameter("price"));
-        } catch (Exception e) { price = 0.0; }
-
-        try {
-            String stockParam = request.getParameter("stock");
-            if (stockParam != null && !stockParam.isEmpty()) {
-                stock = Integer.parseInt(stockParam);
-            }
-        } catch (Exception e) { stock = 0; }
+        double price = Double.parseDouble(request.getParameter("price"));
+        int stock = Integer.parseInt(request.getParameter("stock"));
 
         Part part = request.getPart("image");
-        String fileName = "";
+        String fileName = null;
 
+        // Check if a new image was uploaded
         if (part != null && part.getSize() > 0) {
             fileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
             String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
 
-            // Ensure we save to 'uploads' matching React frontend expectation
             String savePath = getServletContext().getRealPath("") + File.separator + "uploads";
             File fileSaveDir = new File(savePath);
             if (!fileSaveDir.exists()) fileSaveDir.mkdir();
@@ -54,22 +44,20 @@ public class AddAccessoryServlet extends HttpServlet {
         }
 
         Accessory accessory = new Accessory();
+        accessory.setAccessoryId(id);
         accessory.setTitle(title);
         accessory.setCategory(category);
         accessory.setPrice(price);
         accessory.setStock(stock);
-
-        if (!fileName.isEmpty()) {
-            accessory.setImagePath(fileName);
-        }
+        accessory.setImagePath(fileName); // Null if no new image
 
         AccessoryDAO dao = new AccessoryDAO();
-        boolean success = dao.addAccessory(accessory);
+        boolean success = dao.updateAccessory(accessory);
 
         if (success) {
             response.setStatus(HttpServletResponse.SC_OK);
         } else {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database Insert Failed");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Update Failed");
         }
     }
 }

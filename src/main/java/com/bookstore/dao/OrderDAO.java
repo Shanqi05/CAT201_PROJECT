@@ -15,12 +15,15 @@ public class OrderDAO {
         Connection conn = null;
         PreparedStatement psOrder = null;
         PreparedStatement psItem = null;
+        PreparedStatement psUpdateBook = null;
+        PreparedStatement psUpdateAccessory = null;
         ResultSet rs = null;
 
         try {
             conn = DBConnection.getConnection();
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(false); // Start Transaction
 
+            // 1. Insert Order
             String sqlOrder = "INSERT INTO orders (user_id, total_amount, status, shipping_address_id, payment_method) VALUES (?, ?, ?, ?, ?)";
             psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
             psOrder.setInt(1, order.getUserId());
@@ -36,28 +39,39 @@ public class OrderDAO {
             rs = psOrder.getGeneratedKeys();
             if (rs.next()) orderId = rs.getInt(1);
 
+            // 2. Prepare Item Statements
             String sqlItem = "INSERT INTO order_items (order_id, book_id, accessory_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?, ?)";
             psItem = conn.prepareStatement(sqlItem);
 
+            // 3. Prepare Update Statements
             String sqlUpdateBook = "UPDATE books SET status = 'Sold' WHERE book_id = ?";
-            PreparedStatement psUpdateBook = conn.prepareStatement(sqlUpdateBook);
+            psUpdateBook = conn.prepareStatement(sqlUpdateBook);
+
+            String sqlUpdateAccessory = "UPDATE accessories SET stock = stock - ? WHERE accessory_id = ? AND stock >= ?";
+            psUpdateAccessory = conn.prepareStatement(sqlUpdateAccessory);
 
             for (OrderItem item : order.getItems()) {
                 psItem.setInt(1, orderId);
 
-                // [FIX] Insert logic for dual IDs
                 if (item.getBookId() > 0) {
-                    // It's a BOOK
+                    // --- HANDLE BOOK ---
                     psItem.setInt(2, item.getBookId());
-                    psItem.setNull(3, java.sql.Types.INTEGER); // Accessory ID is null
+                    psItem.setNull(3, java.sql.Types.INTEGER);
 
                     // Mark Book as Sold
                     psUpdateBook.setInt(1, item.getBookId());
                     psUpdateBook.addBatch();
+
                 } else if (item.getAccessoryId() > 0) {
-                    // It's an ACCESSORY
-                    psItem.setNull(2, java.sql.Types.INTEGER); // Book ID is null
+                    // --- HANDLE ACCESSORY ---
+                    psItem.setNull(2, java.sql.Types.INTEGER);
                     psItem.setInt(3, item.getAccessoryId());
+
+                    // Deduct Stock
+                    psUpdateAccessory.setInt(1, item.getQuantity());
+                    psUpdateAccessory.setInt(2, item.getAccessoryId());
+                    psUpdateAccessory.setInt(3, item.getQuantity());
+                    psUpdateAccessory.addBatch();
                 }
 
                 psItem.setInt(4, item.getQuantity());
@@ -65,10 +79,12 @@ public class OrderDAO {
                 psItem.addBatch();
             }
 
+            // Execute all batches
             psItem.executeBatch();
             psUpdateBook.executeBatch();
+            psUpdateAccessory.executeBatch();
 
-            conn.commit();
+            conn.commit(); // Commit Transaction
             return true;
 
         } catch (SQLException e) {
@@ -80,16 +96,18 @@ public class OrderDAO {
                 if (rs != null) rs.close();
                 if (psOrder != null) psOrder.close();
                 if (psItem != null) psItem.close();
+                if (psUpdateBook != null) psUpdateBook.close();
+                if (psUpdateAccessory != null) psUpdateAccessory.close();
                 if (conn != null) conn.close();
             } catch (Exception e) {}
         }
     }
 
-    // [FIXED] Get All Orders (Admin) - Removed u.phone
+    // Get All Orders (Admin)
     public List<Map<String, Object>> getAllOrders() {
         return getOrdersGeneric("SELECT o.order_id, o.created_at, o.total_amount, o.status, o.payment_method, " +
-                "u.username AS customer_name, u.email, " + // Removed u.phone
-                "a.house_no, a.street, a.city, a.postcode, a.state, " +
+                "u.username AS customer_name, u.email, " +
+                "a.house_no, a.street, a.city, a.postcode, a.state, a.phone, " +
                 "b.title AS book_title, b.image_path AS book_image, " +
                 "acc.title AS acc_title, acc.image_path AS acc_image, " +
                 "oi.quantity, oi.price_at_purchase " +
@@ -102,11 +120,11 @@ public class OrderDAO {
                 "ORDER BY o.created_at DESC", -1);
     }
 
-    // [FIXED] Get User Orders - Removed u.phone
+    // Get User Orders
     public List<Map<String, Object>> getOrdersByUserId(int userId) {
         return getOrdersGeneric("SELECT o.order_id, o.created_at, o.total_amount, o.status, o.payment_method, " +
-                "u.username AS customer_name, u.email, " + // Removed u.phone
-                "a.house_no, a.street, a.city, a.postcode, a.state, " +
+                "u.username AS customer_name, u.email, " +
+                "a.house_no, a.street, a.city, a.postcode, a.state, a.phone, " +
                 "b.title AS book_title, b.image_path AS book_image, " +
                 "acc.title AS acc_title, acc.image_path AS acc_image, " +
                 "oi.quantity, oi.price_at_purchase " +
@@ -120,7 +138,6 @@ public class OrderDAO {
                 "ORDER BY o.created_at DESC", userId);
     }
 
-    // Helper method
     private List<Map<String, Object>> getOrdersGeneric(String sql, int userIdFilter) {
         Map<Integer, Map<String, Object>> ordersMap = new java.util.LinkedHashMap<>();
         Connection conn = null;
@@ -147,11 +164,10 @@ public class OrderDAO {
                     order.put("status", rs.getString("status"));
                     order.put("paymentMethod", rs.getString("payment_method"));
 
-                    // Admin specific fields
+                    // User Info
                     order.put("customerName", rs.getString("customer_name"));
                     order.put("email", rs.getString("email"));
-                    // [FIX] Removed phone mapping since column doesn't exist
-                    // order.put("phone", rs.getString("u_phone"));
+                    order.put("phone", rs.getString("phone"));
 
                     String fullAddress = "No address";
                     if (rs.getString("street") != null) {
@@ -182,7 +198,6 @@ public class OrderDAO {
                     p.put("title", title);
                     p.put("price", rs.getDouble("price_at_purchase"));
                     p.put("quantity", rs.getInt("quantity"));
-                    // Fix Image Path
                     p.put("image", image != null && !image.startsWith("http") ? "http://localhost:8080/CAT201_project/uploads/" + image : image);
                     productList.add(p);
                 }
