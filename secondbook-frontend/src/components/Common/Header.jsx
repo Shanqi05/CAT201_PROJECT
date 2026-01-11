@@ -39,6 +39,7 @@ const Header = () => {
 
     const handleLogout = async () => {
         if (window.confirm("Are you sure you want to logout?")) {
+            navigate('/home');
             try {
                 await fetch('http://localhost:8080/CAT201_project/logout', { method: 'GET', credentials: 'include' });
             } catch (error) { console.error(error); }
@@ -54,9 +55,6 @@ const Header = () => {
             // Force event to update other components
             window.dispatchEvent(new Event("storage"));
             window.dispatchEvent(new Event("cartUpdated"));
-
-            // Navigate to login page AFTER clearing everything
-            navigate('/login');
         }
     };
 

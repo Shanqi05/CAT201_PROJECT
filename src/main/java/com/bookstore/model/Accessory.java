@@ -10,6 +10,7 @@ public class Accessory {
     private String imagePath;
     private String status;
     private Timestamp createdAt;
+    private int stock;
 
     public Accessory() {}
 
@@ -34,4 +35,7 @@ public class Accessory {
 
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+
+    public int getStock() { return stock; }
+    public void setStock(int stock) { this.stock = stock; }
 }

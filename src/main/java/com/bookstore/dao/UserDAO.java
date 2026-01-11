@@ -8,7 +8,7 @@ import java.util.List;
 
 public class UserDAO {
 
-    // 1. Register New User
+    // Register New User
     public boolean registerUser(User user) {
         String sql = "INSERT INTO users (name, username, password, email, role) VALUES (?, ?, ?, ?, ?)";
 
@@ -29,7 +29,39 @@ public class UserDAO {
         }
     }
 
-    // 2. Login Validation
+    // Check if Email Exists
+    public boolean isEmailTaken(String email) {
+        String sql = "SELECT 1 FROM users WHERE email = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Returns true if a record is found
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Check if Username Exists
+    public boolean isUsernameTaken(String username) {
+        String sql = "SELECT 1 FROM users WHERE username = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // Returns true if a record is found
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Login Validation
     public User checkLogin(String username, String password) {
         User user = null;
         String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
@@ -43,7 +75,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     user = new User();
-                    user.setUserId(rs.getInt("user_id")); // [FIX] New ID name
+                    user.setUserId(rs.getInt("user_id"));
                     user.setName(rs.getString("name"));
                     user.setUsername(rs.getString("username"));
                     user.setPassword(rs.getString("password"));
@@ -57,7 +89,7 @@ public class UserDAO {
         return user;
     }
 
-    // 3. Get All Users (For Admin)
+    // Get All Users (For Admin)
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
         String sql = "SELECT * FROM users ORDER BY user_id DESC";
@@ -81,7 +113,7 @@ public class UserDAO {
         return userList;
     }
 
-    // 4. Delete User
+    // Delete User
     public boolean deleteUser(int userId) {
         String sql = "DELETE FROM users WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -96,7 +128,23 @@ public class UserDAO {
         }
     }
 
-    // 5. Get User details
+    // promote/demote users
+    public boolean updateUserRole(int userId, String newRole) {
+        String sql = "UPDATE users SET role = ? WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newRole);
+            ps.setInt(2, userId);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Get User details
     public User getUserById(int userId) {
         User user = null;
         String sql = "SELECT * FROM users WHERE user_id = ?";
@@ -111,7 +159,6 @@ public class UserDAO {
                 user.setName(rs.getString("name"));
                 user.setEmail(rs.getString("email"));
                 user.setRole(rs.getString("role"));
-                // Password usually not sent back for security, or keep it hashed
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return user;
@@ -138,7 +185,7 @@ public class UserDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, newPassword); // In a real app, hash this first!
+            ps.setString(1, newPassword);
             ps.setInt(2, userId);
 
             return ps.executeUpdate() > 0;

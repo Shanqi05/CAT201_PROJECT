@@ -206,7 +206,7 @@ const HomePage = () => {
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
                             {newArrivals.map((book) => (
-                                <BookCard key={book.id} book={book} />
+                                <BookCard key={book.bookId} book={book} />
                             ))}
                         </div>
                     </section>

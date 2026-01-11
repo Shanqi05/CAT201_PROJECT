@@ -8,9 +8,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
-@WebServlet("/addBook")
-@MultipartConfig // Needed for parsing FormData from frontend
-public class AddBookServlet extends HttpServlet {
+@WebServlet("/updateBook")
+@MultipartConfig
+public class UpdateBookServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -18,7 +18,8 @@ public class AddBookServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try {
-            // 1. Retrieve Fields
+            // Retrieve parameters
+            int id = Integer.parseInt(request.getParameter("id"));
             String title = request.getParameter("title");
             String author = request.getParameter("author");
             double price = Double.parseDouble(request.getParameter("price"));
@@ -27,25 +28,30 @@ public class AddBookServlet extends HttpServlet {
             String status = request.getParameter("status");
             String[] genres = request.getParameterValues("genres");
 
-            // Get Supabase URL string
+            // [UPDATED] Get Supabase URL string
             String imagePath = request.getParameter("imagePath");
 
             Book book = new Book();
+            book.setBookId(id);
             book.setTitle(title);
             book.setAuthor(author);
             book.setPrice(price);
             book.setCategory(category);
             book.setCondition(condition);
-            book.setStatus(status != null ? status : "Available");
+            book.setStatus(status);
             book.setGenres(genres);
+
+            // Only updates if a new URL is provided (handled by DAO if not null)
             book.setImagePath(imagePath);
 
             BookDAO dao = new BookDAO();
-            if (dao.addBook(book)) {
-                response.getWriter().write("{\"success\": true, \"message\": \"Book added\"}");
+            boolean success = dao.updateBook(book);
+
+            if (success) {
+                response.getWriter().write("{\"success\": true}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("{\"error\": \"Database error\"}");
+                response.getWriter().write("{\"error\": \"Update failed\"}");
             }
 
         } catch (Exception e) {
