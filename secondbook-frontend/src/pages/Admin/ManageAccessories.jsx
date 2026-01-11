@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../utils/supabaseClient'; // [NEW] Import
+import { supabase } from '../../utils/supabaseClient';
 import { Plus, Edit, Trash2, Search, Filter, X, Upload, ShoppingBag, Package } from 'lucide-react';
 
 const ManageAccessories = () => {
@@ -8,12 +8,18 @@ const ManageAccessories = () => {
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
+    const [filterCategory, setFilterCategory] = useState('All');
+    const [filterStatus, setFilterStatus] = useState('All');
 
     const [formData, setFormData] = useState({
         title: '', category: 'Bookmark', price: '', stock: 10, image: null
     });
 
     const [previewUrl, setPreviewUrl] = useState(null);
+
+    // Options for Filters
+    const categories = ["Stickers", "Bookmark", "Book Stand", "Bag", "Stationery", "Light", "Other"];
+    const statuses = ["Active", "Sold Out"];
 
     useEffect(() => {
         fetchAccessories();
@@ -54,7 +60,6 @@ const ManageAccessories = () => {
         });
 
         if (item.imagePath) {
-            // Check if it's a Supabase URL or local
             const imgUrl = item.imagePath.startsWith('http')
                 ? item.imagePath
                 : `http://localhost:8080/CAT201_project/uploads/${encodeURIComponent(item.imagePath)}`;
@@ -73,20 +78,16 @@ const ManageAccessories = () => {
         setShowModal(true);
     };
 
-    // [UPDATED] Submit Handler with Supabase Upload
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         let uploadedImageUrl = null;
 
-        // 1. Upload to Supabase if a NEW file is selected
         if (formData.image instanceof File) {
             try {
                 const file = formData.image;
                 const fileExt = file.name.split('.').pop();
                 const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-
-                // Upload to 'Accessories' folder
                 const filePath = `Accessories/${fileName}`;
 
                 const { error: uploadError } = await supabase.storage
@@ -108,14 +109,12 @@ const ManageAccessories = () => {
             }
         }
 
-        // 2. Prepare Data
         const data = new FormData();
         data.append('title', formData.title);
         data.append('category', formData.category);
         data.append('price', formData.price);
         data.append('stock', formData.stock);
 
-        // [IMPORTANT] Send URL string
         if (uploadedImageUrl) {
             data.append('imagePath', uploadedImageUrl);
         }
@@ -163,10 +162,23 @@ const ManageAccessories = () => {
         }
     };
 
-    const filteredItems = accessories.filter(item =>
-        item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.category?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // [UPDATED] Filtering Logic
+    const filteredItems = accessories.filter(item => {
+        // 1. Search
+        const matchesSearch = item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.category?.toLowerCase().includes(searchTerm.toLowerCase());
+
+        // 2. Category Filter
+        const matchesCategory = filterCategory === 'All' || item.category === filterCategory;
+
+        // 3. Status Filter
+        const isSoldOut = item.stock <= 0;
+        const matchesStatus = filterStatus === 'All' ||
+            (filterStatus === 'Active' && !isSoldOut) ||
+            (filterStatus === 'Sold Out' && isSoldOut);
+
+        return matchesSearch && matchesCategory && matchesStatus;
+    });
 
     return (
         <div className="p-8 max-w-7xl mx-auto w-full relative">
@@ -183,11 +195,63 @@ const ManageAccessories = () => {
                 </button>
             </div>
 
-            {/* ... Search Bar ... */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="relative w-full md:w-96">
+            {/* [UPDATED] Filter Bar (Matching Books Style) */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col xl:flex-row items-center justify-between gap-4">
+
+                {/* Search */}
+                <div className="relative w-full xl:w-96">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                    <input type="text" placeholder="Search accessories..." className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 outline-none text-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
+                    <input
+                        type="text"
+                        placeholder="Search accessories..."
+                        className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-400 outline-none text-sm"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
+                {/* Filters Group */}
+                <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+
+                    {/* Category Filter */}
+                    <div className="relative flex-grow xl:flex-grow-0">
+                        <select
+                            value={filterCategory}
+                            onChange={(e) => setFilterCategory(e.target.value)}
+                            className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
+                        >
+                            <option value="All">All Categories</option>
+                            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        </select>
+                        <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
+                    </div>
+
+                    {/* Status Filter */}
+                    <div className="relative flex-grow xl:flex-grow-0">
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                            className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
+                        >
+                            <option value="All">All Status</option>
+                            {statuses.map(st => <option key={st} value={st}>{st}</option>)}
+                        </select>
+                        <Filter className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={14} />
+                    </div>
+
+                    {/* Reset Button */}
+                    {(filterCategory !== 'All' || filterStatus !== 'All') && (
+                        <button
+                            onClick={() => {
+                                setFilterCategory('All');
+                                setFilterStatus('All');
+                            }}
+                            className="px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                            title="Reset Filters"
+                        >
+                            <X size={16} />
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -206,47 +270,50 @@ const ManageAccessories = () => {
                         </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                        {filteredItems.map((item) => (
-                            <tr key={item.accessoryId} className="hover:bg-gray-50/80 transition-colors group">
-                                <td className="p-5">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200 bg-gray-100 flex items-center justify-center relative">
-                                            {item.imagePath ? (
-                                                <img
-                                                    // Handle both Supabase URL and legacy local paths
-                                                    src={item.imagePath.startsWith('http') || item.imagePath.startsWith('blob')
-                                                        ? item.imagePath
-                                                        : `http://localhost:8080/CAT201_project/uploads/${encodeURIComponent(item.imagePath)}`}
-                                                    alt={item.title}
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='block'}}
-                                                />
-                                            ) : null}
-                                            <ShoppingBag className="text-gray-300 absolute" size={24} style={{display: item.imagePath ? 'none' : 'block'}} />
+                        {filteredItems.length === 0 ? (
+                            <tr><td colSpan="6" className="p-8 text-center text-gray-500">No accessories found matching criteria.</td></tr>
+                        ) : (
+                            filteredItems.map((item) => (
+                                <tr key={item.accessoryId} className="hover:bg-gray-50/80 transition-colors group">
+                                    <td className="p-5">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-16 flex-shrink-0 rounded-md overflow-hidden shadow-sm border border-gray-200 bg-gray-100 flex items-center justify-center relative">
+                                                {item.imagePath ? (
+                                                    <img
+                                                        src={item.imagePath.startsWith('http') || item.imagePath.startsWith('blob')
+                                                            ? item.imagePath
+                                                            : `http://localhost:8080/CAT201_project/uploads/${encodeURIComponent(item.imagePath)}`}
+                                                        alt={item.title}
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) => {e.target.style.display='none'; e.target.nextSibling.style.display='block'}}
+                                                    />
+                                                ) : null}
+                                                <ShoppingBag className="text-gray-300 absolute" size={24} style={{display: item.imagePath ? 'none' : 'block'}} />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-gray-900 leading-tight">{item.title}</p>
+                                                <p className="text-xs text-gray-500 mt-1 font-medium">ID: #{item.accessoryId}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-bold text-gray-900 leading-tight">{item.title}</p>
-                                            <p className="text-xs text-gray-500 mt-1 font-medium">ID: #{item.accessoryId}</p>
+                                    </td>
+                                    <td className="p-5"><span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">{item.category}</span></td>
+                                    <td className="p-5 font-mono font-bold text-gray-900 text-sm">RM {parseFloat(item.price).toFixed(2)}</td>
+                                    <td className="p-5 font-mono text-sm text-gray-600">{item.stock}</td>
+                                    <td className="p-5">
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${item.stock > 0 ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${item.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                                {item.stock > 0 ? 'Active' : 'Sold Out'}
+                                            </span>
+                                    </td>
+                                    <td className="p-5 text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <button onClick={() => handleEditClick(item)} className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"><Edit size={18}/></button>
+                                            <button onClick={() => handleDelete(item.accessoryId)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
                                         </div>
-                                    </div>
-                                </td>
-                                <td className="p-5"><span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">{item.category}</span></td>
-                                <td className="p-5 font-mono font-bold text-gray-900 text-sm">RM {parseFloat(item.price).toFixed(2)}</td>
-                                <td className="p-5 font-mono text-sm text-gray-600">{item.stock}</td>
-                                <td className="p-5">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${item.stock > 0 ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
-                                            <span className={`w-1.5 h-1.5 rounded-full ${item.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                                            {item.stock > 0 ? 'Active' : 'Sold Out'}
-                                        </span>
-                                </td>
-                                <td className="p-5 text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <button onClick={() => handleEditClick(item)} className="p-2 text-gray-400 hover:text-cyan-600 hover:bg-cyan-50 rounded-lg transition-colors"><Edit size={18}/></button>
-                                        <button onClick={() => handleDelete(item.accessoryId)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={18}/></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                         </tbody>
                     </table>
                 </div>
