@@ -35,7 +35,7 @@ public class DashboardDAO {
         try (Connection conn = DBConnection.getConnection()) {
 
             // 1. Count Active Books
-            String sqlBooks = "SELECT COUNT(*) FROM books WHERE status = 'Active'";
+            String sqlBooks = "SELECT COUNT(*) FROM books WHERE status = 'Available'";
             try (PreparedStatement ps = conn.prepareStatement(sqlBooks);
                  ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) stats.setTotalBooks(rs.getInt(1));

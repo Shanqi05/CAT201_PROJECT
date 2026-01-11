@@ -149,8 +149,13 @@ const AdminHomePage = () => {
                                     <tr key={book.bookId || index} className="hover:bg-gray-50">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
+                                                {/* [FIX] Check for external URLs (Supabase) vs Local uploads */}
                                                 <img
-                                                    src={book.imagePath ? `http://localhost:8080/CAT201_project/uploads/${book.imagePath}` : ""}
+                                                    src={book.imagePath ? (
+                                                        book.imagePath.startsWith('http')
+                                                            ? book.imagePath
+                                                            : `http://localhost:8080/CAT201_project/uploads/${book.imagePath}`
+                                                    ) : ""}
                                                     className="w-8 h-10 rounded object-cover bg-gray-100"
                                                     onError={(e) => e.target.style.display = 'none'}
                                                     alt=""
@@ -219,8 +224,13 @@ const AdminHomePage = () => {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0">
+                                                    {/* [FIX] Check for external URLs here too for consistency */}
                                                     <img
-                                                        src={item.imagePath ? (item.imagePath.startsWith('http') ? item.imagePath : `http://localhost:8080/CAT201_project/uploads/${item.imagePath}`) : ""}
+                                                        src={item.imagePath ? (
+                                                            item.imagePath.startsWith('http')
+                                                                ? item.imagePath
+                                                                : `http://localhost:8080/CAT201_project/uploads/${item.imagePath}`
+                                                        ) : ""}
                                                         className="w-full h-full object-cover"
                                                         onError={(e) => {e.target.style.display='none'}}
                                                         alt=""
@@ -293,7 +303,7 @@ const AdminHomePage = () => {
                         </table>
                     </div>
                     <div className="p-3 border-t border-gray-100 text-center bg-gray-50 mt-auto">
-                        <a href="/admin/orders" className="text-xs font-bold text-gray-500 hover:text-black uppercase tracking-wider transition-colors">View All Orders</a>
+                        <a href="/admin/manage-orders" className="text-xs font-bold text-gray-500 hover:text-black uppercase tracking-wider transition-colors">View All Orders</a>
                     </div>
                 </div>
 

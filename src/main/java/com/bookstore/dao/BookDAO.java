@@ -21,7 +21,7 @@ public class BookDAO {
             ps.setString(4, book.getCategory());
             ps.setString(5, book.getCondition());
             ps.setString(6, book.getImagePath());
-            ps.setString(7, "Active");
+            ps.setString(7, "Available");
 
             if (book.getGenres() != null) {
                 Array genreArray = conn.createArrayOf("text", book.getGenres());

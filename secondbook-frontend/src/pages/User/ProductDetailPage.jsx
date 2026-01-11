@@ -34,13 +34,14 @@ const ProductDetailPage = () => {
     const handleAddToCart = () => {
         if (!book) return;
 
-        // [UPDATE] Check status before adding
         if (book.status === 'Sold') return;
 
         const API_BASE = "http://localhost:8080/CAT201_project/uploads/";
-        const imageUrl = book.imagePath ? API_BASE + book.imagePath : "https://via.placeholder.com/600x900?text=No+Cover";
+        const imageUrl = book.imagePath
+            ? (book.imagePath.startsWith('http') ? book.imagePath : API_BASE + book.imagePath)
+            : "https://via.placeholder.com/600x900?text=No+Cover";
 
-        addToCart({ ...book, imageUrl }, 1);
+        addToCart({ ...book, imageUrl }, 1, 'book');
         setShowToast(true);
         setIsAdded(true);
         setTimeout(() => setIsAdded(false), 2000);
@@ -50,10 +51,14 @@ const ProductDetailPage = () => {
     if (!book) return <div className="text-center py-20">Product not found. <Link to="/books" className="text-blue-500 underline">Go back</Link></div>;
 
     const API_BASE = "http://localhost:8080/CAT201_project/uploads/";
-    const imageUrl = book.imagePath ? API_BASE + book.imagePath : "https://via.placeholder.com/600x900?text=No+Cover";
+
+    // Check if it's an external URL (Supabase) vs Local
+    const imageUrl = book.imagePath
+        ? (book.imagePath.startsWith('http') ? book.imagePath : API_BASE + book.imagePath)
+        : "https://via.placeholder.com/600x900?text=No+Cover";
+
     const galleryImages = [imageUrl];
 
-    // [UPDATE] Check Sold Status
     const isSoldOut = book.status === 'Sold';
 
     return (
@@ -68,7 +73,6 @@ const ProductDetailPage = () => {
                     {/* Image Section */}
                     <div className="lg:col-span-1">
                         <ProductImageGallery images={galleryImages} />
-                        {/* Sold Out Label for Detail Page */}
                         {isSoldOut && (
                             <div className="mt-4 text-center">
                                 <span className="inline-block bg-black text-cyan-400 px-6 py-2 rounded-lg font-black text-sm uppercase tracking-widest shadow-lg">
@@ -113,18 +117,24 @@ const ProductDetailPage = () => {
                                 <p className="font-bold text-gray-900 text-lg">{book.category || "General"}</p>
                             </div>
 
-                            {/* Genres Display */}
-                            {book.genres && book.genres.length > 0 && (
+                            {/* Genres Display (Robust check for string or array) */}
+                            {book.genres && (
                                 <div className="col-span-1 md:col-span-2 p-4 bg-gray-50 rounded-xl border border-gray-100">
                                     <p className="text-gray-500 uppercase font-bold text-xs tracking-wider mb-3 flex items-center">
                                         <Tag size={14} className="mr-1"/> Genres
                                     </p>
                                     <div className="flex flex-wrap gap-2">
-                                        {book.genres.map((genre, index) => (
-                                            <span key={index} className="px-3 py-1 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-600 shadow-sm">
-                                                {genre}
-                                            </span>
-                                        ))}
+                                        {(() => {
+                                            let gList = [];
+                                            if (Array.isArray(book.genres)) gList = book.genres;
+                                            else if (typeof book.genres === 'string') gList = book.genres.replace(/[{"}]/g, '').split(',');
+
+                                            return gList.filter(g => g && g.trim() !== '').map((genre, index) => (
+                                                <span key={index} className="px-3 py-1 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-600 shadow-sm">
+                                                    {genre.trim()}
+                                                </span>
+                                            ));
+                                        })()}
                                     </div>
                                 </div>
                             )}

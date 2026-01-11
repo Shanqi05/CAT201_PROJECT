@@ -10,15 +10,16 @@ const BookCard = ({ book }) => {
 
     // Default safe object
     const safeBook = book || {
-        title: "Loading...", author: "", price: 0, imagePath: null, bookId: 0, status: 'Active'
+        title: "Loading...", author: "", price: 0, imagePath: null, bookId: 0, status: 'Available', genres: []
     };
 
-    // Destructure properties, including status
-    const { title, author, price, bookId, status } = safeBook;
+    // Destructure properties
+    const { title, author, price, bookId, status, genres } = safeBook;
 
     // Check if sold
     const isSoldOut = status === 'Sold';
 
+    // Checks if it's an external URL (Supabase) or local upload
     const displayImage = safeBook.imagePath
         ? (safeBook.imagePath.startsWith('http') ? safeBook.imagePath : API_BASE + safeBook.imagePath)
         : "https://via.placeholder.com/300x450?text=No+Cover";
@@ -39,10 +40,10 @@ const BookCard = ({ book }) => {
                         src={displayImage}
                         alt={title}
                         className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${isSoldOut ? 'opacity-40 grayscale' : ''}`}
-                        onError={(e) => {e.target.src = "https://via.placeholder.com/300x450?text=Error"}}
+                        onError={(e) => {e.target.style.display = 'none'}} // Hide broken images cleanly
                     />
 
-                    {/* Sold Out Overlay - Matching Site Theme */}
+                    {/* Sold Out Overlay */}
                     {isSoldOut && (
                         <div className="absolute inset-0 flex items-center justify-center bg-gray-900/20 backdrop-blur-[2px] z-10">
                             <span className="bg-black text-cyan-400 px-6 py-2.5 rounded-lg font-black text-xs uppercase tracking-[0.2em] shadow-2xl border border-gray-800">
@@ -58,9 +59,27 @@ const BookCard = ({ book }) => {
                             {title}
                         </h3>
                         <p className="text-sm text-gray-500 mb-2">{author}</p>
+
+                        {/* Genre Pills */}
+                        <div className="flex flex-wrap gap-1 mb-2">
+                            {(() => {
+                                if (!genres) return null;
+                                let gList = [];
+                                if (Array.isArray(genres)) gList = genres;
+                                else if (typeof genres === 'string') gList = genres.replace(/[{"}]/g, '').split(',');
+
+                                // Show top 3 genres max
+                                return gList.filter(g => g && g.trim() !== '').slice(0, 3).map((g, i) => (
+                                    <span key={i} className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded border border-gray-200 font-medium">
+                                        {g.trim()}
+                                    </span>
+                                ));
+                            })()}
+                        </div>
                     </div>
+
                     {/* Price with line-through if sold */}
-                    <span className={`text-2xl font-extrabold block mt-2 ${isSoldOut ? 'text-gray-300 line-through decoration-2' : 'text-pink-600'}`}>
+                    <span className={`text-2xl font-extrabold block mt-auto ${isSoldOut ? 'text-gray-300 line-through decoration-2' : 'text-pink-600'}`}>
                         RM {parseFloat(price).toFixed(2)}
                     </span>
                 </div>

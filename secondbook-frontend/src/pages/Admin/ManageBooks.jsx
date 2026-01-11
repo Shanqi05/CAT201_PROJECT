@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, X, Upload, Package } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X, Upload, Package, ChevronDown, ChevronUp } from 'lucide-react';
 
 const ManageBooks = () => {
     const [books, setBooks] = useState([]);
@@ -10,13 +10,22 @@ const ManageBooks = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
 
+    // Toggle state for Genre list
+    const [showGenres, setShowGenres] = useState(false);
+
     const [formData, setFormData] = useState({
-        title: '', author: '', category: 'Fiction', price: '', condition: 'Brand new', image: null, genres: [], status: 'Active'
+        title: '', author: '', category: 'Fiction', price: '', condition: 'Brand new', image: null, genres: [], status: 'Available'
     });
     const [previewUrl, setPreviewUrl] = useState(null);
 
     // Genre Options
-    const genreOptions = ["Fiction", "Non-Fiction", "Mystery", "Sci-Fi", "Romance", "Horror", "Self-Help", "Business", "Children"];
+    const genreOptions = [
+        "Action/Adventure", "Art/Photography", "Biography/Memoir", "Business/Finance",
+        "Children's", "Comics/Graphic Novels", "Cookbooks/Food", "Crime", "Dystopian",
+        "Fantasy", "Fiction", "Health/Fitness", "History", "Historical Fiction", "Horror", "Music",
+        "Mystery", "Non-Fiction", "Politics", "Religion/Spirituality", "Romance",
+        "Science", "Sci-Fi", "Self-Help", "Technology", "Thriller", "Travel", "Young Adult"
+    ];
 
     const fetchBooks = async () => {
         try {
@@ -58,8 +67,9 @@ const ManageBooks = () => {
     const handleEditClick = (book) => {
         setIsEditing(true);
         setEditId(book.bookId);
+        setShowGenres(false); // Reset genre toggle
 
-        // Robust genre parsing (handles Arrays or CSV Strings from DB)
+        // Robust genre parsing
         let currentGenres = [];
         if (Array.isArray(book.genres)) {
             currentGenres = book.genres;
@@ -75,9 +85,9 @@ const ManageBooks = () => {
             category: book.category,
             price: book.price,
             condition: book.condition,
-            status: book.status || 'Active',
+            status: book.status || 'Available',
             genres: currentGenres,
-            image: null // Reset file input
+            image: null
         });
 
         if (book.imagePath) {
@@ -95,7 +105,8 @@ const ManageBooks = () => {
     const handleAddClick = () => {
         setIsEditing(false);
         setEditId(null);
-        setFormData({ title: '', author: '', category: 'Fiction', price: '', condition: 'Brand new', image: null, genres: [], status: 'Active' });
+        setShowGenres(false); // Reset genre toggle
+        setFormData({ title: '', author: '', category: 'Fiction', price: '', condition: 'Brand new', image: null, genres: [], status: 'Available' });
         setPreviewUrl(null);
         setShowModal(true);
     };
@@ -134,7 +145,7 @@ const ManageBooks = () => {
                 setShowModal(false);
                 fetchBooks();
                 // Reset Form
-                setFormData({ title: '', author: '', category: 'Fiction', condition: 'Brand new', price: '', image: null, genres: [], status: 'Active' });
+                setFormData({ title: '', author: '', category: 'Fiction', condition: 'Brand new', price: '', image: null, genres: [], status: 'Available' });
                 setPreviewUrl(null);
             } else {
                 alert("Operation failed. Server error.");
@@ -222,7 +233,7 @@ const ManageBooks = () => {
                                             <p className="font-bold text-gray-900 text-sm leading-tight">{book.title}</p>
                                             <p className="text-xs text-gray-500 mt-0.5">{book.author}</p>
 
-                                            {/* [FIX] Robust Genre Display */}
+                                            {/* Robust Genre Display */}
                                             <div className="flex flex-wrap gap-1 mt-1">
                                                 {(() => {
                                                     if (!book.genres) return null;
@@ -249,7 +260,7 @@ const ManageBooks = () => {
                                         book.status === 'Sold' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-green-50 text-green-700 border-green-100'
                                     }`}>
                                         <span className={`w-1.5 h-1.5 rounded-full ${book.status === 'Sold' ? 'bg-red-500' : 'bg-green-500'}`}></span>
-                                        {book.status || 'Active'}
+                                        {book.status || 'Available'}
                                     </span>
                                 </td>
 
@@ -318,22 +329,42 @@ const ManageBooks = () => {
                                 <div className="space-y-1">
                                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Status</label>
                                     <select name="status" value={formData.status} onChange={handleInputChange} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-400 outline-none transition-all">
-                                        <option value="Active">Active</option>
+                                        <option value="Available">Available</option>
                                         <option value="Sold">Sold</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Genres</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {genreOptions.map(genre => (
-                                        <label key={genre} className={`flex items-center space-x-1 cursor-pointer px-3 py-1 rounded-full border transition-all ${formData.genres.includes(genre) ? 'bg-cyan-50 border-cyan-200 text-cyan-700' : 'bg-gray-50 border-gray-200'}`}>
-                                            <input type="checkbox" value={genre} checked={formData.genres.includes(genre)} onChange={handleGenreChange} className="accent-cyan-600 rounded" />
-                                            <span className="text-xs font-bold">{genre}</span>
-                                        </label>
-                                    ))}
-                                </div>
+                            {/* [UPDATE] Collapsible Genre Section */}
+                            <div className="border border-gray-200 rounded-lg p-1 bg-gray-50">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowGenres(!showGenres)}
+                                    className="w-full flex justify-between items-center p-2 text-left hover:bg-gray-100 rounded-lg transition-colors"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs font-bold text-gray-500 uppercase">Genres</span>
+                                        {formData.genres.length > 0 && (
+                                            <span className="bg-cyan-100 text-cyan-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                                {formData.genres.length} Selected
+                                            </span>
+                                        )}
+                                    </div>
+                                    {showGenres ? <ChevronUp size={16} className="text-gray-400"/> : <ChevronDown size={16} className="text-gray-400"/>}
+                                </button>
+
+                                {showGenres && (
+                                    <div className="p-2 border-t border-gray-200 mt-1 max-h-60 overflow-y-auto bg-white rounded-b-lg">
+                                        <div className="flex flex-wrap gap-2">
+                                            {genreOptions.map(genre => (
+                                                <label key={genre} className={`flex items-center space-x-1 cursor-pointer px-3 py-1 rounded-full border transition-all ${formData.genres.includes(genre) ? 'bg-cyan-50 border-cyan-200 text-cyan-700' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
+                                                    <input type="checkbox" value={genre} checked={formData.genres.includes(genre)} onChange={handleGenreChange} className="accent-cyan-600 rounded w-3 h-3" />
+                                                    <span className="text-xs font-bold">{genre}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all hover:border-cyan-400 relative overflow-hidden group">

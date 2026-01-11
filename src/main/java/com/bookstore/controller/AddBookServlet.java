@@ -53,7 +53,7 @@ public class AddBookServlet extends HttpServlet {
             book.setCondition(condition);
             book.setGenres(genres); // Set Array
             book.setImagePath(uniqueFileName);
-            book.setStatus("Active");
+            book.setStatus("Available");
 
             // 4. Save via DAO
             BookDAO dao = new BookDAO();
